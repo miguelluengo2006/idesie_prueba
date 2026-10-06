@@ -3,21 +3,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { crm } from '@/components/portal/crmApi';
 import {
   ArrowUpRight,
-  BellRing,
   CheckCircle2,
-  Clapperboard,
   Circle,
-  CreditCard,
+  GraduationCap,
   Inbox,
+  Megaphone,
   MessageCircle,
-  Percent,
   Phone,
   PhoneCall,
   Sparkles,
   UserRound,
+  Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCallDate, formatCallTime, callDayKey, todayInBookingTz, addDays } from '@/lib/booking';
@@ -66,19 +65,17 @@ type FeedEvent = { id: string; at: string; icon: React.ReactNode; title: string;
 function feedOf(leads: Lead[]): FeedEvent[] {
   const events: FeedEvent[] = [];
   for (const l of leads) {
-    const order = l.answers?.order;
-    if (order) {
+    if (l.status === 'won') {
       events.push({
-        id: `${l.id}-paid`,
-        at: order.paid_at || l.created_at,
-        icon: <CreditCard className="w-4 h-4" />,
-        title: `${l.name} compró`,
-        sub: `${order.pack_name} · ${order.amount_eur.toLocaleString('es-ES')} €${order.livemode === false ? ' (prueba)' : ''}`,
+        id: `${l.id}-won`,
+        at: l.created_at,
+        icon: <GraduationCap className="w-4 h-4" />,
+        title: `${l.name} se ha matriculado`,
+        sub: l.answers?.needs?.join(', ') || l.company || 'Matrícula',
         href: `/portal/leads?open=${l.id}`,
         tone: 'green',
       });
-    }
-    if (l.kind === 'call' && l.call_at) {
+    } else if (l.kind === 'call' && l.call_at) {
       events.push({
         id: `${l.id}-call`,
         at: l.created_at,
@@ -88,13 +85,13 @@ function feedOf(leads: Lead[]): FeedEvent[] {
         href: `/portal/calls?open=${l.id}`,
         tone: 'blue',
       });
-    } else if (!order && l.source !== 'cart') {
+    } else {
       events.push({
         id: `${l.id}-req`,
         at: l.created_at,
         icon: <Inbox className="w-4 h-4" />,
-        title: `Nueva solicitud de ${l.name}`,
-        sub: l.answers?.pack?.id === 'welcome' ? 'Pack de Bienvenida' : l.message?.slice(0, 70) || 'Solicitud',
+        title: `Nuevo lead: ${l.name}`,
+        sub: l.answers?.needs?.join(', ') || l.message?.slice(0, 70) || 'Lead',
         href: `/portal/leads?open=${l.id}`,
       });
     }
@@ -102,11 +99,18 @@ function feedOf(leads: Lead[]): FeedEvent[] {
   return events.sort((a, b) => b.at.localeCompare(a.at)).slice(0, 8);
 }
 
+interface CrmSummary {
+  total: number;
+  subscribed: number;
+  unsubscribed: number;
+  noConsent: number;
+  lastCampaign: { id: string; name: string; status: string; total: number; sent_count: number; failed_count: number } | null;
+}
+
 export default function AdminDashboard() {
   const { leads, loading } = useLeadsContext();
   const { user, session } = useAuth();
-  const [videosTodo, setVideosTodo] = useState(0);
-  const [stripeConnected, setStripeConnected] = useState<boolean | null>(null);
+  const [crmSummary, setCrmSummary] = useState<CrmSummary | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -114,26 +118,12 @@ export default function AdminDashboard() {
     return () => clearInterval(t);
   }, []);
 
-  // Pedidos de vídeo pendientes (por hacer = solicitados o con el guion en preparación)
+  // Números de contactos y última campaña (si la migración del CRM aún no está aplicada, simplemente no se muestran)
   useEffect(() => {
     const token = session?.access_token;
     if (!token) return;
-    fetch('/api/videos', { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.json())
-      .then((d) => setVideosTodo(((d.requests || []) as { status: string }[]).filter((r) => r.status === 'requested' || r.status === 'scripting').length))
-      .catch(() => {});
+    crm<CrmSummary>(token, '/api/contacts?summary=1').then(setCrmSummary).catch(() => setCrmSummary(null));
   }, [session?.access_token]);
-
-  // ¿Tiene ya la clave de Stripe? (para el paso "Conecta Stripe" de Primeros pasos)
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from('profiles')
-      .select('agency_stripe_key_set')
-      .eq('id', user.id)
-      .single()
-      .then(({ data }) => setStripeConnected(!!data?.agency_stripe_key_set));
-  }, [user]);
 
   const stats = useMemo(() => {
     const upcoming = upcomingCalls(leads, now);
@@ -141,48 +131,34 @@ export default function AdminDashboard() {
     const weekEnd = addDays(today, 7);
     const inWeek = upcoming.filter((l) => callDayKey(l.call_at!) <= weekEnd);
     const todayCalls = upcoming.filter((l) => callDayKey(l.call_at!) === today);
-    const closed = leads.filter((l) => l.status === 'won' || l.status === 'lost');
     const won = leads.filter((l) => l.status === 'won').length;
-    const orders = leads.filter((l) => l.answers?.order);
-    const sales = orders.reduce((sum, l) => sum + (l.answers?.order?.amount_eur || 0), 0);
+    const closed = leads.filter((l) => l.status === 'won' || l.status === 'lost').length;
 
-    // Series diarias (últimos 14 días) para las gráficas pequeñas
+    // Serie diaria (últimos 14 días) para la gráfica pequeña
     const keys = Array.from({ length: SPARK_DAYS }, (_, i) => addDays(today, i - (SPARK_DAYS - 1)));
-    const salesByDay = new Map(keys.map((k) => [k, 0]));
     const reqByDay = new Map(keys.map((k) => [k, 0]));
     for (const l of leads) {
-      const o = l.answers?.order;
-      if (o) {
-        const k = callDayKey(o.paid_at || l.created_at);
-        if (salesByDay.has(k)) salesByDay.set(k, (salesByDay.get(k) || 0) + o.amount_eur);
-      }
       const k = callDayKey(l.created_at);
       if (reqByDay.has(k)) reqByDay.set(k, (reqByDay.get(k) || 0) + 1);
     }
 
     const unmarked = leads.filter((l) => isPendingCall(l) && new Date(l.call_at!).getTime() + 30 * 60000 < now).length;
-    const possible = leads.filter((l) => !l.answers?.order && l.source === 'cart' && l.status === 'new').length;
     const funnel = {
-      requests: leads.filter((l) => l.kind !== 'call' || l.call_at).length,
-      contacted: leads.filter((l) => l.status === 'contacted' || l.status === 'won').length,
+      leads: leads.filter((l) => l.kind !== 'call' || l.call_at).length,
+      followed: leads.filter((l) => l.status === 'contacted' || l.status === 'won').length,
       won,
-      paid: orders.length,
     };
 
     return {
-      orders: orders.length,
-      sales,
       upcoming,
       next: upcoming[0] || null,
       inWeek: inWeek.length,
       todayCalls: todayCalls.length,
       newList: newRequests(leads),
-      winRate: closed.length > 0 ? Math.round((won / closed.length) * 100) : null,
+      conversion: closed > 0 ? Math.round((won / closed) * 100) : null,
       won,
       unmarked,
-      possible,
       funnel,
-      salesSpark: keys.map((k) => salesByDay.get(k) || 0),
       reqSpark: keys.map((k) => reqByDay.get(k) || 0),
       feed: feedOf(leads),
     };
@@ -206,10 +182,8 @@ export default function AdminDashboard() {
   const next = stats.next;
   const nextWa = whatsappUrl(next?.phone);
   const todos: { n: number; label: string; href: string; icon: React.ReactNode }[] = [
-    { n: videosTodo, label: videosTodo === 1 ? 'vídeo por hacer' : 'vídeos por hacer', href: '/portal/videos', icon: <Clapperboard className="w-4 h-4" /> },
-    { n: stats.newList.length, label: stats.newList.length === 1 ? 'solicitud por responder' : 'solicitudes por responder', href: '/portal/leads', icon: <Inbox className="w-4 h-4" /> },
+    { n: stats.newList.length, label: stats.newList.length === 1 ? 'lead por responder' : 'leads por responder', href: '/portal/leads', icon: <Inbox className="w-4 h-4" /> },
     { n: stats.unmarked, label: stats.unmarked === 1 ? 'llamada sin marcar' : 'llamadas sin marcar', href: '/portal/calls', icon: <PhoneCall className="w-4 h-4" /> },
-    { n: stats.possible, label: stats.possible === 1 ? 'carrito sin pagar' : 'carritos sin pagar', href: '/portal/leads', icon: <BellRing className="w-4 h-4" /> },
   ].filter((t) => t.n > 0);
 
   return (
@@ -286,24 +260,14 @@ export default function AdminDashboard() {
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Kpi
-          label="Ventas"
-          value={<CountUp value={stats.sales} format={(n) => `${n.toLocaleString('es-ES')} €`} />}
-          hint={stats.orders > 0 ? `${stats.orders} ${stats.orders === 1 ? 'compra' : 'compras'} · IVA incl.` : 'Packs pagados con Stripe'}
-          icon={<CreditCard className="w-4 h-4" />}
-          href="/portal/finance"
-          spark={stats.salesSpark}
-          highlight={stats.orders > 0}
-          delay={60}
-        />
-        <Kpi
-          label="Solicitudes nuevas"
+          label="Leads nuevos"
           value={<CountUp value={stats.newList.length} />}
           hint="Pendientes de respuesta"
           icon={<Inbox className="w-4 h-4" />}
           href="/portal/leads"
           spark={stats.reqSpark}
           highlight={stats.newList.length > 0}
-          delay={120}
+          delay={60}
         />
         <Kpi
           label="Llamadas próximas"
@@ -312,14 +276,23 @@ export default function AdminDashboard() {
           icon={<PhoneCall className="w-4 h-4" />}
           href="/portal/calls"
           highlight={stats.todayCalls > 0}
+          delay={120}
+        />
+        <Kpi
+          label="Contactos suscritos"
+          value={crmSummary ? <CountUp value={crmSummary.subscribed} /> : '—'}
+          hint={crmSummary ? `de ${crmSummary.total} en tu agenda` : 'Agenda de contactos'}
+          icon={<Users className="w-4 h-4" />}
+          href="/portal/contacts"
           delay={180}
         />
         <Kpi
-          label="Tasa de cierre"
-          value={stats.winRate === null ? '—' : <CountUp value={stats.winRate} format={(n) => `${n}%`} />}
-          hint={`${stats.won} ${stats.won === 1 ? 'ganada' : 'ganadas'}`}
-          icon={<Percent className="w-4 h-4" />}
+          label="Matriculados"
+          value={<CountUp value={stats.won} />}
+          hint={stats.conversion === null ? 'Aún sin cierres' : `${stats.conversion}% de los leads cerrados`}
+          icon={<GraduationCap className="w-4 h-4" />}
           href="/portal/leads"
+          highlight={stats.won > 0}
           delay={240}
         />
       </div>
@@ -328,9 +301,9 @@ export default function AdminDashboard() {
         <Panel title="Primeros pasos">
           <ul className="grid gap-3 md:grid-cols-3">
             {[
-              { done: false, title: 'Comparte tu web', text: 'Cada llamada agendada y cada solicitud aparecerá aquí al instante.', href: '/', label: 'Abrir la web', external: true },
-              { done: !!stripeConnected, title: 'Conecta Stripe', text: 'Pega tu clave en Ajustes y tus packs se podrán pagar online, con factura y IVA incluido.', href: '/portal/settings?tab=connections', label: 'Conectar Stripe' },
-              { done: false, title: 'Configura los avisos', text: 'Configura el email en Ajustes para recibir un aviso con cada llamada.', href: '/portal/settings?tab=connections', label: 'Abrir ajustes' },
+              { done: false, title: 'Comparte tu web', text: 'Cada llamada agendada y cada formulario aparecerá aquí al instante como un lead.', href: '/', label: 'Abrir la web', external: true },
+              { done: false, title: 'Configura el email', text: 'Lo necesitas para recibir avisos de cada lead y para enviar campañas.', href: '/portal/settings?tab=connections', label: 'Abrir ajustes' },
+              { done: (crmSummary?.total || 0) > 0, title: 'Importa tus contactos', text: 'Sube un CSV con tus alumnos y empresas para empezar a hacer campañas.', href: '/portal/contacts', label: 'Ir a contactos' },
             ].map((step) => (
               <li key={step.title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex flex-col gap-2">
                 <div className="flex items-center gap-2 text-sm font-medium">
@@ -385,14 +358,14 @@ export default function AdminDashboard() {
         </Panel>
 
         {/* Actividad (gráfica) */}
-        <Panel title="Entradas · 14 días" delay={180}>
+        <Panel title="Leads · 14 días" delay={180}>
           <ActivityChart leads={leads} />
         </Panel>
 
         {/* Actividad reciente */}
-        <Panel title="Actividad reciente" action={{ label: 'Ver solicitudes', href: '/portal/leads' }} className="xl:col-span-2" delay={240}>
+        <Panel title="Actividad reciente" action={{ label: 'Ver leads', href: '/portal/leads' }} className="xl:col-span-2" delay={240}>
           {stats.feed.length === 0 ? (
-            <EmptyState icon={<Inbox className="w-6 h-6" />} title="Todavía no hay actividad" text="Solicitudes, llamadas y compras aparecerán aquí en tiempo real." />
+            <EmptyState icon={<Inbox className="w-6 h-6" />} title="Todavía no hay actividad" text="Leads, llamadas y matrículas aparecerán aquí en tiempo real." />
           ) : (
             <ul className="relative space-y-1 -mx-2">
               {stats.feed.map((e) => (
@@ -422,12 +395,11 @@ export default function AdminDashboard() {
         <Panel title="Embudo" delay={300}>
           <ul className="space-y-4">
             {[
-              { label: 'Solicitudes y llamadas', v: stats.funnel.requests, status: 'new' as const },
-              { label: 'Contactadas', v: stats.funnel.contacted, status: 'contacted' as const },
-              { label: 'Ganadas', v: stats.funnel.won, status: 'won' as const },
-              { label: 'Pagadas', v: stats.funnel.paid, status: 'won' as const },
+              { label: 'Leads y llamadas', v: stats.funnel.leads, status: 'new' as const },
+              { label: 'En seguimiento', v: stats.funnel.followed, status: 'contacted' as const },
+              { label: 'Matriculados', v: stats.funnel.won, status: 'won' as const },
             ].map((row) => {
-              const pct = stats.funnel.requests ? Math.round((row.v / stats.funnel.requests) * 100) : 0;
+              const pct = stats.funnel.leads ? Math.round((row.v / stats.funnel.leads) * 100) : 0;
               return (
                 <li key={row.label}>
                   <div className="flex items-baseline justify-between text-sm mb-1.5">
@@ -444,6 +416,28 @@ export default function AdminDashboard() {
               );
             })}
           </ul>
+        </Panel>
+
+        {/* Campañas */}
+        <Panel title="Campañas" action={{ label: 'Ver campañas', href: '/portal/campaigns' }} delay={360}>
+          {crmSummary?.lastCampaign ? (
+            <Link href={`/portal/campaigns/${crmSummary.lastCampaign.id}`} className="block rounded-2xl border border-[var(--portal-line)] bg-white/[0.04] hover:border-[var(--portal-line-strong)] p-4 transition-colors">
+              <div className="text-xs text-white/45 mb-1">Última campaña</div>
+              <div className="text-sm font-semibold truncate">{crmSummary.lastCampaign.name}</div>
+              <div className="text-xs text-white/55 mt-1 tabular-nums">
+                {crmSummary.lastCampaign.status === 'draft'
+                  ? 'Borrador sin enviar'
+                  : `${crmSummary.lastCampaign.sent_count} de ${crmSummary.lastCampaign.total} enviados${crmSummary.lastCampaign.failed_count ? ` · ${crmSummary.lastCampaign.failed_count} fallidos` : ''}`}
+              </div>
+            </Link>
+          ) : (
+            <EmptyState icon={<Megaphone className="w-6 h-6" />} title="Aún no hay campañas" text="Escribe un email y envíalo a tus contactos suscritos." />
+          )}
+          {crmSummary && crmSummary.noConsent > 0 && (
+            <p className="text-xs text-white/45 mt-3">
+              {crmSummary.noConsent} {crmSummary.noConsent === 1 ? 'contacto no ha dado' : 'contactos no han dado'} su consentimiento y no recibirán campañas.
+            </p>
+          )}
         </Panel>
       </div>
     </Page>

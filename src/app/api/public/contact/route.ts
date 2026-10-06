@@ -7,6 +7,7 @@ import { leadAlertText, sendTelegram } from '@/lib/telegram';
 import { leadEmail } from '@/lib/emailTemplates';
 import { VAT_LABEL, WELCOME_PACK, welcomeSpots } from '@/lib/packs';
 import { validateSlot, sanitizeAnswers } from '@/lib/booking';
+import { upsertContacts } from '@/lib/crmServer';
 
 const PHONE_RE = /^[+()\d\s.-]{6,25}$/;
 
@@ -159,6 +160,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No se pudo enviar. Inténtalo de nuevo.' }, { status: 500 });
     }
 
+    // CRM: quien deja su email entra en Contactos. Solo queda suscrito a campañas si marcó la casilla de
+    // novedades (body.marketing === true); si no, se le puede atender pero no entra en envíos masivos.
+    if (email) {
+      try {
+        await upsertContacts(supabaseAdmin, owner.id, [{ email, name, phone, company }], {
+          source: 'web',
+          consent: body.marketing === true,
+          extraTags: ['Lead'],
+        });
+      } catch (contactError) {
+        console.error('Contact form: lead saved but the contact could not be created:', contactError);
+      }
+    }
+
     // Best-effort Telegram alert (needs TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID) — never blocks the lead.
     const siteBase = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin;
     await sendTelegram(
@@ -184,7 +199,7 @@ export async function POST(req: NextRequest) {
         console.error('Contact form: lead saved but email notification failed:', emailError);
       }
     } else {
-      console.warn('Contact form: no email configured (RESEND_API_KEY, Ajustes → Pagos y email, or SMTP_* env vars) — lead saved, no email sent.');
+      console.warn('Contact form: no email configured (RESEND_API_KEY, Ajustes → Email, or SMTP_* env vars) — lead saved, no email sent.');
     }
 
     return NextResponse.json({ success: true, id: lead?.id, callAt: callAt ? callAt.toISOString() : null });

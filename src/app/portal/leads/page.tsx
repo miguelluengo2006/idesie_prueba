@@ -17,6 +17,7 @@ import {
   MessageCircle,
   Phone,
   PhoneCall,
+  Plus,
   Search,
 } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
@@ -25,31 +26,28 @@ import type { Lead } from './context';
 import { isPendingCall, upcomingCalls } from './context';
 import { cn } from '@/lib/utils';
 import LeadDetailModal from '@/components/portal/LeadDetailModal';
+import NewLeadModal from '@/components/portal/NewLeadModal';
 import { contactKeys, statusMeta, timeAgo, whatsappUrl } from '@/components/portal/leadMeta';
 import { EmptyState, Page, Skeleton } from '@/components/portal/ui';
 import { addDays, callDayKey, formatCallDate, formatCallTime, todayInBookingTz } from '@/lib/booking';
 import { exportLeadsCsv } from '@/lib/leadsCsv';
 
 type StatusFilter = 'all' | Lead['status'];
-type ViewFilter = 'all' | 'todo' | 'call' | 'paid' | 'possible';
-
-/** Pagado = hay una compra real registrada; posible compra = aún sin pagar y sin descartar. */
-const isPaid = (l: Lead) => !!l.answers?.order && l.answers.order.livemode !== false;
-const isPossible = (l: Lead) => !l.answers?.order && (l.status === 'new' || l.status === 'contacted');
+type ViewFilter = 'all' | 'todo' | 'call' | 'follow' | 'won';
 
 const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
-  { value: 'all', label: 'Todas' },
-  { value: 'new', label: 'Nuevas' },
-  { value: 'contacted', label: 'Contactadas' },
-  { value: 'won', label: 'Ganadas' },
-  { value: 'lost', label: 'Perdidas' },
+  { value: 'all', label: 'Todos' },
+  { value: 'new', label: 'Nuevos' },
+  { value: 'contacted', label: 'En seguimiento' },
+  { value: 'won', label: 'Matriculados' },
+  { value: 'lost', label: 'Descartados' },
 ];
 
 const BOARD: { status: Lead['status']; title: string; next: Lead['status'] | null; nextLabel: string }[] = [
-  { status: 'new', title: 'Nuevas', next: 'contacted', nextLabel: 'Contactada' },
-  { status: 'contacted', title: 'Contactadas', next: 'won', nextLabel: 'Ganada' },
-  { status: 'won', title: 'Ganadas', next: null, nextLabel: '' },
-  { status: 'lost', title: 'Perdidas', next: null, nextLabel: '' },
+  { status: 'new', title: 'Nuevos', next: 'contacted', nextLabel: 'En seguimiento' },
+  { status: 'contacted', title: 'En seguimiento', next: 'won', nextLabel: 'Matriculado' },
+  { status: 'won', title: 'Matriculados', next: null, nextLabel: '' },
+  { status: 'lost', title: 'Descartados', next: null, nextLabel: '' },
 ];
 
 /** «Hoy 17:00», «Mañana 10:00» o «mar 14 oct 17:00». */
@@ -60,13 +58,10 @@ function callWhen(iso: string): string {
   return `${day} ${formatCallTime(iso)}`;
 }
 
+/** De dónde viene el lead, para la fila de la lista. */
 const originOf = (l: Lead) => {
-  const order = l.answers?.order;
-  if (order) return `Pagado · ${order.amount_eur.toLocaleString('es-ES')} €${order.livemode === false ? ' (prueba)' : ''}`;
-  if (l.answers?.pack?.id === 'welcome') return 'Pack Bienvenida';
-  if (l.source === 'cart') return 'Carrito sin pagar';
-  if (l.source === 'landing') return 'Landing';
-  return l.kind === 'call' ? 'Llamada' : 'Propuesta';
+  if (l.source === 'manual') return 'Añadido a mano';
+  return l.kind === 'call' ? 'Llamada desde la web' : 'Formulario de la web';
 };
 
 export default function LeadsPage() {
@@ -80,6 +75,7 @@ export default function LeadsPage() {
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [newLeadOpen, setNewLeadOpen] = useState(false);
 
   // La vista (lista o tablero) se recuerda en este navegador
   useEffect(() => {
@@ -135,10 +131,10 @@ export default function LeadsPage() {
   }, [leads]);
 
   const matchesView = (l: Lead, v: ViewFilter) => {
-    if (v === 'todo') return l.status === 'new' && !isPaid(l) && l.source !== 'cart';
+    if (v === 'todo') return l.status === 'new' && l.kind !== 'call';
     if (v === 'call') return !!callOf(l);
-    if (v === 'paid') return isPaid(l);
-    if (v === 'possible') return isPossible(l);
+    if (v === 'follow') return l.status === 'contacted';
+    if (v === 'won') return l.status === 'won';
     return true;
   };
 
@@ -159,20 +155,17 @@ export default function LeadsPage() {
   }, [scoped]);
 
   const totals = useMemo(() => {
-    let paid = 0;
-    let revenue = 0;
-    let possible = 0;
     let todo = 0;
+    let follow = 0;
+    let won = 0;
     let withCall = 0;
     for (const l of leads) {
-      if (isPaid(l)) {
-        paid += 1;
-        revenue += Math.max(0, (l.answers!.order!.amount_eur || 0) - (l.answers!.order!.refunded_eur || 0));
-      } else if (isPossible(l)) possible += 1;
-      if (l.status === 'new' && !isPaid(l) && l.source !== 'cart') todo += 1;
+      if (l.status === 'new' && l.kind !== 'call') todo += 1;
+      if (l.status === 'contacted') follow += 1;
+      if (l.status === 'won') won += 1;
       if (callOf(l)) withCall += 1;
     }
-    return { paid, revenue, possible, todo, withCall };
+    return { todo, follow, won, withCall };
   }, [leads, callOf]);
 
   const sorted = (rows: Lead[]) =>
@@ -189,8 +182,25 @@ export default function LeadsPage() {
   const filtered = sorted(status === 'all' ? scoped : scoped.filter((l) => l.status === status));
   const selected = selectedId ? leads.find((l) => l.id === selectedId) || null : null;
 
+  const newLeadButton = (
+    <button onClick={() => setNewLeadOpen(true)} className="flex items-center gap-1.5 px-4 h-9 rounded-full portal-cta text-xs font-semibold cursor-pointer">
+      <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Nuevo lead</span><span className="sm:hidden">Nuevo</span>
+    </button>
+  );
+  const newLeadModal = newLeadOpen ? (
+    <NewLeadModal
+      token={session?.access_token}
+      onClose={() => setNewLeadOpen(false)}
+      onCreated={() => {
+        setNewLeadOpen(false);
+        refetch();
+      }}
+    />
+  ) : null;
+
   const actions = (
     <>
+      {newLeadButton}
       <div className="hidden sm:flex rounded-full border border-white/12 p-0.5 bg-white/[0.03]" role="group" aria-label="Vista">
         {([['list', List, 'Lista'], ['board', KanbanSquare, 'Tablero']] as const).map(([m, Icon, label]) => (
           <button
@@ -218,7 +228,7 @@ export default function LeadsPage() {
 
   if (loading) {
     return (
-      <Page title="Solicitudes">
+      <Page title="Leads">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-24" />)}</div>
         <Skeleton className="h-28" />
         <Skeleton className="h-28" />
@@ -228,12 +238,13 @@ export default function LeadsPage() {
 
   if (leads.length === 0) {
     return (
-      <Page title="Solicitudes">
+      <Page title="Leads" actions={newLeadButton}>
         <EmptyState
           icon={<Inbox className="w-6 h-6" />}
-          title="Sin solicitudes todavía"
-          text="Cuando alguien agende una llamada o pida una propuesta desde tu web pública, aparecerá aquí."
+          title="Sin leads todavía"
+          text="Cuando alguien agende una llamada o pida información desde la web, aparecerá aquí. También puedes añadir uno a mano."
         />
+        {newLeadModal}
       </Page>
     );
   }
@@ -242,7 +253,7 @@ export default function LeadsPage() {
     const meta = statusMeta(lead.status, lead.kind);
     const call = callOf(lead);
     const wa = whatsappUrl(lead.phone);
-    const order = lead.answers?.order;
+    const interest = lead.answers?.needs?.join(', ');
     const step = BOARD.find((b) => b.status === lead.status);
     return (
       <div className={cn('card-liquid rounded-3xl overflow-hidden', compact && 'rounded-2xl')}>
@@ -280,7 +291,7 @@ export default function LeadsPage() {
                   Sin llamada agendada
                 </span>
               ) : null}
-              <span className={cn('text-xs', order ? 'text-green-400 font-semibold' : 'text-white/50')}>{originOf(lead)}</span>
+              <span className="text-xs text-white/50">{originOf(lead)}{interest ? ` · ${interest}` : ''}</span>
             </div>
             {!compact && lead.message && lead.kind !== 'call' && <p className="text-sm text-white/50 line-clamp-1 mt-2">{lead.message}</p>}
           </button>
@@ -330,14 +341,14 @@ export default function LeadsPage() {
   };
 
   return (
-    <Page title="Solicitudes" subtitle={`${leads.length} en total`} actions={actions}>
+    <Page title="Leads" subtitle={`${leads.length} en total`} actions={actions}>
       {/* Resumen: cada tarjeta filtra la lista */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {([
-          { v: 'todo', label: 'Por contactar', value: String(totals.todo), icon: BellRing, tone: 'text-yellow-400', hint: 'Nuevas sin atender' },
+          { v: 'todo', label: 'Por contactar', value: String(totals.todo), icon: BellRing, tone: 'text-yellow-400', hint: 'Nuevos sin atender' },
           { v: 'call', label: 'Llamada agendada', value: String(totals.withCall), icon: PhoneCall, tone: 'text-blue-400', hint: 'Próximas llamadas' },
-          { v: 'paid', label: 'Han comprado', value: String(totals.paid), icon: BadgeCheck, tone: 'text-green-400', hint: `${totals.revenue.toLocaleString('es-ES')} € cobrados` },
-          { v: 'possible', label: 'Posibles compras', value: String(totals.possible), icon: Hourglass, tone: 'text-yellow-400', hint: 'Sin pagar aún' },
+          { v: 'follow', label: 'En seguimiento', value: String(totals.follow), icon: Hourglass, tone: 'text-yellow-400', hint: 'Ya contactados' },
+          { v: 'won', label: 'Matriculados', value: String(totals.won), icon: BadgeCheck, tone: 'text-green-400', hint: 'Han dado el paso' },
         ] as const).map((k, i) => (
           <button
             key={k.v}
@@ -382,7 +393,7 @@ export default function LeadsPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar nombre, email, teléfono…"
-              aria-label="Buscar solicitudes"
+              aria-label="Buscar leads"
               className="w-full lg:w-72 pl-10 pr-3 py-2.5 border border-[var(--portal-line-strong)] rounded-full text-sm outline-none placeholder:text-white/30"
             />
           </div>
@@ -422,6 +433,7 @@ export default function LeadsPage() {
         </div>
       )}
 
+      {newLeadModal}
       <LeadDetailModal lead={selected} onClose={closeModal} accessToken={session?.access_token} onChange={refetch} allLeads={leads} onOpenLead={setSelectedId} />
     </Page>
   );

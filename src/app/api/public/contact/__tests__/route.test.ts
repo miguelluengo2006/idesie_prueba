@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
-const { state, mockSupabaseAdmin, sendMail } = vi.hoisted(() => {
+const { state, mockSupabaseAdmin, sendMail, upsertContacts } = vi.hoisted(() => {
   const state = {
     owner: { id: 'owner-1' } as { id: string } | null,
     ownerMail: {} as Record<string, any>,
@@ -41,10 +41,11 @@ const { state, mockSupabaseAdmin, sendMail } = vi.hoisted(() => {
     }),
   };
 
-  return { state, mockSupabaseAdmin, sendMail: vi.fn().mockResolvedValue({}) };
+  return { state, mockSupabaseAdmin, sendMail: vi.fn().mockResolvedValue({}), upsertContacts: vi.fn().mockResolvedValue({ created: 1, updated: 0, invalid: 0 }) };
 });
 
 vi.mock('@/lib/supabaseAdmin', () => ({ supabaseAdmin: mockSupabaseAdmin }));
+vi.mock('@/lib/crmServer', () => ({ upsertContacts }));
 vi.mock('@/lib/packs', async (orig) => {
   const actual: any = await orig();
   return { ...actual, welcomeSpots: () => ({ ...actual.welcomeSpots(), soldOut: state.soldOut }) };
@@ -84,6 +85,8 @@ beforeEach(() => {
   state.insertError = null;
   state.inserted = null;
   sendMail.mockClear();
+  upsertContacts.mockClear();
+  upsertContacts.mockResolvedValue({ created: 1, updated: 0, invalid: 0 });
   delete process.env.ADMIN_EMAIL;
   delete process.env.SMTP_USER;
   delete process.env.SMTP_PASS;
@@ -340,5 +343,44 @@ describe('POST /api/public/contact — website proposal', () => {
     const ok = await post({ name: 'A', email: 'a@b.es', message: 'hola' });
     expect(ok.status).toBe(200);
     expect(state.inserted).toMatchObject({ source: 'website', kind: 'proposal', email: 'a@b.es' });
+  });
+});
+
+
+// ─── CRM: el lead pasa a Contactos ────────────────────────────────────────────
+
+describe('POST /api/public/contact — contacto en el CRM', () => {
+  const proposal = (extra: Record<string, unknown> = {}) => ({
+    name: 'Laura Pérez',
+    email: 'laura@empresa.com',
+    phone: '+34 600 111 222',
+    company: 'Marea',
+    message: 'Quiero información del Máster BIM',
+    ...extra,
+  });
+
+  it('crea el contacto sin suscribirlo si no marca la casilla de novedades', async () => {
+    const res = await post(proposal());
+    expect(res.status).toBe(200);
+    expect(upsertContacts).toHaveBeenCalledTimes(1);
+    const [, ownerId, items, opts] = upsertContacts.mock.calls[0];
+    expect(ownerId).toBe('owner-1');
+    expect(items).toEqual([{ email: 'laura@empresa.com', name: 'Laura Pérez', phone: '+34 600 111 222', company: 'Marea' }]);
+    expect(opts).toMatchObject({ source: 'web', consent: false, extraTags: ['Lead'] });
+  });
+
+  it('lo suscribe solo si marketing es exactamente true', async () => {
+    await post(proposal({ marketing: true }));
+    expect(upsertContacts.mock.calls[0][3]).toMatchObject({ consent: true });
+    upsertContacts.mockClear();
+    await post(proposal({ marketing: 'true' }));
+    expect(upsertContacts.mock.calls[0][3]).toMatchObject({ consent: false });
+  });
+
+  it('un fallo al crear el contacto no pierde el lead', async () => {
+    upsertContacts.mockRejectedValueOnce(new Error('db caída'));
+    const res = await post(proposal());
+    expect(res.status).toBe(200);
+    expect(state.inserted).toMatchObject({ email: 'laura@empresa.com' });
   });
 });

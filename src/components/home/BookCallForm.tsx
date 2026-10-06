@@ -82,6 +82,7 @@ export default function BookCallForm({
   const [budget, setBudget] = useState('');
   const [timeline, setTimeline] = useState('');
   const [message, setMessage] = useState('');
+  const [marketing, setMarketing] = useState(false);
 
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -138,6 +139,7 @@ export default function BookCallForm({
           message: pack ? `Interés: ${pack}${message.trim() ? `\n${message.trim()}` : ''}` : message,
           date, time,
           answers: { needs, budget, timeline },
+          marketing,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -392,6 +394,18 @@ export default function BookCallForm({
             <label htmlFor={`${uid}-message`} className={labelClass}>¿Algo más que debamos saber? <span className="normal-case tracking-normal text-white/25">(opcional)</span></label>
             <textarea id={`${uid}-message`} rows={2} value={message} onChange={(e) => setMessage(e.target.value)} className={`${inputClass} resize-none`} placeholder="Cuéntanos qué buscas en una frase" />
           </div>
+
+          <label className="md:col-span-2 flex items-start gap-3 text-sm text-white/60 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={marketing}
+              onChange={(e) => setMarketing(e.target.checked)}
+              className="mt-0.5 w-4 h-4 shrink-0 accent-[var(--signal)] cursor-pointer"
+            />
+            <span>
+              Quiero recibir por email novedades de formación y eventos de {businessName}. Puedo darme de baja cuando quiera.
+            </span>
+          </label>
 
           <div className="md:col-span-2 flex items-center justify-between flex-wrap gap-4 mt-2">
             <p className="text-xs text-white/30 max-w-xs">

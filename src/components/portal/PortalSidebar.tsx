@@ -6,22 +6,20 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ChevronDown,
-  Clapperboard,
   ChevronsLeft,
   ChevronsRight,
-  Eye,
   ExternalLink,
   Inbox,
   LayoutDashboard,
-  LineChart,
   LogOut,
+  Megaphone,
   Menu,
   PhoneCall,
-  Puzzle,
   ShieldCheck,
   Search,
   Settings as SettingsIcon,
   UserRound,
+  Users,
   X,
   type LucideIcon,
 } from 'lucide-react';
@@ -55,17 +53,19 @@ const AGENCY_GROUPS: NavGroup[] = [
     items: [
       { label: 'Resumen', href: '/portal', icon: LayoutDashboard, exact: true },
       { label: 'Llamadas', href: '/portal/calls', icon: PhoneCall, badge: 'calls' },
-      { label: 'Solicitudes', href: '/portal/leads', icon: Inbox, badge: 'leads' },
-      { label: 'Vídeos', href: '/portal/videos', icon: Clapperboard },
+      { label: 'Leads', href: '/portal/leads', icon: Inbox, badge: 'leads' },
     ],
   },
   {
-    label: 'Negocio',
+    label: 'CRM',
     items: [
-      { label: 'Finanzas', href: '/portal/finance', icon: LineChart },
-      { label: 'Prompts', href: '/portal/prompts', icon: Puzzle },
-      { label: 'Seguridad', href: '/portal/security', icon: ShieldCheck },
+      { label: 'Contactos', href: '/portal/contacts', icon: Users },
+      { label: 'Campañas', href: '/portal/campaigns', icon: Megaphone },
     ],
+  },
+  {
+    label: 'Administración',
+    items: [{ label: 'Seguridad', href: '/portal/security', icon: ShieldCheck }],
   },
 ];
 
@@ -180,9 +180,6 @@ function SidebarFooter({ role, collapsed, onNavigate }: { role: PortalRole; coll
   return (
     <div className="flex flex-col gap-1 border-t border-white/10 pt-3">
       <NavLink item={{ label: 'Ajustes', href: '/portal/settings', icon: SettingsIcon }} active={settingsActive} collapsed={collapsed} count={0} onNavigate={onNavigate} />
-      {role === 'agency' && (
-        <NavLink item={{ label: 'Ver como cliente', href: '/vista-cliente', icon: Eye }} active={false} collapsed={collapsed} count={0} onNavigate={onNavigate} />
-      )}
       <Link
         href="/"
         target="_blank"
@@ -214,7 +211,7 @@ function SidebarFooter({ role, collapsed, onNavigate }: { role: PortalRole; coll
 export default function PortalSidebar({ role }: { role: PortalRole }) {
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  const [businessName, setBusinessName] = useState('samgple');
+  const [businessName, setBusinessName] = useState('IDESIE');
   const pathname = usePathname();
 
   useEffect(() => {
@@ -378,8 +375,8 @@ export function PortalBottomNav({ role }: { role: PortalRole }) {
   const items: { label: string; href: string; icon: LucideIcon; exact?: boolean; badge?: 'calls' | 'leads' }[] = [
     { label: 'Resumen', href: '/portal', icon: LayoutDashboard, exact: true },
     { label: 'Llamadas', href: '/portal/calls', icon: PhoneCall, badge: 'calls' },
-    { label: 'Solicitudes', href: '/portal/leads', icon: Inbox, badge: 'leads' },
-    { label: 'Finanzas', href: '/portal/finance', icon: LineChart },
+    { label: 'Leads', href: '/portal/leads', icon: Inbox, badge: 'leads' },
+    { label: 'Contactos', href: '/portal/contacts', icon: Users },
   ];
 
   return (

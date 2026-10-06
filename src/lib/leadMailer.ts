@@ -44,7 +44,7 @@ export async function resolveLeadMailer(supabase: SupabaseClient, ownerId: strin
       origin: 'env',
       transport: { host: 'api.resend.com', port: 443, secure: true, auth: { user: 'resend', pass: resendKey } },
       resendApiKey: resendKey,
-      from: process.env.RESEND_FROM?.trim() || `samgple <${RESEND_TEST_SENDER}>`,
+      from: process.env.RESEND_FROM?.trim() || `IDESIE <${RESEND_TEST_SENDER}>`,
       to: resendTo,
     };
   }
@@ -105,6 +105,13 @@ export interface LeadMailMessage {
   replyTo?: string;
   /** Evita duplicados si se reintenta el mismo aviso (solo Resend) */
   idempotencyKey?: string;
+  /** Cabeceras extra (p. ej. List-Unsubscribe en las campañas) */
+  headers?: Record<string, string>;
+}
+
+/** El mismo remitente y proveedor, pero con otro destinatario (campañas: un email por contacto). */
+export function mailerFor(mailer: LeadMailer, to: string): LeadMailer {
+  return { ...mailer, to };
 }
 
 /** Sends one notification with whichever provider was resolved. Throws on failure (callers treat it as best-effort). */
@@ -124,6 +131,7 @@ export async function sendLeadMail(mailer: LeadMailer, msg: LeadMailMessage): Pr
         html: msg.html,
         ...(msg.text ? { text: msg.text } : {}),
         ...(msg.replyTo ? { reply_to: msg.replyTo } : {}),
+        ...(msg.headers ? { headers: msg.headers } : {}),
       }),
     });
     if (!res.ok) {
@@ -137,6 +145,7 @@ export async function sendLeadMail(mailer: LeadMailer, msg: LeadMailMessage): Pr
     from: mailer.from,
     to: mailer.to,
     ...(msg.replyTo ? { replyTo: msg.replyTo } : {}),
+    ...(msg.headers ? { headers: msg.headers } : {}),
     subject: msg.subject,
     html: msg.html,
     ...(msg.text ? { text: msg.text } : {}),

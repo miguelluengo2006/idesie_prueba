@@ -15,9 +15,9 @@ const BASE: Record<LeadStatus, Omit<StatusMeta, 'label'>> = {
   lost: { badgeClass: 'bg-gray-800/30 text-gray-400 border border-gray-700', dotColor: 'bg-gray-500' },
 };
 
-const REQUEST_LABELS: Record<LeadStatus, string> = { new: 'Nuevo', contacted: 'Contactado', won: 'Ganado', lost: 'Perdido' };
+const REQUEST_LABELS: Record<LeadStatus, string> = { new: 'Nuevo', contacted: 'En seguimiento', won: 'Matriculado', lost: 'Descartado' };
 // Same pipeline, worded for a scheduled call
-const CALL_LABELS: Record<LeadStatus, string> = { new: 'Agendada', contacted: 'Realizada', won: 'Ganada', lost: 'Cancelada' };
+const CALL_LABELS: Record<LeadStatus, string> = { new: 'Agendada', contacted: 'Realizada', won: 'Matriculado', lost: 'Cancelada' };
 
 export function statusMeta(status: LeadStatus, kind: Lead['kind'] = 'proposal'): StatusMeta {
   return { ...BASE[status], label: (kind === 'call' ? CALL_LABELS : REQUEST_LABELS)[status] };
