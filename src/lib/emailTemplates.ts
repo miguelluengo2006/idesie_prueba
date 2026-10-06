@@ -8,15 +8,15 @@ import { whatsappDigits } from '@/lib/contact';
  */
 
 const C = {
-  page: '#eef0e6',
+  page: '#e0e9f6',
   card: '#ffffff',
-  head: '#2f3a1a',
-  lime: '#b9e04a',
-  ink: '#16210e',
-  muted: '#5f6a52',
-  line: '#dfe4d2',
-  soft: '#f6f8ef',
-  button: '#4d6a14',
+  head: '#17263d',
+  lime: '#4a86e0',
+  ink: '#0d1522',
+  muted: '#2a5492',
+  line: '#c7d7ef',
+  soft: '#edf2fa',
+  button: '#14366a',
   orange: '#e8542b',
 };
 
@@ -46,9 +46,9 @@ export interface RenderedEmail {
 
 type Tone = 'call' | 'pack' | 'lead' | 'paid';
 const TONES: Record<Tone, { bg: string; fg: string }> = {
-  call: { bg: '#e6f2c2', fg: '#3b5a0a' },
+  call: { bg: '#c2d5f2', fg: '#0a2a5a' },
   pack: { bg: '#ffe2d5', fg: '#a8360c' },
-  lead: { bg: '#e9ecdf', fg: '#3d4a2b' },
+  lead: { bg: '#d7e3f4', fg: '#1a345b' },
   paid: { bg: '#d4f3dc', fg: '#116a2c' },
 };
 

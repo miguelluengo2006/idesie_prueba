@@ -23,15 +23,15 @@ nextjs-portal {
   --muted-foreground: light-dark(#666666, #a3a3a3);
   --border: light-dark(#e2e2e2, #262626);
   --input: light-dark(#f2f2f2, #1a1a1a);
-  --primary: #8fae1c;
-  --primary-foreground: #0a0a0a;
-  --secondary: #4a6113;
+  --primary: #006cff;
+  --primary-foreground: #ffffff;
+  --secondary: #0052cc;
   --secondary-foreground: #ffffff;
   --accent: light-dark(#e2e2e2, #262626);
   --accent-foreground: light-dark(#0a0a0a, #f5f5f5);
   --destructive: #dc4b34;
   --destructive-foreground: #ffffff;
-  --ring: #8fae1c;
+  --ring: #006cff;
   --radius: 0.5rem;
 }
 
@@ -77,22 +77,22 @@ nextjs-portal {
   --color-gray-950: light-dark(#f7f7f7, #0d0d0d);
 
   /*
-   * "Signal" accent family — the one saturated acid-lime color used across
+   * "Signal" accent family — the one saturated blue (idesie.com) color used across
    * the whole product (public site + dashboard), kept constant across modes.
-   * Kept the `olive` name so every existing olive-* class in the app just
+   * Kept the legacy `olive` name (now the idesie.com blue scale) so every existing olive-* class in the app just
    * picks up the new tone with zero component changes.
    */
-  --color-olive-50: #f6ffe0;
-  --color-olive-100: #eaffb8;
-  --color-olive-200: #d9fb8f;
-  --color-olive-300: #c2ee5e;
-  --color-olive-400: #a8d93f;
-  --color-olive-500: #8fae1c;
-  --color-olive-600: #708a17;
-  --color-olive-700: #566a12;
-  --color-olive-800: #3d4a0d;
-  --color-olive-900: #283109;
-  --color-olive-950: #181e06;
+  --color-olive-50: #f0f4ff;
+  --color-olive-100: #dbe7ff;
+  --color-olive-200: #b8d2ff;
+  --color-olive-300: #85b4ff;
+  --color-olive-400: #4d94ff;
+  --color-olive-500: #006cff;
+  --color-olive-600: #0052cc;
+  --color-olive-700: #0042a3;
+  --color-olive-800: #00327a;
+  --color-olive-900: #002252;
+  --color-olive-950: #00132e;
 }
 
 html {
@@ -111,10 +111,10 @@ body {
   overflow-x: clip;
   width: 100%;
   max-width: 100vw;
-  /* Faint signal-lime glow for depth instead of a flat fill; softer on the light-mode paper background */
+  /* Faint signal-blue glow for depth instead of a flat fill; softer on the light-mode paper background */
   background-image:
-    radial-gradient(ellipse 1200px 800px at 15% -10%, light-dark(rgba(143, 174, 28, 0.06), rgba(143, 174, 28, 0.14)), transparent 60%),
-    radial-gradient(ellipse 900px 700px at 100% 10%, light-dark(rgba(86, 106, 18, 0.04), rgba(86, 106, 18, 0.1)), transparent 55%);
+    radial-gradient(ellipse 1200px 800px at 15% -10%, light-dark(rgba(28, 86, 174, 0.06), rgba(28, 86, 174, 0.14)), transparent 60%),
+    radial-gradient(ellipse 900px 700px at 100% 10%, light-dark(rgba(18, 53, 106, 0.04), rgba(18, 53, 106, 0.1)), transparent 55%);
   background-attachment: fixed;
   position: relative;
 }
@@ -180,11 +180,11 @@ h1, h2, h3, h4,
 
 .card-liquid-interactive:hover {
   transform: translateY(-2px);
-  border-color: light-dark(rgba(107, 122, 69, 0.4), rgba(138, 159, 83, 0.35));
+  border-color: light-dark(rgba(43, 85, 148, 0.4), rgba(54, 108, 188, 0.35));
   box-shadow:
     inset 0 1px 0 light-dark(rgba(255, 255, 255, 0.7), rgba(245, 245, 245, 0.08)),
     0 1px 2px light-dark(rgba(10, 10, 10, 0.04), rgba(0, 0, 0, 0.2)),
-    0 16px 32px -14px light-dark(rgba(107, 122, 69, 0.3), rgba(0, 0, 0, 0.6));
+    0 16px 32px -14px light-dark(rgba(43, 85, 148, 0.3), rgba(0, 0, 0, 0.6));
 }
 
 /* Icon badge — rounded gradient container for icons, replaces bare/flat icon usage */
@@ -199,7 +199,7 @@ h1, h2, h3, h4,
     0 4px 10px -4px light-dark(rgba(10, 10, 10, 0.3), rgba(0, 0, 0, 0.5));
 }
 
-.icon-badge-olive { --badge-a: #8a9f53; --badge-b: #4a5530; }
+.icon-badge-olive { --badge-a: #3b8bff; --badge-b: #0052cc; }
 .icon-badge-neutral { --badge-a: #6b6b6b; --badge-b: #2b2b2b; }
 
 /* Hide scrollbars while keeping scroll functionality */
@@ -259,7 +259,7 @@ h1, h2, h3, h4,
 }
 
 .btn-minimal-filled:hover {
-  background: #7d8f52;
+  background: #3364ae;
   transform: translateY(-1px);
 }
 
@@ -317,23 +317,26 @@ select {
 }
 
 :root {
-  /* Same family as the dashboard's olive-* accent — one signature color everywhere */
+  /* Same family as the dashboard's olive-* accent (now idesie.com blue) — one signature color everywhere */
   --signal: var(--color-olive-400);
   --signal-dim: var(--color-olive-600);
+  /* idesie.com: amarillo de acento y azul marino de las tarjetas oscuras */
+  --yellow: #ffba08;
+  --ink-solid: #0a1f44;
 }
 
 .home-root {
-  color: #16210e;
+  color: #0d1522;
   /*
-   * Public site = light theme on an animated white ↔ military-green background. The shared
+   * Public site = light theme on an animated white ↔ idesie-blue background. The shared
    * white/black/gray Tailwind tokens are light-dark() pairs, so forcing color-scheme keeps every
    * text-white / border-white / bg-white utility consistent whatever the visitor's OS mode is
    * (under "light" they resolve to dark ink on the light glass panels).
    */
   color-scheme: light;
-  /* Accent for text and buttons on light panels: a darker, military olive instead of acid lime */
-  --signal: #56741a;
-  --signal-dim: #435a13;
+  /* Accent for text and buttons on light panels: idesie blue, a touch darker so small text keeps contrast */
+  --signal: #0063e6;
+  --signal-dim: #0052cc;
 }
 
 .force-dark {
@@ -341,10 +344,10 @@ select {
 }
 
 /*
- * Animated background: white ↔ military green.
- *  ::before — one huge linear gradient (white → sage → army green → white) that slowly rotates about the
- *             viewport centre, so bands of white and green sweep across the screen;
- *  ::after  — soft white and deep-green blobs drifting on top for depth.
+ * Animated background: white ↔ idesie blue.
+ *  ::before — one huge linear gradient (white → light blue → idesie blue → white) that slowly rotates about the
+ *             viewport centre, so bands of white and blue sweep across the screen;
+ *  ::after  — soft white and deep-blue blobs drifting on top for depth.
  * Both are fixed and only transform-animated (GPU-composited: no repaint per frame). The element that
  * uses it must create a stacking context (isolation) so the layers sit above its background colour
  * and below its content.
@@ -353,7 +356,7 @@ select {
 .mil-bg {
   position: relative;
   isolation: isolate;
-  background: #dfe7cd;
+  background: #dbe8ff;
 }
 
 .home-root::before,
@@ -371,13 +374,13 @@ select {
   background: linear-gradient(
     90deg,
     #ffffff 0%,
-    #f1f5e6 14%,
-    #b7c596 30%,
-    #6f8244 43%,
-    #4b5d2a 50%,
-    #6f8244 57%,
-    #b7c596 70%,
-    #f1f5e6 86%,
+    #eaf2ff 14%,
+    #9cc3ff 30%,
+    #2f84ff 43%,
+    #006cff 50%,
+    #2f84ff 57%,
+    #9cc3ff 70%,
+    #eaf2ff 86%,
     #ffffff 100%
   );
   animation: mil-sweep 70s linear infinite;
@@ -393,9 +396,9 @@ select {
   will-change: transform;
   background:
     radial-gradient(32% 32% at 15% 20%, rgba(255, 255, 255, 0.75), transparent 70%),
-    radial-gradient(30% 30% at 85% 30%, rgba(75, 93, 42, 0.5), transparent 70%),
+    radial-gradient(30% 30% at 85% 30%, rgba(0, 108, 255, 0.45), transparent 70%),
     radial-gradient(36% 36% at 60% 85%, rgba(255, 255, 255, 0.65), transparent 70%),
-    radial-gradient(28% 28% at 10% 85%, rgba(63, 80, 32, 0.45), transparent 70%);
+    radial-gradient(28% 28% at 10% 85%, rgba(0, 82, 204, 0.4), transparent 70%);
   animation: mil-drift 34s ease-in-out infinite alternate;
 }
 
@@ -420,18 +423,18 @@ select {
 
 /*
  * Light "glass" panel: content of the public site sits on these so text always has contrast,
- * whichever part of the moving white/green background is behind it.
+ * whichever part of the moving white/blue background is behind it.
  */
 .home-slab,
 .home-root main > section {
-  /* Translucent enough to let the moving white/green background tint the panel, opaque enough that
-     dark text keeps ≥ 7:1 contrast even over the deepest army green. */
+  /* Translucent enough to let the moving white/blue background tint the panel, opaque enough that
+     dark text keeps ≥ 7:1 contrast even over the deepest blue. */
   background: rgba(255, 255, 255, 0.6);
   -webkit-backdrop-filter: blur(16px) saturate(1.15);
   backdrop-filter: blur(16px) saturate(1.15);
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 32px;
-  box-shadow: 0 24px 60px -34px rgba(35, 50, 15, 0.5);
+  box-shadow: 0 24px 60px -34px rgba(15, 29, 50, 0.5);
 }
 
 .home-root main > section {
@@ -441,17 +444,17 @@ select {
 }
 
 /* Secondary text was tuned for a near-black page; on tinted glass it needs a little more weight */
-.home-root .text-white\/25 { color: rgba(22, 33, 14, 0.45); }
-.home-root .text-white\/30 { color: rgba(22, 33, 14, 0.58); }
-.home-root .text-white\/40 { color: rgba(22, 33, 14, 0.66); }
-.home-root .text-white\/50 { color: rgba(22, 33, 14, 0.74); }
-.home-root .text-white\/60 { color: rgba(22, 33, 14, 0.82); }
+.home-root .text-white\/25 { color: rgba(13, 21, 34, 0.45); }
+.home-root .text-white\/30 { color: rgba(13, 21, 34, 0.58); }
+.home-root .text-white\/40 { color: rgba(13, 21, 34, 0.66); }
+.home-root .text-white\/50 { color: rgba(13, 21, 34, 0.74); }
+.home-root .text-white\/60 { color: rgba(13, 21, 34, 0.82); }
 
 .home-root .home-glow-text {
   text-shadow: none;
 }
 
-/* Auth form button (shared component) in the site's olive instead of the app's acid lime */
+/* Auth form button (shared component) in the site's blue */
 .home-root .btn-minimal-filled {
   background: var(--signal);
   border-color: var(--signal);
@@ -463,7 +466,7 @@ select {
 }
 
 .home-glow-text {
-  text-shadow: 0 0 40px rgba(215, 255, 63, 0.35);
+  text-shadow: 0 0 40px rgba(63, 140, 255, 0.35);
 }
 
 /* Marquee ticker */
@@ -560,7 +563,7 @@ select {
   padding: 5px 11px;
   border-radius: 999px;
   background: #ffffff;
-  color: #2f3a19;
+  color: #17263c;
   font-size: 11px;
   font-weight: 800;
   line-height: 1.2;
@@ -725,17 +728,17 @@ select {
   border: 1px solid rgba(255, 255, 255, 0.85);
   border-radius: 26px;
   background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 18px 40px -26px rgba(35, 50, 15, 0.55);
+  box-shadow: 0 18px 40px -26px rgba(15, 29, 50, 0.55);
   transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.3s ease;
 }
 
 .pack-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 30px 50px -24px rgba(35, 50, 15, 0.6);
+  box-shadow: 0 30px 50px -24px rgba(15, 29, 50, 0.6);
 }
 
 .pack-card--featured {
-  box-shadow: 0 0 0 3px var(--signal), 0 24px 46px -24px rgba(35, 50, 15, 0.6);
+  box-shadow: 0 0 0 3px var(--signal), 0 24px 46px -24px rgba(15, 29, 50, 0.6);
 }
 
 .pack-card__body {
@@ -743,7 +746,7 @@ select {
   flex: 1;
   flex-direction: column;
   padding: 20px 22px 22px;
-  color: #16210e;
+  color: #0d1522;
 }
 
 .pack-card__name {
@@ -756,7 +759,7 @@ select {
 
 .pack-card__for {
   margin-top: 6px;
-  color: rgba(22, 33, 14, 0.72);
+  color: rgba(13, 21, 34, 0.72);
   font-size: 14px;
   line-height: 1.4;
 }
@@ -768,7 +771,7 @@ select {
   gap: 4px 8px;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px dashed rgba(22, 33, 14, 0.2);
+  border-top: 1px dashed rgba(13, 21, 34, 0.2);
 }
 
 .pack-card__amount {
@@ -799,7 +802,7 @@ select {
 }
 
 .pack-card__unit {
-  color: rgba(22, 33, 14, 0.7);
+  color: rgba(13, 21, 34, 0.7);
   font-size: 15px;
   font-weight: 600;
 }
@@ -807,7 +810,7 @@ select {
 .pack-card__iva {
   padding: 2px 9px;
   border-radius: 999px;
-  background: rgba(22, 33, 14, 0.08);
+  background: rgba(13, 21, 34, 0.08);
   font-size: 12px;
   font-weight: 700;
 }
@@ -889,7 +892,7 @@ select {
   flex: none;
   min-height: 44px;
   padding: 0 18px;
-  border: 1px solid rgba(22, 33, 14, 0.22);
+  border: 1px solid rgba(13, 21, 34, 0.22);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.6);
   font-size: 14px;
@@ -949,8 +952,8 @@ select {
   margin-top: 10px;
   padding: 4px 11px;
   border-radius: 999px;
-  background: rgba(22, 33, 14, 0.07);
-  color: rgba(22, 33, 14, 0.78);
+  background: rgba(13, 21, 34, 0.07);
+  color: rgba(13, 21, 34, 0.78);
   font-size: 12.5px;
   font-weight: 600;
   line-height: 1.35;
@@ -958,7 +961,7 @@ select {
 
 .pack-card__terms {
   margin-top: 8px;
-  color: rgba(22, 33, 14, 0.68);
+  color: rgba(13, 21, 34, 0.68);
   font-size: 13px;
   font-weight: 600;
 }
@@ -1008,7 +1011,7 @@ select {
 .pack-buy__status {
   min-height: 20px;
   margin-top: 8px;
-  color: rgba(22, 33, 14, 0.7);
+  color: rgba(13, 21, 34, 0.7);
   font-size: 13px;
   font-weight: 600;
   text-align: center;
@@ -1026,7 +1029,7 @@ select {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: rgba(22, 33, 14, 0.62);
+  color: rgba(13, 21, 34, 0.62);
   font-size: 12px;
   font-weight: 600;
 }
@@ -1069,7 +1072,7 @@ select {
   gap: 8px;
   min-height: 40px;
   padding: 0 14px;
-  border: 1px solid rgba(22, 33, 14, 0.16);
+  border: 1px solid rgba(13, 21, 34, 0.16);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.55);
   font-size: 13.5px;
@@ -1090,18 +1093,18 @@ select {
  */
 .portal-ui {
   color-scheme: light;
-  --signal: #4f7a10;
-  --signal-dim: #3f6309;
-  --portal-ink: #16210e;
-  --portal-line: rgba(22, 33, 14, 0.13);
-  --portal-line-strong: rgba(22, 33, 14, 0.3);
-  --portal-glow: rgba(79, 122, 16, 0.16);
+  --signal: #0063e6;
+  --signal-dim: #0052cc;
+  --portal-ink: #0d1522;
+  --portal-line: rgba(13, 21, 34, 0.13);
+  --portal-line-strong: rgba(13, 21, 34, 0.3);
+  --portal-glow: rgba(16, 58, 122, 0.16);
   position: relative;
   isolation: isolate;
   background:
-    radial-gradient(900px 480px at 92% -10%, rgba(120, 170, 30, 0.13), transparent 62%),
+    radial-gradient(900px 480px at 92% -10%, rgba(30, 86, 170, 0.13), transparent 62%),
     radial-gradient(760px 420px at -8% 108%, rgba(56, 160, 200, 0.07), transparent 58%),
-    #f5f7f0;
+    #edf2fa;
   color: var(--portal-ink);
 }
 .portal-ui [class*='border-white/'],
@@ -1118,14 +1121,14 @@ select {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border: 1px solid var(--portal-line);
-  box-shadow: 0 1px 2px rgba(22, 33, 14, 0.05), 0 14px 34px -22px rgba(22, 33, 14, 0.25);
+  box-shadow: 0 1px 2px rgba(13, 21, 34, 0.05), 0 14px 34px -22px rgba(13, 21, 34, 0.25);
 }
 .portal-ui .card-liquid-interactive:hover,
 .portal-ui button.card-liquid:hover,
 .portal-ui a.card-liquid:hover {
   transform: none;
   border-color: var(--portal-line-strong);
-  box-shadow: 0 1px 2px rgba(22, 33, 14, 0.06), 0 18px 38px -20px rgba(22, 33, 14, 0.3);
+  box-shadow: 0 1px 2px rgba(13, 21, 34, 0.06), 0 18px 38px -20px rgba(13, 21, 34, 0.3);
 }
 .portal-ui input,
 .portal-ui select,
@@ -1137,7 +1140,7 @@ select {
 .portal-ui textarea:focus,
 .portal-ui select:focus {
   border-color: var(--signal);
-  box-shadow: 0 0 0 3px rgba(79, 122, 16, 0.16);
+  box-shadow: 0 0 0 3px rgba(16, 58, 122, 0.16);
 }
 /* Títulos en display; etiquetas y cifras en monoespaciada */
 .portal-ui h1 {
@@ -1150,18 +1153,18 @@ select {
 }
 /* Fondo de las ventanas emergentes */
 .portal-ui .fixed.inset-0[class*='bg-black/'] {
-  background: rgba(22, 33, 14, 0.5);
+  background: rgba(13, 21, 34, 0.5);
   backdrop-filter: blur(5px);
 }
 .portal-ui ::-webkit-scrollbar { width: 8px; height: 8px; }
-.portal-ui ::-webkit-scrollbar-thumb { background: rgba(22, 33, 14, 0.2); border-radius: 8px; }
+.portal-ui ::-webkit-scrollbar-thumb { background: rgba(13, 21, 34, 0.2); border-radius: 8px; }
 .portal-ui ::-webkit-scrollbar-track { background: transparent; }
 /* Botón principal: verde oliva con texto blanco */
 .portal-ui .portal-cta {
   background: var(--signal);
   color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(22, 33, 14, 0.2), 0 8px 18px -8px rgba(79, 122, 16, 0.55);
+  box-shadow: 0 1px 2px rgba(13, 21, 34, 0.2), 0 8px 18px -8px rgba(16, 58, 122, 0.55);
   transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
 }
 .portal-ui .portal-cta:hover { background: var(--signal-dim); }
@@ -1188,13 +1191,13 @@ select {
   to { background-position: 200% 0; }
 }
 @keyframes pn-pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(79, 122, 16, 0.4); }
-  100% { box-shadow: 0 0 0 12px rgba(79, 122, 16, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(16, 58, 122, 0.4); }
+  100% { box-shadow: 0 0 0 12px rgba(16, 58, 122, 0); }
 }
 .portal-ui .pn-in { animation: pn-fade-up 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 .portal-ui .pn-skeleton {
   border-radius: 14px;
-  background: linear-gradient(90deg, rgba(22, 33, 14, 0.05) 25%, rgba(22, 33, 14, 0.1) 50%, rgba(22, 33, 14, 0.05) 75%);
+  background: linear-gradient(90deg, rgba(13, 21, 34, 0.05) 25%, rgba(13, 21, 34, 0.1) 50%, rgba(13, 21, 34, 0.05) 75%);
   background-size: 200% 100%;
   animation: pn-shimmer 1.4s linear infinite;
 }
@@ -1206,9 +1209,9 @@ select {
   border-radius: 24px;
   border: 1px solid var(--portal-line-strong);
   background:
-    radial-gradient(520px 200px at 100% 0%, rgba(120, 170, 30, 0.18), transparent 65%),
-    linear-gradient(160deg, #ffffff, #f3f8e8);
-  box-shadow: 0 1px 2px rgba(22, 33, 14, 0.06), 0 26px 60px -34px rgba(79, 122, 16, 0.45);
+    radial-gradient(520px 200px at 100% 0%, rgba(30, 86, 170, 0.18), transparent 65%),
+    linear-gradient(160deg, #ffffff, #e8eef8);
+  box-shadow: 0 1px 2px rgba(13, 21, 34, 0.06), 0 26px 60px -34px rgba(16, 58, 122, 0.45);
 }
 .portal-ui .pn-chip {
   display: inline-flex;
@@ -1220,7 +1223,7 @@ select {
   background: #ffffff;
   font-size: 12px;
   font-weight: 500;
-  color: rgba(22, 33, 14, 0.72);
+  color: rgba(13, 21, 34, 0.72);
   white-space: nowrap;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
@@ -1232,18 +1235,18 @@ select {
   border-color: transparent;
   color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 6px 14px -8px rgba(79, 122, 16, 0.6);
+  box-shadow: 0 6px 14px -8px rgba(16, 58, 122, 0.6);
 }
 .portal-ui .pn-title {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(22, 33, 14, 0.52);
+  color: rgba(13, 21, 34, 0.52);
   font-family: var(--font-mono);
 }
 .portal-ui .pn-row { transition: background 0.15s, border-color 0.15s; }
-.portal-ui .pn-row:hover { background: rgba(22, 33, 14, 0.035); }
+.portal-ui .pn-row:hover { background: rgba(13, 21, 34, 0.035); }
 @media (prefers-reduced-motion: reduce) {
   .portal-ui .pn-in, .portal-ui .pn-skeleton, .portal-ui .pn-live { animation: none; }
 }

@@ -9,8 +9,8 @@ export const MIN_LEAD_HOURS = 3;
 export const BOOKING_DAYS_AHEAD = 21;
 export const CALL_DURATION_MIN = 30;
 
-export const NEED_OPTIONS = ['Vídeo', 'Redes sociales', 'Estrategia', 'Copy', 'Fotografía', 'Aún no lo sé'];
-export const BUDGET_OPTIONS = ['Menos de 1.000 €/mes', '1.000 – 3.000 €/mes', '3.000 – 7.000 €/mes', 'Más de 7.000 €/mes', 'Sin definir'];
+export const NEED_OPTIONS = ['Máster BIM', 'Microcredenciales', 'Certificación AECOMI', 'Formación para mi empresa', 'Consultoría BIM', 'Aún no lo sé'];
+export const BUDGET_OPTIONS = ['Hasta 1.500 €', '1.500 – 3.000 €', '3.000 – 5.000 €', 'Más de 5.000 €', 'Sin definir'];
 export const TIMELINE_OPTIONS = ['Lo antes posible', 'En 1–3 meses', 'Solo estoy explorando'];
 
 export interface CallAnswers {

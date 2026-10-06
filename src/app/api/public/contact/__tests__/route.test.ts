@@ -100,7 +100,7 @@ describe('POST /api/public/contact — booked call', () => {
     company: 'Marea',
     date: bookableDate(),
     time: '11:00',
-    answers: { needs: ['Vídeo'], budget: 'Sin definir', timeline: 'Lo antes posible' },
+    answers: { needs: ['Máster BIM'], budget: 'Sin definir', timeline: 'Lo antes posible' },
   });
 
   it('stores the call as a lead attached to the agency owner', async () => {
@@ -112,7 +112,7 @@ describe('POST /api/public/contact — booked call', () => {
       source: 'website',
       email: 'laura@empresa.com',
       phone: '+34 600 111 222',
-      answers: { needs: ['Vídeo'], budget: 'Sin definir', timeline: 'Lo antes posible' },
+      answers: { needs: ['Máster BIM'], budget: 'Sin definir', timeline: 'Lo antes posible' },
     });
     expect(new Date(state.inserted.call_at).toString()).not.toBe('Invalid Date');
     expect((await res.json()).id).toBe('lead-1');

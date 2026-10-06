@@ -31,6 +31,14 @@ const nextConfig: NextConfig = {
       },
     },
   }),
+  // La web de IDESIE no vende packs: la landing y el carrito de la web anterior llevan a la home.
+  // (Las páginas y la API de pagos siguen en el código; quita estas redirecciones para reactivarlas.)
+  async redirects() {
+    return [
+      { source: '/landing', destination: '/', permanent: false },
+      { source: '/carrito', destination: '/', permanent: false },
+    ];
+  },
   async headers() {
     const securityHeaders = [
       { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -51,7 +59,8 @@ const nextConfig: NextConfig = {
         key: 'Content-Security-Policy',
         value: [
           "default-src 'self'",
-          "script-src 'self' 'unsafe-inline' https://connect.facebook.net",
+          // 'unsafe-eval' solo en desarrollo: React Refresh lo necesita y sin él la web no hidrata (se queda en blanco)
+          `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'"} https://connect.facebook.net`,
           "style-src 'self' 'unsafe-inline'",
           "img-src 'self' data: blob: https:",
           "font-src 'self' data:",

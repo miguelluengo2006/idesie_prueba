@@ -45,7 +45,7 @@ export default async function CartPage() {
         <CartClient />
       </main>
 
-      <SiteFooter businessName={businessName} className="max-w-6xl mx-3 md:mx-auto mt-4 mb-4" />
+      <SiteFooter className="max-w-6xl mx-3 md:mx-auto mt-4 mb-4" />
     </div>
   );
 }

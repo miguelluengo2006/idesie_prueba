@@ -63,7 +63,7 @@ function Confirm() {
           </p>
           <dl
             className="mt-8 rounded-2xl p-5 text-left space-y-3"
-            style={{ background: 'rgba(255,255,255,0.78)', border: '1px solid rgba(20,27,10,0.12)', color: '#16210e' }}
+            style={{ background: 'rgba(255,255,255,0.78)', border: '1px solid rgba(10, 17, 27,0.12)', color: '#0d1522' }}
           >
             <div className="flex justify-between gap-4">
               <dt style={{ opacity: 0.65 }}>Pack</dt>

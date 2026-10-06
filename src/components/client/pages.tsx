@@ -331,7 +331,7 @@ export function NoticesPage() {
         <ul className="space-y-3">
           {c.notices.map((n) => (
             <li key={n.id} className="pn-in">
-              <button onClick={() => c.markNoticeRead(n)} className={cn('w-full text-left rounded-3xl border p-4 md:p-5 transition-colors', n.read_at ? 'card-liquid' : 'border-[var(--portal-line-strong)] bg-[var(--signal)]/[0.07] cursor-pointer shadow-[0_14px_34px_-22px_rgba(79,122,16,0.5)]')}>
+              <button onClick={() => c.markNoticeRead(n)} className={cn('w-full text-left rounded-3xl border p-4 md:p-5 transition-colors', n.read_at ? 'card-liquid' : 'border-[var(--portal-line-strong)] bg-[var(--signal)]/[0.07] cursor-pointer shadow-[0_14px_34px_-22px_rgba(16, 58, 122,0.5)]')}>
                 <div className="flex items-start justify-between gap-3">
                   <span className="text-sm font-semibold">{n.title}</span>
                   {n.read_at ? <Check className="w-4 h-4 text-white/35 shrink-0" aria-label="Leído" /> : <span className="w-2.5 h-2.5 mt-1 rounded-full bg-[var(--signal)] shrink-0" aria-label="Sin leer" />}

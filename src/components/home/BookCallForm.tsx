@@ -135,7 +135,7 @@ export default function BookCallForm({
         body: JSON.stringify({
           kind: 'call',
           name, email, phone, company,
-          message: pack ? `Pack de interés: ${pack}${message.trim() ? `\n${message.trim()}` : ''}` : message,
+          message: pack ? `Interés: ${pack}${message.trim() ? `\n${message.trim()}` : ''}` : message,
           date, time,
           answers: { needs, budget, timeline },
         }),
@@ -311,7 +311,7 @@ export default function BookCallForm({
                   className="group inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full bg-[var(--signal)] text-black hover:bg-[var(--signal-dim)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <span className="text-sm font-medium tracking-wide">Continuar</span>
-                  <span className="w-9 h-9 rounded-full bg-[#03150d] text-[var(--signal)] flex items-center justify-center">
+                  <span className="w-9 h-9 rounded-full bg-[#00132e] text-[var(--signal)] flex items-center justify-center">
                     <ArrowUpRight className="w-4 h-4" />
                   </span>
                 </button>
@@ -340,7 +340,7 @@ export default function BookCallForm({
 
           {pack && (
             <p className="md:col-span-2 text-sm rounded-2xl border border-[var(--signal)]/40 bg-[var(--signal)]/10 px-4 py-3">
-              <span className="text-white/60">Pack elegido:</span> <strong className="font-semibold">{pack}</strong>
+              <span className="text-white/60">Interés:</span> <strong className="font-semibold">{pack}</strong>
             </p>
           )}
 
@@ -350,7 +350,7 @@ export default function BookCallForm({
           </div>
           <div>
             <label htmlFor={`${uid}-company`} className={labelClass}>Empresa <span className="normal-case tracking-normal text-white/25">(opcional)</span></label>
-            <input id={`${uid}-company`} autoComplete="organization" value={company} onChange={(e) => setCompany(e.target.value)} className={inputClass} placeholder="Nombre de tu empresa" />
+            <input id={`${uid}-company`} autoComplete="organization" value={company} onChange={(e) => setCompany(e.target.value)} className={inputClass} placeholder="Tu empresa o centro" />
           </div>
           <div>
             <label htmlFor={`${uid}-email`} className={labelClass}>Email</label>
@@ -362,7 +362,7 @@ export default function BookCallForm({
           </div>
 
           <fieldset className="md:col-span-2">
-            <legend className={labelClass}>¿Qué necesitas? <span className="normal-case tracking-normal text-white/25">(elige las que quieras)</span></legend>
+            <legend className={labelClass}>¿Qué te interesa? <span className="normal-case tracking-normal text-white/25">(elige las que quieras)</span></legend>
             <div className="flex flex-wrap gap-2">
               {NEED_OPTIONS.map((n) => (
                 <Chip key={n} selected={needs.includes(n)} onClick={() => toggleNeed(n)}>{n}</Chip>
@@ -371,7 +371,7 @@ export default function BookCallForm({
           </fieldset>
 
           <fieldset>
-            <legend className={labelClass}>Presupuesto aproximado</legend>
+            <legend className={labelClass}>Inversión aproximada</legend>
             <div className="flex flex-wrap gap-2">
               {BUDGET_OPTIONS.map((b) => (
                 <Chip key={b} selected={budget === b} onClick={() => setBudget(budget === b ? '' : b)}>{b}</Chip>
@@ -390,7 +390,7 @@ export default function BookCallForm({
 
           <div className="md:col-span-2">
             <label htmlFor={`${uid}-message`} className={labelClass}>¿Algo más que debamos saber? <span className="normal-case tracking-normal text-white/25">(opcional)</span></label>
-            <textarea id={`${uid}-message`} rows={2} value={message} onChange={(e) => setMessage(e.target.value)} className={`${inputClass} resize-none`} placeholder="Cuéntanos tu proyecto en una frase" />
+            <textarea id={`${uid}-message`} rows={2} value={message} onChange={(e) => setMessage(e.target.value)} className={`${inputClass} resize-none`} placeholder="Cuéntanos qué buscas en una frase" />
           </div>
 
           <div className="md:col-span-2 flex items-center justify-between flex-wrap gap-4 mt-2">
@@ -405,7 +405,7 @@ export default function BookCallForm({
               <span className="text-sm font-medium tracking-wide">
                 {status === 'sending' ? 'Agendando…' : 'Confirmar llamada'}
               </span>
-              <span className="w-9 h-9 rounded-full bg-[#03150d] text-[var(--signal)] flex items-center justify-center group-hover:rotate-45 transition-transform">
+              <span className="w-9 h-9 rounded-full bg-[#00132e] text-[var(--signal)] flex items-center justify-center group-hover:rotate-45 transition-transform">
                 {status === 'sending' ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowUpRight className="w-4 h-4" />}
               </span>
             </button>

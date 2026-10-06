@@ -96,8 +96,8 @@ describe('validateSlot', () => {
 describe('sanitizeAnswers', () => {
   it('drops anything that is not one of the offered options', () => {
     expect(
-      sanitizeAnswers({ needs: ['Vídeo', 'Vídeo', '<script>'], budget: 'lo que sea', timeline: 'Lo antes posible' })
-    ).toEqual({ needs: ['Vídeo'], budget: '', timeline: 'Lo antes posible' });
+      sanitizeAnswers({ needs: ['Máster BIM', 'Máster BIM', '<script>'], budget: 'lo que sea', timeline: 'Lo antes posible' })
+    ).toEqual({ needs: ['Máster BIM'], budget: '', timeline: 'Lo antes posible' });
   });
 
   it('copes with missing input', () => {

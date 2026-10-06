@@ -52,7 +52,7 @@ function BookCallModal({ businessName, pack, onClose }: { businessName: string; 
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="force-dark text-[#f2f2f0] fixed inset-0 z-[70] flex items-end sm:items-center justify-center sm:p-6 bg-[#141b0a]/70 backdrop-blur-sm"
+      className="force-dark text-[#f2f2f0] fixed inset-0 z-[70] flex items-end sm:items-center justify-center sm:p-6 bg-[#0a111b]/70 backdrop-blur-sm"
       onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <motion.div
@@ -66,7 +66,7 @@ function BookCallModal({ businessName, pack, onClose }: { businessName: string; 
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 16 }}
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full sm:max-w-2xl max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl border border-white/15 bg-[#2f3a1a] p-6 sm:p-10 outline-none"
+        className="relative w-full sm:max-w-2xl max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl border border-white/15 bg-[#17263d] p-6 sm:p-10 outline-none"
       >
         <button
           type="button"

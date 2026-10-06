@@ -101,7 +101,7 @@ export function ClientShell({ active, hrefFor, banner, children }: { active: Cli
       {banner}
       <div className="flex-1 min-h-0 flex flex-col md:flex-row">
       {/* Escritorio */}
-      <aside className="hidden md:block w-64 shrink-0 m-3 mr-0 rounded-3xl border border-[var(--portal-line)] bg-black/95 p-3.5 overflow-y-auto shadow-[0_18px_50px_-30px_rgba(22,33,14,0.35)]">{sidebar}</aside>
+      <aside className="hidden md:block w-64 shrink-0 m-3 mr-0 rounded-3xl border border-[var(--portal-line)] bg-black/95 p-3.5 overflow-y-auto shadow-[0_18px_50px_-30px_rgba(13, 21, 34,0.35)]">{sidebar}</aside>
 
       {/* Móvil: cabecera */}
       <header className="md:hidden flex-shrink-0 h-14 px-4 flex items-center justify-between border-b border-white/10 bg-black/95">
@@ -122,7 +122,7 @@ export function ClientShell({ active, hrefFor, banner, children }: { active: Cli
 
       {/* Móvil: barra inferior */}
       <nav aria-label="Navegación rápida" className="md:hidden flex-shrink-0 px-3 pt-2" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 10px)' }}>
-        <div className="grid grid-cols-5 rounded-2xl border border-[var(--portal-line-strong)] bg-black/95 shadow-[0_10px_30px_-14px_rgba(22,33,14,0.4)] p-1">
+        <div className="grid grid-cols-5 rounded-2xl border border-[var(--portal-line-strong)] bg-black/95 shadow-[0_10px_30px_-14px_rgba(13, 21, 34,0.4)] p-1">
           {BOTTOM.map((p) => {
             const item = NAV.find((n) => n.page === p)!;
             const Icon = item.icon;

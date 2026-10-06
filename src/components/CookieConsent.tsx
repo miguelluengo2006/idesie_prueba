@@ -45,35 +45,35 @@ export default function CookieConsent() {
 
   if (!open || NO_BANNER.some((p) => pathname.startsWith(p))) return null;
 
-  const btn = 'px-4 py-2.5 rounded-full border border-[#16210e]/30 text-sm font-medium text-[#16210e] hover:bg-[#16210e]/5 transition-colors cursor-pointer';
+  const btn = 'px-4 py-2.5 rounded-full border border-[#0d1522]/30 text-sm font-medium text-[#0d1522] hover:bg-[#0d1522]/5 transition-colors cursor-pointer';
 
   return (
     <div
       role="dialog"
       aria-modal="false"
       aria-labelledby="cookie-title"
-      className="fixed inset-x-3 bottom-3 md:left-auto md:right-4 md:bottom-4 md:max-w-md z-[200] rounded-2xl border border-[#16210e]/20 bg-[#ffffff] p-5 shadow-2xl text-[#16210e] [color-scheme:light]"
+      className="fixed inset-x-3 bottom-3 md:left-auto md:right-4 md:bottom-4 md:max-w-md z-[200] rounded-2xl border border-[#0d1522]/20 bg-[#ffffff] p-5 shadow-2xl text-[#0d1522] [color-scheme:light]"
     >
       <h2 id="cookie-title" className="text-sm font-semibold mb-1.5">Tu privacidad</h2>
-      <p className="text-xs text-[#16210e]/70 leading-relaxed">
+      <p className="text-xs text-[#0d1522]/70 leading-relaxed">
         Usamos cookies técnicas imprescindibles para que la web funcione. Con tu permiso, también cookies de análisis y de publicidad.
         Puedes aceptarlas, rechazarlas o elegir, y cambiarlo cuando quieras. Más información en la{' '}
-        <Link href="/cookies" className="underline underline-offset-2 hover:text-[#16210e]">política de cookies</Link>.
+        <Link href="/cookies" className="underline underline-offset-2 hover:text-[#0d1522]">política de cookies</Link>.
       </p>
 
       {custom && (
         <div className="mt-4 space-y-3 text-xs">
           <label className="flex items-start gap-3 opacity-70">
             <input type="checkbox" checked disabled className="mt-0.5 accent-[var(--signal)]" />
-            <span><strong className="text-[#16210e]">Técnicas</strong> — necesarias (sesión, seguridad, este aviso). Siempre activas.</span>
+            <span><strong className="text-[#0d1522]">Técnicas</strong> — necesarias (sesión, seguridad, este aviso). Siempre activas.</span>
           </label>
           <label className="flex items-start gap-3 cursor-pointer">
             <input type="checkbox" checked={analytics} onChange={(e) => setAnalytics(e.target.checked)} className="mt-0.5 accent-[var(--signal)]" />
-            <span><strong className="text-[#16210e]">Análisis</strong> — medir visitas para mejorar la web.</span>
+            <span><strong className="text-[#0d1522]">Análisis</strong> — medir visitas para mejorar la web.</span>
           </label>
           <label className="flex items-start gap-3 cursor-pointer">
             <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} className="mt-0.5 accent-[var(--signal)]" />
-            <span><strong className="text-[#16210e]">Publicidad</strong> — medir y mejorar nuestros anuncios (p. ej. Meta).</span>
+            <span><strong className="text-[#0d1522]">Publicidad</strong> — medir y mejorar nuestros anuncios (p. ej. Meta).</span>
           </label>
         </div>
       )}

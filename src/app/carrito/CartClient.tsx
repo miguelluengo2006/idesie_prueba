@@ -9,7 +9,7 @@ import { formatEur } from '@/lib/packs';
 
 // Colores fijos: los tokens white/black de Tailwind cambian según la página y aquí el campo debe leerse siempre igual
 const field =
-  'w-full min-h-12 rounded-xl border border-[#16210e]/25 bg-[#fbfcf7] px-4 py-3 text-base text-[#16210e] placeholder:text-[#16210e]/45 outline-none focus:border-[var(--signal)] focus:ring-2 focus:ring-[var(--signal)]/30';
+  'w-full min-h-12 rounded-xl border border-[#0d1522]/25 bg-[#f6f9fd] px-4 py-3 text-base text-[#0d1522] placeholder:text-[#0d1522]/45 outline-none focus:border-[var(--signal)] focus:ring-2 focus:ring-[var(--signal)]/30';
 
 export default function CartClient() {
   const { items, ready, setQty, remove } = useCart();

@@ -7,8 +7,8 @@ import MetaPixel from '@/components/MetaPixel';
 import WebAnalytics from '@/components/WebAnalytics';
 
 export const metadata: Metadata = {
-  title: 'samgple — Agencia de contenido y marketing',
-  description: 'Agencia de creación de contenido y estrategia de marketing para empresas.',
+  title: { default: 'IDESIE Business & Tech School', template: '%s | IDESIE' },
+  description: 'Escuela de formación BIM: microcredenciales, Máster BIM y certificación de perfiles profesionales con AECOMI.',
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
