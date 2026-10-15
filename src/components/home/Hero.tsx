@@ -62,7 +62,7 @@ export default function Hero() {
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
-                href="/#perfiles"
+                href="/perfiles"
                 className="group inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full bg-[var(--signal)] text-black hover:bg-[var(--signal-dim)] transition-colors"
               >
                 <span className="text-sm font-medium tracking-wide">Explorar perfiles profesionales</span>
@@ -71,7 +71,7 @@ export default function Hero() {
                 </span>
               </Link>
               <Link
-                href="/#formacion"
+                href="/formacion"
                 className="inline-flex items-center px-6 py-3.5 rounded-full border border-white/15 hover:border-[var(--signal)] text-sm font-medium tracking-wide transition-colors"
               >
                 Ver el Máster BIM

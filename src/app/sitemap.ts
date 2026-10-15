@@ -15,8 +15,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: 'monthly',
     priority: 0.7,
   }));
+  const pages: MetadataRoute.Sitemap = ['ia-bim', 'metodologia', 'profesores', 'empresas', 'perfiles', 'formacion', 'microcredenciales', 'simulador', 'certificacion', 'contacto'].map((slug) => ({
+    url: `${siteUrl}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  }));
   return [
     { url: siteUrl, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
+    ...pages,
     ...profiles,
     ...legal,
   ];

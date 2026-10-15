@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import Reveal, { SectionHead } from './Reveal';
 import { BookCallButton } from './BookCall';
@@ -65,9 +66,9 @@ export default function Programs() {
             <p className="text-sm font-semibold text-[var(--signal)]">
               Desde {formatEuro(PRICE_PER_ECTS)} · {formatEuro(PRICE_PER_ECTS)} por ECTS · Acumulables
             </p>
-            <a href="#catalogo" className={`${link} text-[var(--signal)]`}>
+            <Link href="/microcredenciales" className={`${link} text-[var(--signal)]`}>
               Ver el catálogo {arrow}
-            </a>
+            </Link>
           </Reveal>
         </div>
       </div>

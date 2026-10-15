@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { ArrowUpRight } from 'lucide-react';
 import KineticWordmark from '@/components/home/KineticWordmark';
 import CookieSettingsLink from '@/components/legal/CookieSettingsLink';
 import { LEGAL_LINKS } from '@/components/legal/LegalPage';
@@ -29,16 +28,14 @@ export default function SiteFooter({ className = '' }: { className?: string }) {
           <nav aria-label="Web" className="text-sm text-white/50">
             <h2 className="mb-3 text-xs uppercase tracking-[0.2em] text-white/30">Web</h2>
             <ul className="space-y-2">
-              <li><Link href="/#perfiles" className={link}>Perfiles profesionales</Link></li>
-              <li><Link href="/#formacion" className={link}>Másteres y microcredenciales</Link></li>
-              <li><Link href="/#certificacion" className={link}>Certificación</Link></li>
-              <li><Link href="/#empresas" className={link}>Empresas y consultoría</Link></li>
-              <li><Link href="/#contacto" className={link}>Contacto</Link></li>
-              <li>
-                <Link href="/auth" className={`${link} inline-flex items-center gap-1`}>
-                  Acceder <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                </Link>
-              </li>
+              <li><Link href="/perfiles" className={link}>Perfiles profesionales</Link></li>
+              <li><Link href="/formacion" className={link}>Másteres y microcredenciales</Link></li>
+              <li><Link href="/ia-bim" className={link}>BIM con IA</Link></li>
+              <li><Link href="/metodologia" className={link}>Metodología</Link></li>
+              <li><Link href="/profesores" className={link}>Profesores</Link></li>
+              <li><Link href="/certificacion" className={link}>Certificación</Link></li>
+              <li><Link href="/empresas" className={link}>Empresas y consultoría</Link></li>
+              <li><Link href="/contacto" className={link}>Contacto</Link></li>
             </ul>
           </nav>
 

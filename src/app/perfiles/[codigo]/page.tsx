@@ -63,7 +63,7 @@ export default async function ProfilePage({ params }: { params: Promise<Params> 
           <section className="px-4 md:px-6 pt-28 pb-16 md:pt-36 md:pb-20">
             <div className="max-w-6xl mx-auto">
               <Link
-                href="/#perfiles"
+                href="/perfiles"
                 className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors mb-8"
               >
                 <ArrowLeft className="w-4 h-4" aria-hidden="true" /> Todos los perfiles
