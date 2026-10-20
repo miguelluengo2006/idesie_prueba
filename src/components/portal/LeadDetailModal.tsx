@@ -4,7 +4,6 @@ import { whatsappDigits } from '@/lib/contact';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  BellRing,
   Building2,
   CalendarClock,
   CreditCard,
@@ -16,15 +15,10 @@ import {
   MessageCircle,
   Phone,
   PhoneCall,
-  Send,
   ShoppingCart,
   Trash2,
   UserRound,
   X,
-  Check,
-  Copy,
-  Eye,
-  KeyRound,
 } from 'lucide-react';
 import type { Lead } from '@/app/portal/leads/context';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
@@ -48,14 +42,7 @@ const ANSWER_ROWS: { key: 'budget' | 'timeline'; label: string }[] = [
   { key: 'timeline', label: 'Cuándo empezar' },
 ];
 
-const NOTICE_TEMPLATES: { title: string; body: string }[] = [
-  { title: 'Tu guion está listo para revisar', body: 'Ya tienes los guiones preparados. Revísalos y dinos si los apruebas o quieres cambios. No producimos nada hasta tu visto bueno.' },
-  { title: 'Tus vídeos están en producción', body: 'Hemos empezado a producir tus vídeos con el guion aprobado. Te avisaremos en cuanto estén listos para revisar.' },
-  { title: 'Tus vídeos están listos', body: 'Ya puedes ver tus vídeos. Revísalos y, si quieres algún ajuste, dínoslo y lo hacemos.' },
-  { title: 'Necesitamos algo de ti', body: 'Para seguir adelante necesitamos que nos envíes más información (fotos, web o ficha de producto). Respóndenos cuando puedas.' },
-];
-
-type Tab = 'resumen' | 'historial' | 'avisos';
+type Tab = 'resumen' | 'historial';
 
 const initials = (name: string) =>
   name
@@ -74,14 +61,7 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [accessBusy, setAccessBusy] = useState(false);
-  const [access, setAccess] = useState<{ email: string; password: string; loginUrl: string; reset: boolean } | null>(null);
-  const [accessMsg, setAccessMsg] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [noticeTitle, setNoticeTitle] = useState('');
-  const [noticeBody, setNoticeBody] = useState('');
-  const [sendingNotice, setSendingNotice] = useState(false);
-  const [noticeMsg, setNoticeMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   useEscapeKey(!!lead, onClose);
 
@@ -90,12 +70,7 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
     setNotes(lead?.notes || '');
     setConfirmDelete(false);
     setError(null);
-    setAccess(null);
-    setAccessMsg(null);
     setCopied(false);
-    setNoticeTitle('');
-    setNoticeBody('');
-    setNoticeMsg(null);
   }, [lead?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Todo lo de la misma persona: solicitudes, llamadas y compras
@@ -120,14 +95,6 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
     return { spent, purchases, calls, requests: related.length };
   }, [related]);
 
-  const notices = useMemo(
-    () =>
-      related
-        .flatMap((l) => (l.answers?.notices || []).map((n) => ({ ...n })))
-        .sort((a, b) => b.created_at.localeCompare(a.created_at)),
-    [related]
-  );
-
   if (!lead) return null;
 
   const isCall = lead.kind === 'call' && !!lead.call_at;
@@ -141,42 +108,6 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
   const phoneDigits = whatsappDigits(lead.phone);
   const hasAnswers = !!lead.answers && (!!lead.answers.needs?.length || !!lead.answers.budget || !!lead.answers.timeline);
   const utmEntries = Object.entries(lead.answers?.utm || {});
-  const unread = notices.filter((n) => !n.read_at).length;
-
-  const createAccess = async (reset = false) => {
-    if (!accessToken || !lead.email) return;
-    setAccessBusy(true);
-    setAccessMsg(null);
-    try {
-      const res = await fetch('/api/agency/create-customer-access', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ email: lead.email, name: lead.name, reset }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) setAccessMsg(data.error || 'No se pudo crear el acceso');
-      else if (data.alreadyRegistered) setAccessMsg('Este cliente ya tiene acceso. Si ha perdido la contraseña, genera una nueva.');
-      else setAccess({ email: data.email, password: data.password, loginUrl: data.loginUrl || `${window.location.origin}/auth`, reset: !!data.reset });
-    } catch {
-      setAccessMsg('No se pudo crear el acceso');
-    } finally {
-      setAccessBusy(false);
-    }
-  };
-
-  const accessText = access
-    ? `Hola ${lead.name.split(' ')[0]}, ya tienes tu acceso a samgple para ver tus avisos, compras y llamadas:\n\n🔗 ${access.loginUrl}\n📧 ${access.email}\n🔑 ${access.password}\n\nPuedes cambiar la contraseña desde Ajustes cuando quieras.`
-    : '';
-
-  const copyAccess = async () => {
-    try {
-      await navigator.clipboard.writeText(accessText);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setAccessMsg('No se pudo copiar. Selecciona el texto y cópialo a mano.');
-    }
-  };
 
   const updateLead = async (updates: Record<string, any>) => {
     if (!accessToken) return;
@@ -192,33 +123,6 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
       else setError('No se pudo guardar el cambio');
     } finally {
       setSaving(false);
-    }
-  };
-
-  const sendNotice = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!accessToken) return;
-    setSendingNotice(true);
-    setNoticeMsg(null);
-    try {
-      const res = await fetch(`/api/leads/${lead.id}/notices`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ title: noticeTitle, body: noticeBody }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        setNoticeTitle('');
-        setNoticeBody('');
-        setNoticeMsg({ ok: true, text: 'Aviso enviado: lo verá en su cuenta.' });
-        onChange();
-      } else {
-        setNoticeMsg({ ok: false, text: data.error || 'No se pudo enviar el aviso' });
-      }
-    } catch {
-      setNoticeMsg({ ok: false, text: 'No se pudo enviar el aviso' });
-    } finally {
-      setSendingNotice(false);
     }
   };
 
@@ -242,7 +146,6 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
   const TABS: { value: Tab; label: string; icon: typeof UserRound; badge?: number }[] = [
     { value: 'resumen', label: 'Resumen', icon: UserRound },
     { value: 'historial', label: 'Historial', icon: History, badge: related.length > 1 ? related.length : undefined },
-    { value: 'avisos', label: 'Avisos', icon: BellRing, badge: unread || undefined },
   ];
 
   return (
@@ -522,115 +425,6 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
               })}
               {related.length === 1 && <p className="text-xs text-white/40 pt-1">Es la única solicitud de esta persona. Si vuelve a escribir o compra con el mismo email o teléfono, aparecerá aquí.</p>}
             </ol>
-          )}
-
-          {tab === 'avisos' && (
-            <>
-              <form onSubmit={sendNotice} className="space-y-3">
-                <div>
-                  <div className="text-xs uppercase tracking-widest text-white/40 mb-2">Plantillas rápidas</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {NOTICE_TEMPLATES.map((t) => (
-                      <button
-                        key={t.title}
-                        type="button"
-                        onClick={() => { setNoticeTitle(t.title); setNoticeBody(t.body); }}
-                        className="px-2.5 py-1 rounded-full border border-white/15 text-xs text-white/65 hover:text-white hover:border-[var(--portal-line-strong)] cursor-pointer text-left"
-                      >
-                        {t.title}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <input
-                  value={noticeTitle}
-                  onChange={(e) => setNoticeTitle(e.target.value)}
-                  maxLength={120}
-                  placeholder="Título del aviso"
-                  aria-label="Título del aviso"
-                  className="w-full px-4 py-2.5 rounded-xl border border-white/15 text-sm text-white placeholder:text-gray-500 outline-none"
-                />
-                <textarea
-                  value={noticeBody}
-                  onChange={(e) => setNoticeBody(e.target.value)}
-                  maxLength={2000}
-                  rows={4}
-                  placeholder="Mensaje para el cliente"
-                  aria-label="Mensaje para el cliente"
-                  className="w-full px-4 py-2.5 rounded-xl border border-white/15 text-sm text-white placeholder:text-gray-500 outline-none resize-none"
-                />
-                <button
-                  type="submit"
-                  disabled={sendingNotice || !noticeTitle.trim() || !noticeBody.trim()}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full portal-cta text-sm cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  {sendingNotice ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  Enviar aviso a su cuenta
-                </button>
-                {noticeMsg && <p role="status" className={cn('text-xs text-center', noticeMsg.ok ? 'text-green-400' : 'text-red-400')}>{noticeMsg.text}</p>}
-              </form>
-
-              <div className="rounded-2xl border border-[var(--portal-line-strong)] bg-[var(--signal)]/[0.05] p-4 space-y-3">
-                <div className="flex items-center gap-2 text-sm font-semibold"><KeyRound className="w-4 h-4 text-[var(--signal)]" /> Acceso del cliente</div>
-                <p className="text-xs text-white/55">El registro está cerrado: tú creas su acceso y se lo pasas. Con él ve sus avisos, compras y llamadas en <b className="text-white/80">Mi cuenta</b>{lead.email ? <> (<span className="text-white/80">{lead.email}</span>)</> : null}.</p>
-                {!lead.email ? (
-                  <p className="text-xs text-yellow-400">Esta solicitud no tiene email, así que no se puede crear un acceso.</p>
-                ) : access ? (
-                  <div className="space-y-3">
-                    <pre className="whitespace-pre-wrap break-words rounded-xl border border-white/10 bg-black/30 p-3 text-xs leading-relaxed font-mono">{accessText}</pre>
-                    <p className="text-[11px] text-yellow-400">Guarda o envía esta contraseña ahora: no se vuelve a mostrar. Si se pierde, genera otra.</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      <button onClick={copyAccess} className="flex items-center justify-center gap-1.5 rounded-xl portal-cta py-2.5 text-xs cursor-pointer">
-                        {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />} {copied ? 'Copiado' : 'Copiar'}
-                      </button>
-                      {phoneDigits.length >= 8 ? (
-                        <a href={`https://wa.me/${phoneDigits}?text=${encodeURIComponent(accessText)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 hover:border-[var(--portal-line-strong)] py-2.5 text-xs text-green-400">
-                          <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
-                        </a>
-                      ) : <span className="rounded-xl border border-white/5 py-2.5 text-xs text-white/25 flex items-center justify-center gap-1.5"><MessageCircle className="w-3.5 h-3.5" />WhatsApp</span>}
-                      <a href={`mailto:${access.email}?subject=${encodeURIComponent('Tu acceso a samgple')}&body=${encodeURIComponent(accessText)}`} className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 hover:border-[var(--portal-line-strong)] py-2.5 text-xs">
-                        <Mail className="w-3.5 h-3.5" /> Email
-                      </a>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    <button onClick={() => createAccess(false)} disabled={accessBusy} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full portal-cta text-xs cursor-pointer disabled:opacity-50">
-                      {accessBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <KeyRound className="w-3.5 h-3.5" />} Crear acceso
-                    </button>
-                    <button onClick={() => createAccess(true)} disabled={accessBusy} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/15 hover:border-[var(--portal-line-strong)] text-xs cursor-pointer disabled:opacity-50">
-                      Generar nueva contraseña
-                    </button>
-                  </div>
-                )}
-                {accessMsg && <p role="status" className="text-xs text-white/70">{accessMsg}</p>}
-                <Link href={`/vista-cliente?lead=${lead.id}`} onClick={onClose} className="inline-flex items-center gap-2 text-xs text-[var(--signal)] hover:underline">
-                  <Eye className="w-3.5 h-3.5" /> Ver su panel tal como lo ve {lead.name.split(' ')[0]}
-                </Link>
-              </div>
-
-              <div>
-                <div className="text-xs uppercase tracking-widest text-white/40 mb-2">Enviados ({notices.length})</div>
-                {notices.length === 0 ? (
-                  <p className="text-sm text-white/40">Todavía no le has enviado ningún aviso.</p>
-                ) : (
-                  <ul className="space-y-2">
-                    {notices.map((n) => (
-                      <li key={n.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-3.5">
-                        <div className="flex items-start justify-between gap-2">
-                          <span className="text-sm font-medium">{n.title}</span>
-                          <span className={cn('shrink-0 inline-flex items-center gap-1 text-[11px]', n.read_at ? 'text-green-400' : 'text-white/40')}>
-                            {n.read_at ? <><Check className="w-3 h-3" />Leído</> : 'Sin leer'}
-                          </span>
-                        </div>
-                        <p className="text-xs text-white/55 mt-1 whitespace-pre-wrap">{n.body}</p>
-                        <div className="text-[11px] text-white/30 mt-1.5">{timeAgo(n.created_at)}</div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </>
           )}
         </div>
       </div>

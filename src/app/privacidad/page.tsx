@@ -26,19 +26,24 @@ export default function PrivacidadPage() {
         </thead>
         <tbody>
           <tr>
-            <td>Atender solicitudes de propuesta y reservas de llamada</td>
-            <td>Nombre, email, teléfono, empresa, mensaje, datos de la reserva</td>
+            <td>Atender solicitudes de información y reservas de llamada con admisiones</td>
+            <td>Nombre, email, teléfono, interés formativo, mensaje, datos de la reserva</td>
             <td>Medidas precontractuales a petición tuya (art. 6.1.b RGPD)</td>
           </tr>
           <tr>
-            <td>Gestionar compras, cobros, suscripciones y facturación</td>
-            <td>Nombre, email, teléfono, dirección de facturación, NIF de empresa, importe y estado del pago (los datos de tarjeta los trata solo Stripe)</td>
+            <td>Gestionar matrículas, reservas de plaza, cobros y facturación</td>
+            <td>Nombre, apellidos, email, teléfono, importe, cupón aplicado y estado del pago (los datos de tarjeta o de la cuenta bancaria los trata solo la pasarela de pago Flywire)</td>
             <td>Ejecución del contrato (art. 6.1.b) y obligaciones legales fiscales y contables (art. 6.1.c)</td>
           </tr>
           <tr>
-            <td>Crear y mantener tu cuenta de cliente y atenderte por soporte</td>
-            <td>Email, nombre, historial de compras, mensajes que nos envías</td>
+            <td>Atender tus consultas y gestionar tu matrícula</td>
+            <td>Email, nombre, historial de pedidos, mensajes que nos envías</td>
             <td>Ejecución del contrato (art. 6.1.b) e interés legítimo en atender tus consultas (art. 6.1.f)</td>
+          </tr>
+          <tr>
+            <td>Enviarte novedades y convocatorias de IDESIE</td>
+            <td>Nombre y email</td>
+            <td>Tu consentimiento (art. 6.1.a), que puedes retirar en cualquier momento desde el enlace de baja de cada correo</td>
           </tr>
           <tr>
             <td>Medir el rendimiento de la web y de nuestros anuncios</td>
@@ -60,10 +65,11 @@ export default function PrivacidadPage() {
       <H2>3. Destinatarios y encargados del tratamiento</H2>
       <p>Solo compartimos datos con los proveedores necesarios para prestarte el servicio, con los que tenemos un contrato de encargado del tratamiento:</p>
       <ul>
-        <li><strong>Stripe Payments Europe, Ltd.</strong> — procesamiento de pagos y facturas.</li>
+        <li><strong>Flywire</strong> — pasarela de pago de matrículas y reservas.</li>
+        <li><strong>AECOMI</strong> — entidad certificadora, solo si solicitas la certificación de un perfil profesional.</li>
         <li><strong>Supabase</strong> y el proveedor de alojamiento de la Web (p. ej. Vercel) — almacenamiento de datos, hospedaje y estadísticas anónimas de visitas.</li>
-        <li>Proveedor de correo electrónico transaccional — envío de avisos, facturas e invitaciones.</li>
-        <li>Herramientas de comunicación que utilices para hablar con nosotros (WhatsApp, Telegram, videollamadas), bajo sus propias políticas.</li>
+        <li>Proveedor de correo electrónico transaccional — envío de confirmaciones, avisos y comunicaciones.</li>
+        <li>Herramientas de comunicación que utilices para hablar con nosotros (WhatsApp, videollamadas), bajo sus propias políticas.</li>
         <li>Asesoría fiscal y contable, y las Administraciones públicas cuando la ley lo exija.</li>
       </ul>
       <p>No vendemos tus datos a terceros.</p>
@@ -77,9 +83,9 @@ export default function PrivacidadPage() {
 
       <H2>5. Plazo de conservación</H2>
       <ul>
-        <li>Solicitudes y reservas sin compra: hasta 24 meses desde el último contacto, salvo que pidas antes su supresión.</li>
+        <li>Solicitudes de información y reservas sin matrícula: hasta 24 meses desde el último contacto, salvo que pidas antes su supresión.</li>
         <li>Datos de compras y facturas: el tiempo que exija la normativa mercantil y tributaria (generalmente entre 4 y 6 años).</li>
-        <li>Cuenta de cliente: mientras esté activa, y después, bloqueados durante los plazos de prescripción de posibles responsabilidades.</li>
+        <li>Datos del alumnado: mientras dure la relación formativa y, después, bloqueados durante los plazos de prescripción de posibles responsabilidades.</li>
         <li>Consentimiento de cookies: 6 meses.</li>
       </ul>
 
@@ -101,7 +107,7 @@ export default function PrivacidadPage() {
       </p>
 
       <H2>8. Menores</H2>
-      <p>Nuestros servicios están dirigidos a empresas y mayores de edad. No recogemos conscientemente datos de menores de 14 años.</p>
+      <p>Nuestros programas están dirigidos a personas mayores de edad. No recogemos conscientemente datos de menores de 14 años.</p>
 
       <H2>9. Cambios en esta política</H2>
       <p>Podemos actualizar esta política; la fecha de la última revisión figura arriba. Si el cambio es relevante, te lo comunicaremos.</p>

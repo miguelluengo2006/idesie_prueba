@@ -27,7 +27,7 @@ import { isPendingCall, upcomingCalls } from './context';
 import { cn } from '@/lib/utils';
 import LeadDetailModal from '@/components/portal/LeadDetailModal';
 import NewLeadModal from '@/components/portal/NewLeadModal';
-import { contactKeys, statusMeta, timeAgo, whatsappUrl } from '@/components/portal/leadMeta';
+import { contactKeys, leadChannel, leadInterest, leadNote, statusMeta, statusOptions, timeAgo, whatsappUrl } from '@/components/portal/leadMeta';
 import { EmptyState, Page, Skeleton } from '@/components/portal/ui';
 import { addDays, callDayKey, formatCallDate, formatCallTime, todayInBookingTz } from '@/lib/booking';
 import { exportLeadsCsv } from '@/lib/leadsCsv';
@@ -253,7 +253,8 @@ export default function LeadsPage() {
     const meta = statusMeta(lead.status, lead.kind);
     const call = callOf(lead);
     const wa = whatsappUrl(lead.phone);
-    const interest = lead.answers?.needs?.join(', ');
+    const interest = leadInterest(lead);
+    const note = leadNote(lead.message);
     const step = BOARD.find((b) => b.status === lead.status);
     return (
       <div className={cn('card-liquid rounded-3xl overflow-hidden', compact && 'rounded-2xl')}>
@@ -293,7 +294,7 @@ export default function LeadsPage() {
               ) : null}
               <span className="text-xs text-white/50">{originOf(lead)}{interest ? ` · ${interest}` : ''}</span>
             </div>
-            {!compact && lead.message && lead.kind !== 'call' && <p className="text-sm text-white/50 line-clamp-1 mt-2">{lead.message}</p>}
+            {!compact && note && lead.kind !== 'call' && <p className="text-sm text-white/50 line-clamp-1 mt-2">{note}</p>}
           </button>
 
           {!compact && (lead.phone || lead.email || (step?.next && lead.kind !== 'call')) && (
@@ -340,6 +341,80 @@ export default function LeadsPage() {
     );
   };
 
+  const Table = () => (
+    <div className="hidden md:block card-liquid rounded-3xl overflow-hidden">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="pn-title text-left border-b border-white/10">
+            <th scope="col" className="px-4 py-3 font-medium">Persona</th>
+            <th scope="col" className="px-3 py-3 font-medium">Contacto</th>
+            <th scope="col" className="px-3 py-3 font-medium">Interés y origen</th>
+            <th scope="col" className="px-3 py-3 font-medium">Estado</th>
+            <th scope="col" className="px-3 py-3 font-medium">Llamada</th>
+            <th scope="col" className="px-3 py-3 font-medium">Recibido</th>
+            <th scope="col" className="px-3 py-3 w-28"><span className="sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-white/10">
+          {filtered.map((lead) => {
+            const call = callOf(lead);
+            const wa = whatsappUrl(lead.phone);
+            const interest = leadInterest(lead);
+            const channel = leadChannel(lead);
+            const act = 'w-8 h-8 inline-flex items-center justify-center rounded-full hover:bg-white/[0.08] text-white/65 hover:text-white';
+            return (
+              <tr key={lead.id} className="hover:bg-white/[0.04] transition-colors align-middle">
+                <td className="px-4 py-3 max-w-[220px]">
+                  <button onClick={() => setSelectedId(lead.id)} className="text-left cursor-pointer block w-full min-w-0">
+                    <span className="block font-semibold truncate">{lead.name}</span>
+                    {lead.company && <span className="block text-xs text-white/50 truncate">{lead.company}</span>}
+                  </button>
+                </td>
+                <td className="px-3 py-3 text-xs text-white/60 max-w-[220px]">
+                  {lead.phone && <span className="block tabular-nums">{lead.phone}</span>}
+                  {lead.email && <span className="block truncate">{lead.email}</span>}
+                </td>
+                <td className="px-3 py-3 max-w-[240px]">
+                  {interest && <span className="block text-sm truncate">{interest}</span>}
+                  <span className="mt-0.5 flex items-center gap-1.5 text-xs text-white/50 flex-wrap">
+                    <span className="rounded-full border border-white/15 px-2 py-px">{channel.label}</span>
+                    {channel.campaign && <span className="truncate text-[var(--signal)]">{channel.campaign}</span>}
+                  </span>
+                </td>
+                <td className="px-3 py-3">
+                  <select
+                    value={lead.status}
+                    disabled={busyId === lead.id}
+                    onChange={(e) => move(lead, e.target.value as Lead['status'])}
+                    aria-label={`Estado de ${lead.name}`}
+                    className={cn('h-8 w-36 rounded-full pl-3 pr-7 text-xs font-medium cursor-pointer disabled:opacity-50', statusMeta(lead.status, lead.kind).badgeClass)}
+                  >
+                    {statusOptions(lead.kind).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </td>
+                <td className="px-3 py-3 whitespace-nowrap">
+                  {call ? (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400"><PhoneCall className="w-3.5 h-3.5" />{callWhen(call.call_at!)}</span>
+                  ) : (
+                    <span className="text-xs text-white/35">—</span>
+                  )}
+                </td>
+                <td className="px-3 py-3 text-xs text-white/50 whitespace-nowrap">{timeAgo(lead.created_at)}</td>
+                <td className="px-3 py-3">
+                  <div className="flex items-center justify-end gap-0.5">
+                    {lead.phone && <a href={`tel:${lead.phone}`} aria-label={`Llamar a ${lead.name}`} title="Llamar" className={act}><Phone className="w-4 h-4" /></a>}
+                    {wa && <a href={wa} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp a ${lead.name}`} title="WhatsApp" className={cn(act, 'text-green-400 hover:text-green-300')}><MessageCircle className="w-4 h-4" /></a>}
+                    {lead.email && <a href={`mailto:${lead.email}`} aria-label={`Email a ${lead.name}`} title="Email" className={act}><Mail className="w-4 h-4" /></a>}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+
   return (
     <Page title="Leads" subtitle={`${leads.length} en total`} actions={actions}>
       {/* Resumen: cada tarjeta filtra la lista */}
@@ -375,7 +450,7 @@ export default function LeadsPage() {
               </button>
             ))
           ) : (
-            <span className="text-xs text-white/45">Arrastra el trabajo de izquierda a derecha con «Pasar a…».</span>
+            <span className="text-xs text-white/45">Mueve cada lead de izquierda a derecha con «Pasar a…».</span>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -404,13 +479,16 @@ export default function LeadsPage() {
         filtered.length === 0 ? (
           <EmptyState icon={<Search className="w-6 h-6" />} title="Nada coincide" text="Prueba con otros filtros o borra la búsqueda." />
         ) : (
-          <ul className="space-y-3">
+          <>
+          {Table()}
+          <ul className="space-y-3 md:hidden">
             {filtered.map((lead, i) => (
               <li key={lead.id} className="pn-in" style={{ animationDelay: `${Math.min(i, 8) * 30}ms` }}>
                 <Card lead={lead} />
               </li>
             ))}
           </ul>
+          </>
         )
       ) : (
         <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-4 md:overflow-visible">

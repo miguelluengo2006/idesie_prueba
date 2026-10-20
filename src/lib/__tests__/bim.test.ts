@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
   AREAS,
-  MASTER_PRICE_PARTS,
   MICROS,
   PROFILES,
   TOTAL_ECTS,
@@ -27,10 +26,6 @@ describe('catálogo BIM', () => {
     expect(TOTAL_MICROS).toBe(23);
     expect(TOTAL_ECTS).toBe(44);
     expect(new Set(MICROS.map((m) => m.code)).size).toBe(23);
-  });
-
-  it('el máster completo por partes cuesta 5.760 €', () => {
-    expect(MASTER_PRICE_PARTS).toBe(5760);
   });
 
   it.each(Object.entries(EXPECTED))('el perfil %s coincide con las cifras publicadas', (code, exp) => {

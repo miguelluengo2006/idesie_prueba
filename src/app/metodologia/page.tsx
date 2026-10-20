@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Reveal, { SectionHead } from '@/components/home/Reveal';
 import { CtaBand, PageHero, SubPageShell } from '@/components/home/SubPage';
 import { CONTACT, SIMULATOR_ECTS } from '@/lib/bim';
+import { FACTS } from '@/lib/content';
 
 const TITLE = 'Metodología Learning by Working';
 const DESCRIPTION =
@@ -15,9 +16,9 @@ export const metadata: Metadata = {
 };
 
 const STATS = [
-  { value: '100%', label: 'inserción laboral' },
-  { value: '~50', label: 'empresas colaboradoras' },
-  { value: '1.000+', label: 'alumnos formados' },
+  { value: FACTS.placement, label: 'inserción laboral' },
+  { value: FACTS.companies, label: 'empresas colaboradoras' },
+  { value: FACTS.students, label: 'alumnos formados' },
   { value: '50/50', label: 'presencial y online en el máster blended' },
 ];
 
@@ -69,7 +70,7 @@ export default function MetodologiaPage() {
         lead="Un modelo que combina estudios y trabajo: la formación técnica se enriquece con la experiencia real de profesionales en activo y con las últimas tecnologías, IA incluida."
       />
 
-      <section aria-label="Resultados" className="px-4 md:px-6 py-10 md:py-12">
+      <section aria-label="Resultados" className="field-white px-4 md:px-6 py-10 md:py-12">
         <dl className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
           {STATS.map((s, i) => (
             <Reveal key={s.label} delay={i * 0.08}>
@@ -83,7 +84,7 @@ export default function MetodologiaPage() {
         </dl>
       </section>
 
-      <section aria-labelledby="ciclo-title" className="px-4 md:px-6 py-16 md:py-24">
+      <section aria-labelledby="ciclo-title" className="field-tint px-4 md:px-6 py-16 md:py-24">
         <div className="max-w-6xl mx-auto">
           <SectionHead
             eyebrow="El ciclo"
@@ -93,9 +94,9 @@ export default function MetodologiaPage() {
           <div className="mt-12 grid md:grid-cols-3 gap-4">
             {CYCLE.map((c, i) => (
               <Reveal key={c.step} delay={i * 0.1} className="h-full">
-                <article className="h-full rounded-2xl border border-white/10 bg-black/40 p-6 md:p-7">
+                <article className="h-full ui-card p-6 md:p-7">
                   <span className="font-kinetic font-black text-3xl text-[var(--signal)]">{c.step}</span>
-                  <h3 className="font-kinetic font-bold text-base uppercase leading-snug mt-3">{c.title}</h3>
+                  <h3 className="font-kinetic font-bold text-base leading-snug mt-3">{c.title}</h3>
                   <p className="text-sm text-white/60 leading-relaxed mt-3">{c.text}</p>
                 </article>
               </Reveal>
@@ -104,20 +105,20 @@ export default function MetodologiaPage() {
         </div>
       </section>
 
-      <section aria-labelledby="blended-title" className="px-4 md:px-6 py-16 md:py-24">
+      <section aria-labelledby="blended-title" className="field-white px-4 md:px-6 py-16 md:py-24">
         <div className="max-w-6xl mx-auto">
           <SectionHead eyebrow="Máster blended" title={<span id="blended-title">Learning by Working, ahora en 50/50</span>} />
           <div className="mt-12 grid md:grid-cols-2 gap-5">
             {BLENDED.map((b, i) => (
-              <Reveal key={b.title} delay={i * 0.1} className="rounded-3xl bg-[var(--ink-solid)] text-[#f4f8ff] p-7 md:p-9">
+              <Reveal key={b.title} delay={i * 0.1} className="field-navy rounded-2xl p-7 md:p-9">
                 <p className="font-kinetic font-black text-5xl text-[var(--yellow)]">{b.value}</p>
-                <h3 className="font-kinetic font-black uppercase text-xl mt-3">{b.title}</h3>
+                <h3 className="font-kinetic font-bold text-xl mt-3">{b.title}</h3>
                 <p className="text-[#c9d9f0] leading-relaxed mt-3">{b.text}</p>
               </Reveal>
             ))}
           </div>
-          <Reveal className="mt-5 rounded-2xl border border-white/10 bg-black/40 p-6 md:p-7">
-            <h3 className="font-kinetic font-bold text-sm uppercase">Proyecto fin de máster · Simulador profesional</h3>
+          <Reveal className="mt-5 ui-card p-6 md:p-7">
+            <h3 className="font-kinetic font-semibold text-base">Proyecto fin de máster · Simulador profesional</h3>
             <p className="text-sm text-white/60 leading-relaxed mt-3 max-w-3xl">
               {SIMULATOR_ECTS} ECTS: un encargo completo con un cliente real, desde los requisitos y el plan de ejecución BIM hasta la
               entrega y defensa, con reuniones, cambios, incidencias y auditoría de modelos. Los alumnos rotan los roles IDM, BDM y BCM.
@@ -126,13 +127,13 @@ export default function MetodologiaPage() {
         </div>
       </section>
 
-      <section aria-labelledby="beneficios-title" className="px-4 md:px-6 py-16 md:py-24">
+      <section aria-labelledby="beneficios-title" className="field-tint px-4 md:px-6 py-16 md:py-24">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12">
           <div>
             <SectionHead eyebrow="Resultado" title={<span id="beneficios-title">Beneficios tangibles</span>} />
             <ul className="mt-8 grid sm:grid-cols-2 gap-3">
               {BENEFITS.map((b) => (
-                <li key={b} className="rounded-2xl border border-white/10 bg-black/40 p-4 text-sm font-medium leading-snug">
+                <li key={b} className="ui-card p-4 text-sm font-medium leading-snug">
                   {b}
                 </li>
               ))}

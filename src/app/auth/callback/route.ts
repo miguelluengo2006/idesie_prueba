@@ -1,3 +1,4 @@
+import { GATE_COOKIE, gateCookieOptions, gateEnabled, signGate } from '@/lib/crmGate';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -80,7 +81,9 @@ export async function GET(request: Request) {
       }
 
       // On success, redirect to the intended page or homepage
-      return NextResponse.redirect(`${baseUrl}${next}`);
+      const ok = NextResponse.redirect(`${baseUrl}${next}`);
+      if (gateEnabled()) ok.cookies.set(GATE_COOKIE, await signGate(), gateCookieOptions);
+      return ok;
     }
 
     console.error('Auth exchange error:', error);

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-19T00:00:00Z",
+  "title": "Design System: IDESIE",
+  "extensions": {
+    "colorMeta": {
+      "signal-blue": { "role": "primary", "displayName": "Azul Señal", "canonical": "#006cff" },
+      "signal-blue-ink": { "role": "primary", "displayName": "Azul Señal Tinta", "canonical": "#0063e6" },
+      "navy-ink": { "role": "secondary", "displayName": "Marino Tinta", "canonical": "#0a1f44" },
+      "accent-yellow": { "role": "secondary", "displayName": "Amarillo Acento", "canonical": "#ffba08" },
+      "paper-blue": { "role": "neutral", "displayName": "Papel Azulado", "canonical": "#dbe8ff" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Titulares de hero, Unbounded 900." },
+      "body": { "displayName": "Cuerpo", "purpose": "Texto corrido, Inter." }
+    },
+    "shadows": [
+      { "name": "glass-rest", "value": "inset 0 1px 0 rgba(255,255,255,.6), 0 1px 2px rgba(10,10,10,.04), 0 8px 24px -12px rgba(10,10,10,.12)", "purpose": "Tarjetas de cristal en reposo." },
+      { "name": "glass-lift", "value": "0 16px 32px -14px rgba(43,85,148,.3)", "purpose": "Hover de tarjetas interactivas." }
+    ],
+    "motion": [
+      { "name": "reveal", "value": "0.55s", "purpose": "Entrada de secciones con framer-motion, retardo escalonado." },
+      { "name": "control", "value": "0.3s ease", "purpose": "Hover de botones." }
+    ],
+    "breakpoints": [{ "name": "md", "value": "768px" }, { "name": "lg", "value": "1024px" }]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "CTA principal en píldora azul con flecha.",
+      "html": "<button class=\"ds-btn-primary\">Ver programas</button>",
+      "css": ".ds-btn-primary{background:#0063e6;color:#fff;border:0;border-radius:9999px;padding:12px 24px;font-weight:600;transition:background .3s ease,transform .3s ease}.ds-btn-primary:hover{background:#0052cc;transform:translateY(-1px)}.ds-btn-primary:focus-visible{outline:2px solid #006cff;outline-offset:2px}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Acción secundaria con borde fino.",
+      "html": "<button class=\"ds-btn-outline\">Más información</button>",
+      "css": ".ds-btn-outline{background:transparent;color:#0d1522;border:1px solid rgba(10,10,10,.2);border-radius:8px;padding:12px 20px;transition:all .3s ease}.ds-btn-outline:hover{background:rgba(10,10,10,.06);border-color:rgba(10,10,10,.4)}.ds-btn-outline:focus-visible{outline:2px solid #006cff;outline-offset:2px}"
+    },
+    {
+      "name": "Glass Card",
+      "kind": "card",
+      "description": "Superficie de cristal por defecto.",
+      "html": "<div class=\"ds-card\">Máster en BIM con IA</div>",
+      "css": ".ds-card{background:rgba(255,255,255,.65);backdrop-filter:blur(20px) saturate(140%);border:1px solid rgba(10,10,10,.08);border-radius:16px;padding:24px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 8px 24px -12px rgba(10,10,10,.12);transition:transform .2s ease,box-shadow .2s ease}.ds-card:hover{transform:translateY(-2px);box-shadow:0 16px 32px -14px rgba(43,85,148,.3)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "El estudio de arquitectura vivo",
+    "overview": "Precisión técnica de plano BIM y movimiento fluido que enseña cómo se construye. Azul idesie.com como única señal.",
+    "keyCharacteristics": ["Un solo azul de señal", "Display pesado, cuerpo Inter", "Movimiento como pedagogía", "Respeta reduced-motion"],
+    "rules": [
+      { "name": "The Una Señal Rule", "body": "El azul es el único color saturado de una pantalla.", "section": "colors" },
+      { "name": "The Dos Titulares Rule", "body": "Un titular no pasa de dos líneas en ningún ancho.", "section": "typography" }
+    ],
+    "dos": ["Do mantener el azul idesie.com", "Do animar con intención y respetar reduced-motion"],
+    "donts": ["Don't parecer una plantilla de IA", "Don't recargar la animación"]
+  }
+}

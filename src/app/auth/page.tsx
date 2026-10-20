@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
 import Auth from '@/components/Auth';
 import { supabase } from '@/lib/supabase';
-import KineticWordmark from '@/components/home/KineticWordmark';
+import IdesieLogo from '@/components/home/IdesieLogo';
 
 const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
 const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL || '';
@@ -102,7 +102,7 @@ export default function AuthPage() {
       <div className="mb-8 flex flex-col items-center gap-3">
         {logoUrl && <img src={logoUrl} alt="" className="w-16 h-16 object-contain" />}
         <Link href="/" aria-label="Ir a la web">
-          <KineticWordmark name={authConfig?.agency_name || 'samgple'} className="text-2xl" />
+          <IdesieLogo tone="white" className="h-10" />
         </Link>
       </div>
       {DEMO_MODE && DEMO_EMAIL ? (

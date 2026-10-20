@@ -13,7 +13,7 @@ export function SubPageShell({ children }: { children: React.ReactNode }) {
       <div className="home-root min-h-screen relative">
         <SiteHeader />
         <main className="relative z-[2]">{children}</main>
-        <SiteFooter className="w-[calc(100%-clamp(20px,5vw,72px))] max-w-[1320px] mx-auto mt-3 mb-4" />
+        <SiteFooter />
       </div>
     </BookCallProvider>
   );
@@ -31,13 +31,13 @@ export function PageHero({
   children?: React.ReactNode;
 }) {
   return (
-    <section className="px-4 md:px-6 pt-28 pb-16 md:pt-36 md:pb-20">
+    <section className="field-tint px-4 md:px-6 pt-28 pb-16 md:pt-36 md:pb-20">
       <div className="max-w-6xl mx-auto">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors mb-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-[#0a1f44] transition-colors mb-8">
           <ArrowLeft className="w-4 h-4" aria-hidden="true" /> Inicio
         </Link>
-        <p className="text-xs tracking-[0.25em] uppercase text-[var(--signal)]">{eyebrow}</p>
-        <h1 className="font-kinetic font-black uppercase text-3xl sm:text-4xl md:text-6xl leading-[1.02] mt-4 max-w-4xl">{title}</h1>
+        <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[var(--signal)]">{eyebrow}</p>
+        <h1 className="font-kinetic font-bold text-3xl sm:text-4xl md:text-6xl leading-[1.12] mt-4 max-w-4xl">{title}</h1>
         <p className="text-lg md:text-xl text-white/60 max-w-2xl leading-relaxed mt-6">{lead}</p>
         {children}
       </div>
@@ -45,22 +45,21 @@ export function PageHero({
   );
 }
 
-/** Cierre de página: llamada a la acción sobre fondo oscuro, igual que los bloques destacados de la home. */
+/** Cierre de página: llamada a la acción sobre campo marino, igual que los bloques destacados de la home. */
 export function CtaBand({ title, text, pack, label = 'Agendar llamada' }: { title: string; text: string; pack?: string; label?: string }) {
   return (
-    <section className="px-4 md:px-6 py-16 md:py-24">
+    <section className="field-navy px-4 md:px-6 py-16 md:py-24">
       <div className="max-w-6xl mx-auto">
-        <Reveal className="rounded-[28px] bg-[var(--ink-solid)] text-[#f4f8ff] p-7 md:p-12 flex flex-col lg:flex-row gap-8 lg:items-center justify-between">
+        <Reveal className="flex flex-col lg:flex-row gap-8 lg:items-center justify-between">
           <div className="max-w-2xl">
-            <h2 className="font-kinetic font-black uppercase text-2xl md:text-4xl leading-[1.08]">{title}</h2>
+            <h2 className="font-kinetic font-bold text-2xl md:text-4xl leading-[1.15]">{title}</h2>
             <p className="text-[#c9d9f0] mt-4 leading-relaxed">{text}</p>
           </div>
-          <BookCallButton
-            pack={pack}
-            className="group shrink-0 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full bg-[var(--yellow)] text-[#0a1f44] text-sm font-semibold hover:brightness-95 transition cursor-pointer"
-          >
+          <BookCallButton pack={pack} className="btn btn-cta shrink-0">
             {label}
-            <ArrowUpRight className="w-4 h-4 group-hover:rotate-45 transition-transform" aria-hidden="true" />
+            <span className="btn-dot">
+              <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+            </span>
           </BookCallButton>
         </Reveal>
       </div>

@@ -16,7 +16,7 @@ describe('analytics filter', () => {
   });
 
   it('never reports the admin panel, previews or access links', () => {
-    for (const path of ['/portal', '/portal/leads?open=3f2b', '/vista-cliente?lead=1', '/auth/confirm?token_hash=abc', '/auth/set-password', '/invite/accept-team?token=t']) {
+    for (const path of ['/portal', '/portal/leads?open=3f2b', '/auth/confirm?token_hash=abc', '/auth/set-password', '/invite/accept-team?token=t']) {
       expect(filterAnalyticsEvent(ev(`https://samgple.com${path}`)), path).toBeNull();
     }
   });

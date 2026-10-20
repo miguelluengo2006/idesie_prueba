@@ -1,78 +1,48 @@
 import Reveal, { SectionHead } from './Reveal';
+import Section from './Section';
+import { COMPANY_LOGOS } from '@/lib/content';
+import LogoTile from './LogoTile';
 
-const HIGHLIGHTS = [
-  {
-    tag: 'Talento',
-    title: 'Captad talento con poca inversión',
-    text: 'Participad como cliente en el simulador profesional y ved trabajar a los candidatos antes de contratarlos.',
-  },
-  {
-    tag: 'Concursos',
-    title: 'Equipos con perfiles certificados',
-    text: 'Cada vez más licitaciones y proyectos piden acreditar los perfiles profesionales del equipo.',
-  },
+const OFFERS = [
+  { title: 'Captad talento', text: 'Participad como cliente en el simulador y ved trabajar a los candidatos antes de contratarlos.' },
+  { title: 'Concursos y licitaciones', text: 'Equipos con perfiles certificados, cada vez más exigidos.' },
+  { title: 'Formación in-company', text: 'Itinerarios por perfil profesional para vuestros equipos.' },
+  { title: 'Consultoría BIM', text: 'ISO 19650, BIM Management Office, modelado, auditoría y 4D/5D.' },
 ];
 
-const SERVICES = [
-  { title: 'Definir perfiles', text: 'Identificamos juntos las competencias de cada puesto.' },
-  { title: 'Incorporar talento', text: 'Alumnos en formación dual y en el simulador, preparados para certificarse.' },
-  { title: 'Formación in-company', text: 'Itinerarios para tus equipos sobre el mapa de cada perfil.' },
-  { title: 'Consultoría BIM', text: 'ISO 19650, BIM Management Office, modelado, auditoría, 4D/5D y Facility Management.' },
-];
-
-const CLIENTS = [
-  'Ferrovial',
-  'Acciona',
-  'IDOM',
-  'Accenture',
-  'Banco de España',
-  'Savills',
-  'Metrovacesa',
-  'AEDAS Homes',
-  'Hill International',
-  'Estudio Lamela',
-];
-
-/** Para empresas: perfiles, talento, formación in-company y consultoría. */
+/** Empresas: quién confía en nosotros y qué ofrecemos a las empresas. */
 export default function Companies() {
   return (
-    <section id="empresas" aria-labelledby="empresas-title" className="px-4 md:px-6 py-20 md:py-28 scroll-mt-24">
-      <div className="max-w-6xl mx-auto">
-        <SectionHead eyebrow="Para empresas" title={<span id="empresas-title">Definid con nosotros los perfiles que necesitáis</span>} />
+    <Section field="navy" id="empresas" labelledBy="empresas-title">
+      <SectionHead
+        eyebrow="Empresas"
+        title={
+          <span id="empresas-title">
+            Las empresas referentes del sector <span className="ui-hl">confían</span> en nosotros
+          </span>
+        }
+      />
 
-        <div className="mt-12 grid md:grid-cols-2 gap-5">
-          {HIGHLIGHTS.map((h, i) => (
-            <Reveal key={h.tag} delay={i * 0.1} className="rounded-3xl bg-[var(--ink-solid)] text-[#f4f8ff] p-7 md:p-9">
-              <p className="text-xs tracking-[0.2em] uppercase text-[var(--yellow)]">{h.tag}</p>
-              <h3 className="font-kinetic font-black uppercase text-xl md:text-2xl leading-tight mt-3">{h.title}</h3>
-              <p className="text-[#c9d9f0] leading-relaxed mt-3">{h.text}</p>
+      <ul className="mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" aria-label="Empresas que confían en IDESIE">
+        {COMPANY_LOGOS.map((l, i) => (
+          <li key={l.name}>
+            <Reveal delay={(i % 5) * 0.05}>
+              <LogoTile logo={l} />
             </Reveal>
-          ))}
-        </div>
+          </li>
+        ))}
+      </ul>
 
-        <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {SERVICES.map((s, i) => (
-            <Reveal key={s.title} delay={i * 0.06} className="h-full">
-              <div className="h-full rounded-2xl border border-white/10 bg-black/40 p-6 hover:border-[var(--signal)]/50 transition-colors">
-                <h3 className="font-kinetic font-bold text-sm uppercase leading-snug">{s.title}</h3>
-                <p className="text-sm text-white/60 leading-relaxed mt-3">{s.text}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        <div className="mt-14">
-          <p className="text-xs tracking-[0.2em] uppercase text-white/50">Ya confían en nosotros</p>
-          <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-2">
-            {CLIENTS.map((c, i) => (
-              <li key={c} className="font-kinetic font-bold text-base md:text-lg flex items-center gap-3">
-                {c}
-                {i < CLIENTS.length - 1 && <span className="w-1.5 h-1.5 rounded-full bg-[var(--signal)]" aria-hidden="true" />}
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {OFFERS.map((o, i) => (
+          <Reveal key={o.title} delay={i * 0.06} className="h-full">
+            <div className="ui-card h-full p-6">
+              <h3 className="font-kinetic font-semibold text-base leading-snug">{o.title}</h3>
+              <p className="text-sm text-[#c9d9f0] leading-relaxed mt-3">{o.text}</p>
+            </div>
+          </Reveal>
+        ))}
       </div>
-    </section>
+    </Section>
   );
 }

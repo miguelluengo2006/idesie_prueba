@@ -344,6 +344,20 @@ describe('POST /api/public/contact — website proposal', () => {
     expect(ok.status).toBe(200);
     expect(state.inserted).toMatchObject({ source: 'website', kind: 'proposal', email: 'a@b.es' });
   });
+
+  it('guarda el programa de interés como "needs" y la página de origen en el mensaje', async () => {
+    const res = await post({ name: 'A', email: 'a@b.es', message: 'Quiero info', interest: 'Máster en IA aplicada a la Arquitectura', page: '/ia-bim' });
+    expect(res.status).toBe(200);
+    expect(state.inserted.answers).toEqual({ needs: ['Máster en IA aplicada a la Arquitectura'], budget: '', timeline: '' });
+    expect(state.inserted.message).toBe('Quiero info\n\nOrigen: /ia-bim');
+  });
+
+  it('ignora una página de origen que no sea una ruta interna y no guarda answers sin programa', async () => {
+    const res = await post({ name: 'A', email: 'a@b.es', message: 'hola', page: 'https://evil.example/x' });
+    expect(res.status).toBe(200);
+    expect(state.inserted.answers).toBeNull();
+    expect(state.inserted.message).toBe('hola');
+  });
 });
 
 

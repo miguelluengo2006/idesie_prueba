@@ -1,77 +1,99 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import Reveal, { SectionHead } from './Reveal';
-import { BookCallButton } from './BookCall';
-import { MASTER_PRICE_ONLINE, PRICE_PER_ECTS, formatEuro } from '@/lib/bim';
+import Section from './Section';
+import { PRICE_PER_ECTS, PROFILES, formatEuro } from '@/lib/bim';
 
-/** "Tres formas de recorrer tu mapa": máster blended, máster online y microcredenciales. */
-export default function Programs() {
-  const link = 'inline-flex items-center gap-2 text-sm font-semibold mt-auto pt-2 cursor-pointer group';
-  const arrow = <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />;
+const certifiable = PROFILES.filter((p) => p.certifiable);
+const pathways = PROFILES.filter((p) => !p.certifiable);
+const profileHref = (code: string) => `/perfiles/${code.toLowerCase()}`;
 
+const row =
+  'flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium hover:bg-[#0a1f44] hover:text-[#fff] transition-colors';
+
+function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section id="formacion" aria-labelledby="formacion-title" className="px-4 md:px-6 py-20 md:py-28 scroll-mt-24">
-      <div className="max-w-6xl mx-auto">
-        <SectionHead eyebrow="Formación" title={<span id="formacion-title">Tres formas de recorrer tu mapa</span>} />
+    <div>
+      <p className="text-xs font-semibold tracking-[0.2em] uppercase text-white/50 mb-2">{title}</p>
+      <ul className="-mx-3">{children}</ul>
+    </div>
+  );
+}
 
-        <div className="mt-12 grid lg:grid-cols-3 gap-5">
-          <Reveal className="rounded-3xl bg-[var(--ink-solid)] text-[#f4f8ff] p-7 md:p-9 flex flex-col gap-4">
-            <span className="self-start text-[11px] font-bold tracking-[0.12em] uppercase px-3 py-1.5 rounded-full bg-[var(--yellow)] text-[#0a1f44]">
-              Programa insignia
-            </span>
-            <h3 className="font-kinetic font-black uppercase text-xl md:text-2xl">Máster BIM blended</h3>
-            <p className="text-[#c9d9f0] leading-relaxed">
-              Para recién titulados y jóvenes profesionales. 50% presencial con casos reales y 50% online. Trabajo remunerado en empresa
-              desde el primer día.
-            </p>
-            <ul className="text-sm text-[#c9d9f0] space-y-2">
-              <li>
-                <strong className="text-[#f4f8ff]">50% presencial:</strong> casos reales, coordinación entre disciplinas y trabajo en
-                equipo sobre modelos.
-              </li>
-              <li>
-                <strong className="text-[#f4f8ff]">50% online:</strong> manejo de software y contenidos que no requieren presencialidad,
-                a ritmo propio.
-              </li>
-            </ul>
-            <p className="text-sm font-semibold text-[var(--yellow)]">Madrid · Metodología dual</p>
-            <BookCallButton pack="Máster BIM blended" className={`${link} text-[#f4f8ff]`}>
-              Conocer el máster {arrow}
-            </BookCallButton>
-          </Reveal>
+function Item({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <li>
+      <Link href={href} className={`group ${row}`}>
+        {children}
+        <ArrowRight className="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition" aria-hidden="true" />
+      </Link>
+    </li>
+  );
+}
 
-          <Reveal delay={0.1} className="rounded-3xl border border-white/10 bg-black/40 p-7 md:p-9 flex flex-col gap-4">
-            <span className="self-start text-[11px] font-bold tracking-[0.12em] uppercase px-3 py-1.5 rounded-full bg-[var(--signal)]/10 text-[var(--signal)]">
-              Flexible
-            </span>
-            <h3 className="font-kinetic font-black uppercase text-xl md:text-2xl">Máster BIM online</h3>
-            <p className="text-white/60 leading-relaxed">
-              El mismo contenido del programa presencial, 100% online y a tu ritmo, con acceso a nuestra bolsa de empleo.
-            </p>
-            <p className="text-sm font-semibold text-[var(--signal)]">{formatEuro(MASTER_PRICE_ONLINE)} · Online · Bolsa de empleo</p>
-            <BookCallButton pack="Máster BIM online" className={`${link} text-[var(--signal)]`}>
-              Conocer el máster online {arrow}
-            </BookCallButton>
-          </Reveal>
+/** Casilla de programas: banda de título y, debajo, la lista de enlaces. */
+function Tile({ title, delay, children }: { title: string; delay: number; children: React.ReactNode }) {
+  return (
+    <Reveal delay={delay} className="h-full flex flex-col overflow-hidden rounded-2xl">
+      <h3 className="bg-[#0a1f44] text-[#fff] font-kinetic font-bold text-xl md:text-2xl px-7 md:px-8 py-5">{title}</h3>
+      <div className="ui-card !rounded-t-none flex-1 p-7 md:p-8 flex flex-col gap-6">{children}</div>
+    </Reveal>
+  );
+}
 
-          <Reveal delay={0.2} className="rounded-3xl border border-white/10 bg-black/40 p-7 md:p-9 flex flex-col gap-4">
-            <span className="self-start text-[11px] font-bold tracking-[0.12em] uppercase px-3 py-1.5 rounded-full bg-[var(--yellow)]/30 text-[#5c4300]">
-              Nuevo
-            </span>
-            <h3 className="font-kinetic font-black uppercase text-xl md:text-2xl">Microcredenciales</h3>
-            <p className="text-white/60 leading-relaxed">
-              23 módulos de 1 a 3 ECTS. Elige las competencias que te faltan o completa el máster módulo a módulo, cerrando con el
-              simulador profesional como proyecto fin de máster.
-            </p>
-            <p className="text-sm font-semibold text-[var(--signal)]">
-              Desde {formatEuro(PRICE_PER_ECTS)} · {formatEuro(PRICE_PER_ECTS)} por ECTS · Acumulables
-            </p>
-            <Link href="/microcredenciales" className={`${link} text-[var(--signal)]`}>
-              Ver el catálogo {arrow}
-            </Link>
-          </Reveal>
-        </div>
+/** "Másteres, microcredenciales y perfiles profesionales": las tres puertas al catálogo. */
+export default function Programs() {
+  return (
+    <Section field="tint" id="formacion" labelledBy="formacion-title">
+      <SectionHead
+        eyebrow="Programas"
+        title={
+          <span id="formacion-title">
+            Másteres, microcredenciales y <span className="ui-hl">perfiles profesionales</span>
+          </span>
+        }
+        lead="Todos con certificación universitaria de UTAMED y alineados con los perfiles que certifica AECOMI."
+      />
+
+      <div className="mt-12 grid lg:grid-cols-3 gap-5">
+        <Tile title="Másteres" delay={0}>
+          <Group title="Programas presenciales">
+            <Item href="/masters/mbim">MBIM · Máster BIM presencial</Item>
+            <Item href="/masters/mbbe">MBBE · Building Engineering</Item>
+          </Group>
+          <Group title="Programas online">
+            <Item href="/masters/mbim-online">MBIM Online</Item>
+          </Group>
+          <p className="text-sm text-white/60 mt-auto">Learning by Working: en el presencial trabajas en empresa desde el primer día.</p>
+        </Tile>
+
+        <Tile title="Microcredenciales" delay={0.1}>
+          <Group title="Por áreas">
+            <Item href="/microcredenciales">Ingeniería</Item>
+            <Item href="/microcredenciales">Arquitectura</Item>
+            <Item href="/microcredenciales">Construcción</Item>
+            <Item href="/microcredenciales">Gestión de proyectos</Item>
+            <Item href="/microcredenciales">Operación y mantenimiento</Item>
+          </Group>
+          <p className="text-sm font-semibold text-[var(--signal)] mt-auto">
+            Desde {formatEuro(PRICE_PER_ECTS)} · {formatEuro(PRICE_PER_ECTS)} por ECTS
+          </p>
+        </Tile>
+
+        <Tile title="Perfiles profesionales" delay={0.2}>
+          <Group title="Certificables AECOMI">
+            {certifiable.map((p) => (
+              <Item key={p.code} href={profileHref(p.code)}>{p.name}</Item>
+            ))}
+          </Group>
+          <Group title="Itinerarios formativos">
+            {pathways.map((p) => (
+              <Item key={p.code} href={profileHref(p.code)}>{p.name}</Item>
+            ))}
+          </Group>
+          <p className="text-sm font-semibold text-[var(--signal)] mt-auto">Certificación universitaria UTAMED</p>
+        </Tile>
       </div>
-    </section>
+    </Section>
   );
 }

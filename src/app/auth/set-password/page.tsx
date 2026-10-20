@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
 import { supabase } from '@/lib/supabase';
-import KineticWordmark from '@/components/home/KineticWordmark';
+import IdesieLogo from '@/components/home/IdesieLogo';
 
 /** Pantalla a la que lleva el correo de bienvenida: el cliente elige su contraseña y entra. */
 export default function SetPasswordPage() {
@@ -15,7 +15,7 @@ export default function SetPasswordPage() {
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [brand, setBrand] = useState('samgple');
+  const [brand, setBrand] = useState('IDESIE');
 
   useEffect(() => {
     fetch('/api/public/branding')
@@ -39,7 +39,7 @@ export default function SetPasswordPage() {
       setSaving(false);
       return setError(/same|different/i.test(err.message) ? 'Elige una contraseña distinta a la anterior.' : 'No se pudo guardar la contraseña. Inténtalo de nuevo.');
     }
-    router.replace('/cuenta');
+    router.replace('/portal');
   };
 
   if (loading || !user) return <div className="home-root min-h-screen" />;
@@ -48,7 +48,7 @@ export default function SetPasswordPage() {
     <div className="home-root min-h-screen flex items-center justify-center px-4 py-16">
       <div className="home-slab w-full max-w-md px-6 sm:px-10 py-10">
         <div className="flex justify-center mb-6">
-          <Link href="/" aria-label="Ir a la web"><KineticWordmark name={brand} className="text-2xl" /></Link>
+          <Link href="/" aria-label="Ir a la web"><IdesieLogo tone="white" className="h-10" /></Link>
         </div>
         <h1 className="text-2xl font-bold text-center text-white">Crea tu contraseña</h1>
         <p className="text-sm text-white/60 text-center mt-2">Con ella entrarás a tu panel, donde están tus vídeos disponibles.</p>

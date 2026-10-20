@@ -4,7 +4,7 @@ import { teamInviteEmail } from '../emailTemplates';
 describe('teamInviteEmail', () => {
   it('is in Spanish, carries the invite link and the role', () => {
     const m = teamInviteEmail({ ownerName: 'Miguel', role: 'admin', inviteUrl: 'https://samgple.com/invite/accept-team?token=tm_abc' });
-    expect(m.subject).toBe('Miguel te ha invitado al equipo de samgple');
+    expect(m.subject).toBe('Miguel te ha invitado al equipo de IDESIE');
     expect(m.html).toContain('administrador');
     expect(m.html).toContain('https://samgple.com/invite/accept-team?token=tm_abc');
     expect(m.text).toContain('tm_abc');

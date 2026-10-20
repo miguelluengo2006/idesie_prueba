@@ -63,7 +63,7 @@ export default function IaBimPage() {
         eyebrow="Novedad · IA aplicada al sector AEC"
         title={
           <>
-            BIM con IA. <span className="home-glow-text text-[var(--signal)]">Más criterio, menos tarea repetida.</span>
+            BIM con IA. <span className="ui-hl">Más criterio</span>, menos tarea repetida.
           </>
         }
         lead="La inteligencia artificial ya está en los flujos de trabajo de arquitectura, ingeniería y construcción. En IDESIE la integramos en el Máster BIM y en las microcredenciales, para que la uses con método y con responsabilidad profesional."
@@ -71,14 +71,14 @@ export default function IaBimPage() {
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
             href="/microcredenciales"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--signal)] text-black text-sm font-medium hover:bg-[var(--signal-dim)] transition-colors"
+            className="btn btn-blue"
           >
-            Ver el catálogo <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            Ver el catálogo <span className="btn-dot bg-[#fff]/20"><ArrowRight className="w-4 h-4" aria-hidden="true" /></span>
           </Link>
         </div>
       </PageHero>
 
-      <section aria-labelledby="etapas-title" className="px-4 md:px-6 py-16 md:py-24">
+      <section aria-labelledby="etapas-title" className="field-white px-4 md:px-6 py-16 md:py-24">
         <div className="max-w-6xl mx-auto">
           <SectionHead
             eyebrow="Dónde aplicarás la IA"
@@ -88,8 +88,8 @@ export default function IaBimPage() {
           <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {STAGES.map((s, i) => (
               <Reveal key={s.stage} delay={(i % 3) * 0.08} className="h-full">
-                <article className="h-full rounded-2xl border border-white/10 bg-black/40 p-6 hover:border-[var(--signal)]/50 transition-colors">
-                  <h3 className="font-kinetic font-bold text-sm md:text-base uppercase leading-snug">{s.stage}</h3>
+                <article className="h-full ui-card p-6 hover:border-[var(--signal)]/50 transition-colors">
+                  <h3 className="font-kinetic font-semibold text-base leading-snug">{s.stage}</h3>
                   <p className="text-sm text-white/60 leading-relaxed mt-3">{s.text}</p>
                   <ul className="mt-4 flex flex-wrap gap-2">
                     {s.micros.map((code) => (
@@ -106,7 +106,7 @@ export default function IaBimPage() {
         </div>
       </section>
 
-      <section aria-labelledby="micro-title" className="px-4 md:px-6 py-16 md:py-24">
+      <section aria-labelledby="micro-title" className="field-tint px-4 md:px-6 py-16 md:py-24">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.2fr_1fr] gap-10 items-start">
           <div>
             <SectionHead
@@ -114,8 +114,8 @@ export default function IaBimPage() {
               title={<span id="micro-title">{ia.title}</span>}
               lead={`${ia.ects} ECTS · ${formatEuro(ia.ects * PRICE_PER_ECTS)}. Puedes cursarla suelta o dentro del mapa de tu perfil, y se acumula hasta completar el Máster BIM.`}
             />
-            <Reveal className="mt-8 rounded-2xl border border-white/10 bg-black/40 p-6">
-              <p className="text-xs tracking-[0.2em] uppercase text-white/50">Se combina con</p>
+            <Reveal className="mt-8 ui-card p-6">
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-white/50">Se combina con</p>
               <ul className="mt-4 divide-y divide-white/10">
                 {AI_MICROS.filter((m) => m.code !== '21').map((m) => (
                   <li key={m.code} className="flex items-center gap-3 py-2.5 text-sm">
@@ -128,13 +128,13 @@ export default function IaBimPage() {
             </Reveal>
           </div>
 
-          <Reveal delay={0.1} className="rounded-3xl bg-[var(--ink-solid)] text-[#f4f8ff] p-7 md:p-8">
-            <p className="text-xs tracking-[0.2em] uppercase text-[var(--yellow)]">Perfiles que la incluyen</p>
+          <Reveal delay={0.1} className="field-navy rounded-2xl p-7 md:p-8">
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[var(--yellow)]">Perfiles que la incluyen</p>
             <ul className="mt-4 space-y-3">
               {AI_PROFILES.map((p) => (
                 <li key={p.code}>
                   <Link href={`/perfiles/${p.code.toLowerCase()}`} className="group flex items-center justify-between gap-3 hover:text-[var(--yellow)] transition-colors">
-                    <span className="font-kinetic font-bold text-sm uppercase">{p.name}</span>
+                    <span className="font-kinetic font-semibold text-base">{p.name}</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                   </Link>
                 </li>
@@ -147,14 +147,14 @@ export default function IaBimPage() {
         </div>
       </section>
 
-      <section aria-labelledby="principios-title" className="px-4 md:px-6 py-16 md:py-24">
+      <section aria-labelledby="principios-title" className="field-white px-4 md:px-6 py-16 md:py-24">
         <div className="max-w-6xl mx-auto">
           <SectionHead eyebrow="Nuestro enfoque" title={<span id="principios-title">IA con método profesional</span>} />
           <div className="mt-12 grid md:grid-cols-3 gap-4">
             {PRINCIPLES.map((p, i) => (
               <Reveal key={p.title} delay={i * 0.08} className="h-full">
-                <div className="h-full rounded-2xl border border-white/10 bg-black/40 p-6">
-                  <h3 className="font-kinetic font-bold text-sm uppercase leading-snug">{p.title}</h3>
+                <div className="h-full ui-card p-6">
+                  <h3 className="font-kinetic font-semibold text-base leading-snug">{p.title}</h3>
                   <p className="text-sm text-white/60 leading-relaxed mt-3">{p.text}</p>
                 </div>
               </Reveal>

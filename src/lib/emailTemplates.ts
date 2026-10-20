@@ -167,7 +167,7 @@ export interface LeadMailData {
 }
 
 export function leadEmail(lead: LeadMailData, opts: EmailOptions): RenderedEmail {
-  const brand = opts.brand || 'samgple';
+  const brand = opts.brand || 'IDESIE';
   const receivedAt = opts.receivedAt || new Date();
   const isCall = lead.kind === 'call' && !!lead.callAt;
   const isPack = !!lead.pack;
@@ -278,7 +278,7 @@ export interface PurchaseMailData {
 }
 
 export function purchaseEmail(p: PurchaseMailData, opts: EmailOptions): RenderedEmail {
-  const brand = opts.brand || 'samgple';
+  const brand = opts.brand || 'IDESIE';
   const amount = `${p.amountEur.toLocaleString('es-ES')} €`;
   const title = p.customerName || p.customerEmail || 'Cliente de Stripe';
   const subject = `Nueva compra — ${p.packName} · ${amount} (IVA incluido)${p.livemode ? '' : ' [prueba]'}`;
@@ -340,7 +340,7 @@ export interface TeamInviteData {
 const ROLE_LABEL: Record<string, string> = { admin: 'administrador', manager: 'gestor', member: 'miembro' };
 
 export function teamInviteEmail(d: TeamInviteData): RenderedEmail {
-  const brand = d.brand || 'samgple';
+  const brand = d.brand || 'IDESIE';
   const role = ROLE_LABEL[d.role] || ROLE_LABEL.member;
   const subject = `${d.ownerName} te ha invitado al equipo de ${brand}`;
 
@@ -399,7 +399,7 @@ function customerShell(brand: string, bodyHtml: string, title: string): string {
 
 /** Correo tras la compra: cuenta creada (o ya existente) y vídeos disponibles. */
 export function customerWelcomeEmail(d: CustomerWelcomeData): RenderedEmail {
-  const brand = d.brand || 'samgple';
+  const brand = d.brand || 'IDESIE';
   const hello = d.name ? `Hola ${d.name.split(' ')[0]},` : 'Hola,';
   const videos = `${d.credits} ${d.credits === 1 ? 'vídeo disponible' : 'vídeos disponibles'}`;
   const subject = d.isNew ? `Tu cuenta de ${brand} está lista · ${videos}` : `Ya tienes ${videos} en tu cuenta de ${brand}`;
@@ -441,7 +441,7 @@ export interface CustomerUpdateData {
 
 /** Correo corto cuando cambia algo en un pedido (guion listo, vídeo entregado…). */
 export function customerUpdateEmail(d: CustomerUpdateData): RenderedEmail {
-  const brand = d.brand || 'samgple';
+  const brand = d.brand || 'IDESIE';
   const html = customerShell(
     brand,
     `<h1 style="margin:0;font:800 26px/1.15 ${FONT};letter-spacing:-.02em;color:${C.ink};">${esc(d.title)}</h1>

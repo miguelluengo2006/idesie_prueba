@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import { SectionPage } from '@/components/home/SubPage';
-import Certification from '@/components/home/Certification';
-import Route from '@/components/home/Route';
+import CertPage from '@/components/home/CertPage';
 import { CONTACT } from '@/lib/bim';
 
 const TITLE = 'Certificación de perfiles con AECOMI';
@@ -15,10 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return (
-    <SectionPage title="Certificación de perfiles con AECOMI">
-      <Certification />
-      <Route />
-    </SectionPage>
-  );
+  return <CertPage />;
 }

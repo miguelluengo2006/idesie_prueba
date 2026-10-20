@@ -31,16 +31,10 @@ const nextConfig: NextConfig = {
       },
     },
   }),
-  // La web de IDESIE no vende packs ni hace vídeos: la landing, el carrito y esas secciones del panel llevan a la home / al resumen.
-  // (Las páginas y las APIs siguen en el código; quita estas redirecciones para reactivarlas.)
+  // La dirección antigua del carrito lleva al pago de la tienda. El único panel es el CRM (/portal).
   async redirects() {
     return [
-      { source: '/landing', destination: '/', permanent: false },
-      { source: '/carrito', destination: '/', permanent: false },
-      // Secciones del panel de la agencia anterior (vídeos con IA, finanzas de packs, prompts): el CRM ya no las usa
-      { source: '/portal/videos', destination: '/portal', permanent: false },
-      { source: '/portal/finance', destination: '/portal', permanent: false },
-      { source: '/portal/prompts', destination: '/portal', permanent: false },
+      { source: '/carrito', destination: '/checkout', permanent: false },
     ];
   },
   async headers() {

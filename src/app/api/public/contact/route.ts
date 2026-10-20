@@ -116,6 +116,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Cuéntanos qué necesitas' }, { status: 400 });
     }
 
+    // Formularios de las páginas de programas: qué programa interesa y desde qué página llega el lead.
+    // El programa va como `needs` (el panel y el email ya lo muestran como «Necesita») y el origen, en el mensaje.
+    if (kind === 'proposal' && source === 'website') {
+      const interest = sanitizeString(body.interest || '', 120);
+      const page = typeof body.page === 'string' && /^\/[\w\-/]{0,119}$/.test(body.page) ? body.page : '';
+      if (interest) answers = { needs: [interest], budget: '', timeline: '' };
+      if (page) message = `${message}\n\nOrigen: ${page}`;
+    }
+
     // Self-hosted deployments serve a single agency — the earliest-created
     // profile is the owner (matches /api/public/branding and /api/public/checkout).
     const { data: owner } = await supabaseAdmin

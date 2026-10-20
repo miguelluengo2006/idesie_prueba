@@ -8,91 +8,74 @@ export default function TerminosPage() {
   return (
     <LegalPage title="Términos y condiciones">
       <p>
-        Estas condiciones regulan la contratación de los servicios que <Legal v={LEGAL.name} /> (NIF/CIF <Legal v={LEGAL.taxId} />, en adelante
-        «{LEGAL.brand}») ofrece a través de {LEGAL.domain}. Al pulsar «Comprar» o contratar un servicio, aceptas estas condiciones.
+        Estas condiciones regulan la contratación de los programas formativos y servicios que <Legal v={LEGAL.name} /> (NIF/CIF <Legal v={LEGAL.taxId} />,
+        en adelante «{LEGAL.brand}») ofrece a través de {LEGAL.domain}. Al marcar la casilla de aceptación y pagar, aceptas estas condiciones.
       </p>
 
       <H2>1. Servicios</H2>
       <p>
-        {LEGAL.brand} crea vídeos y contenido para negocios y empresas, utilizando herramientas de inteligencia artificial y edición profesional. El
-        contenido, duración, número de piezas y plazo de entrega de cada pack son los indicados en su descripción en la Web en el momento de la compra.
+        {LEGAL.brand} imparte formación en BIM y metodologías relacionadas: másteres, títulos y cursos. El contenido, la duración, la modalidad y la
+        titulación de cada programa son los indicados en su ficha de la Web en el momento de la contratación. Las certificaciones profesionales de perfiles
+        las emite AECOMI de forma independiente; {LEGAL.brand} forma pero no garantiza que se obtenga la certificación.
       </p>
 
       <H2>2. Contratación y precios</H2>
       <ul>
         <li>Todos los precios se muestran en euros e <strong>incluyen el IVA</strong>, salvo que se indique lo contrario.</li>
-        <li>El contrato se perfecciona cuando completas el pago y recibes la confirmación por email. {LEGAL.brand} puede rechazar un pedido por causa justificada, reembolsando lo cobrado.</li>
-        <li>Recibirás una factura con los datos que indiques en el pago (por ejemplo, el NIF de tu empresa). Revísalos: no podremos modificarla si son incorrectos tras un plazo razonable.</li>
-        <li>Ofertas y promociones (p. ej. el Pack de Bienvenida) tienen plazas o condiciones limitadas y pueden retirarse al agotarse.</li>
+        <li>El contrato se perfecciona cuando completas el pago y recibes la confirmación por email. {LEGAL.brand} puede rechazar una inscripción por causa justificada (por ejemplo, falta de plazas o de requisitos de acceso), reembolsando lo cobrado.</li>
+        <li>Los datos que indiques en la compra (nombre, apellidos y email) son los que se usarán para tu matrícula y para la factura. Revísalos antes de pagar.</li>
+        <li>Los programas sin precio publicado se contratan tras una conversación con admisiones.</li>
+        <li>Los códigos de descuento son personales, no acumulables y pueden tener fecha de caducidad, productos concretos o un número máximo de usos.</li>
       </ul>
 
-      <H2>3. Pago</H2>
+      <H2>3. Reserva de plaza</H2>
       <p>
-        El pago se realiza a través de <strong>Stripe</strong>, una pasarela segura. {LEGAL.brand} no almacena los datos de tu tarjeta. Los pagos
-        pueden requerir autenticación reforzada (3D Secure) de tu banco.
+        En los másteres con reserva online, el importe abonado en la Web (por ejemplo, 3.000 €) es una <strong>reserva de plaza</strong> que se descuenta
+        del precio total del programa. El resto del importe, y las posibles opciones de pago fraccionado o financiación, se acuerdan con el equipo de
+        admisiones tras la reserva. La reserva garantiza tu plaza en la convocatoria indicada por admisiones.
       </p>
 
-      <H2>4. Suscripciones mensuales</H2>
+      <H2>4. Pago</H2>
       <p>
-        Los planes mensuales se renuevan automáticamente cada mes hasta que los canceles. Puedes cancelarlos en cualquier momento escribiendo a{' '}
-        <Legal v={LEGAL.email} /> o desde tu área de cliente cuando esté disponible; la cancelación surte efecto al final del periodo ya pagado y no
-        genera reembolso del mes en curso. Si un cobro falla, reintentaremos el pago y podremos suspender el servicio hasta regularizarlo.
+        El pago se realiza a través de <strong>Flywire</strong>, una pasarela de pago segura, con tarjeta o transferencia según las opciones disponibles.
+        {' '}{LEGAL.brand} no almacena los datos de tu tarjeta. Los pagos pueden requerir autenticación reforzada de tu banco.
       </p>
 
-      <H2>5. Entrega y colaboración del cliente</H2>
+      <H2>5. Desarrollo de la formación</H2>
       <p>
-        Los plazos de entrega son orientativos y empiezan cuando recibimos todo el material y la información necesarios y, en los packs con guion a medida, cuando el cliente aprueba el guion (no producimos antes de ese visto bueno). El cliente se compromete a
-        facilitarlos a tiempo y a garantizar que tiene derecho a usar los logotipos, imágenes, textos, voces y marcas que nos entregue. Las
-        revisiones incluidas (del guion y del vídeo) son las indicadas en cada pack; las adicionales pueden tener coste.
+        Las fechas de inicio, los horarios y el profesorado pueden ajustarse por causas organizativas, comunicándotelo con antelación. Si {LEGAL.brand}
+        no pudiera iniciar una convocatoria, te ofrecerá una convocatoria posterior equivalente o el reembolso íntegro de lo abonado. Te comprometes a
+        hacer un uso adecuado de las plataformas, materiales y aulas, y a no compartir tus credenciales ni reproducir los contenidos.
       </p>
 
-      <H2>6. Contenido generado con inteligencia artificial</H2>
+      <H2>6. Propiedad intelectual</H2>
       <p>
-        Los vídeos pueden incluir imágenes, voces o escenas generadas con IA. {LEGAL.brand} informa de ello y el cliente es responsable de indicar, cuando
-        la ley o la plataforma de publicación lo exijan, que el contenido está generado o modificado con IA. El cliente no debe pedirnos contenido que
-        suplante a personas reales sin su consentimiento, que sea engañoso, ilícito o que vulnere derechos de terceros; podremos rechazarlo.
+        Los materiales, plataformas y contenidos formativos son titularidad de {LEGAL.brand} o de sus autores y se ceden para tu uso personal y
+        formativo. Queda prohibida su reproducción o distribución sin autorización.
       </p>
 
-      <H2>7. Propiedad intelectual</H2>
+      <H2>7. Derecho de desistimiento y cancelación</H2>
       <p>
-        Una vez pagado íntegramente el servicio, {LEGAL.brand} cede al cliente una licencia de uso de los vídeos y materiales finales entregados para su
-        actividad comercial, en todo el mundo y sin límite de tiempo, salvo las limitaciones de las licencias de terceros (música, fuentes, herramientas) que
-        se indiquen. {LEGAL.brand} conserva los derechos sobre sus métodos, plantillas y material de trabajo, y podrá mostrar el resultado como ejemplo de su
-        trabajo salvo que el cliente se oponga por escrito.
+        Si eres consumidor o usuario, tienes <strong>14 días naturales</strong> desde la contratación para desistir sin indicar motivo, siempre que la formación
+        no haya comenzado. Si solicitas que el servicio comience antes de que acabe ese plazo y desistes, abonarás la parte proporcional de lo ya prestado.
+        Para desistir, escribe a <Legal v={LEGAL.email} /> indicando tu número de pedido; reembolsaremos lo cobrado por el mismo medio de pago en un
+        máximo de 14 días desde que recibamos tu solicitud. Las condiciones particulares de cancelación de la reserva de plaza una vez iniciada la
+        convocatoria te las indicará admisiones antes de formalizar la matrícula.
       </p>
 
-      <H2>8. Derecho de desistimiento</H2>
+      <H2>8. Garantía y responsabilidad</H2>
       <p>
-        <strong>Clientes empresa o profesionales:</strong> al ser contratación entre profesionales, no existe derecho legal de desistimiento; cualquier
-        devolución se valorará caso por caso.
-      </p>
-      <p>
-        <strong>Consumidores y usuarios:</strong> tienes 14 días naturales para desistir del contrato sin indicar motivo. Como se trata de un servicio
-        personalizado que empieza a prestarse de inmediato, al contratar solicitas expresamente que la ejecución comience ya y reconoces que, una vez
-        completamente ejecutado el servicio, pierdes el derecho de desistimiento; si desistes antes, abonarás la parte proporcional del servicio ya prestado.
-        Para desistir, escribe a <Legal v={LEGAL.email} /> indicando tu pedido.
+        {LEGAL.brand} se compromete a impartir la formación con la diligencia profesional debida y conforme a lo descrito. No garantiza resultados
+        concretos de empleo, de aprobado o de certificación, que dependen también del esfuerzo del alumno y de terceros. Salvo dolo o negligencia grave y
+        lo que la ley imponga, la responsabilidad total de {LEGAL.brand} se limita al importe pagado por el servicio afectado.
       </p>
 
-      <H2>9. Garantía y responsabilidad</H2>
-      <p>
-        {LEGAL.brand} se compromete a entregar el servicio con la diligencia profesional debida y conforme a lo descrito. Si no cumple lo contratado, el
-        cliente puede reclamar su corrección o, en su defecto, el reembolso proporcional. {LEGAL.brand} no garantiza resultados comerciales concretos
-        (ventas, visualizaciones, rendimiento de anuncios), que dependen de factores ajenos. Salvo dolo o negligencia grave y lo que la ley
-        imponga, la responsabilidad total de {LEGAL.brand} se limita al importe pagado por el servicio afectado.
-      </p>
-
-      <H2>10. Cuenta de cliente</H2>
-      <p>
-        El acceso al área de cliente es personal y se facilita por invitación. Eres responsable de custodiar tus credenciales y de avisarnos si sospechas un
-        uso no autorizado.
-      </p>
-
-      <H2>11. Protección de datos</H2>
+      <H2>9. Protección de datos</H2>
       <p>
         Tratamos tus datos conforme a la <a href="/privacidad">Política de privacidad</a> y usamos cookies según la <a href="/cookies">Política de cookies</a>.
       </p>
 
-      <H2>12. Modificaciones, ley aplicable y reclamaciones</H2>
+      <H2>10. Modificaciones, ley aplicable y reclamaciones</H2>
       <p>
         Podemos modificar estas condiciones; se aplicarán a las contrataciones posteriores a su publicación. El contrato se rige por la legislación
         española. Los consumidores pueden acudir a los tribunales de su domicilio y a la plataforma europea de resolución de litigios en línea

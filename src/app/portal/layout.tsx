@@ -38,15 +38,29 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
     }
   }, [authLoading, user, router]);
 
-  // Los clientes tienen su propio panel (/cuenta); /portal es solo para la agencia.
-  // (Si es del equipo pero entró sin passkey, se queda aquí para ver el aviso.)
-  useEffect(() => {
-    if (authLoading || roleLoading || !user) return;
-    if (role !== 'agency' && !passkeyRequired) router.replace('/cuenta');
-  }, [authLoading, roleLoading, user, role, passkeyRequired, pathname, router]);
-
-  if (authLoading || !user || roleLoading || (role !== 'agency' && !passkeyRequired)) {
+  if (authLoading || !user || roleLoading) {
     return <BrandedLoadingSpinner logoUrl={logoUrl} />;
+  }
+
+  // El único panel es el CRM del equipo: una cuenta que no es del equipo no tiene nada que ver aquí
+  if (role !== 'agency' && !passkeyRequired) {
+    return (
+      <div className="portal-ui min-h-[100dvh] flex items-center justify-center px-4">
+        <div className="card-liquid rounded-3xl p-8 max-w-md text-center space-y-4">
+          <h1 className="text-xl font-semibold">Esta cuenta no tiene acceso</h1>
+          <p className="text-sm text-white/65">El panel es solo para el equipo de IDESIE. Cierra la sesión y entra con una cuenta del equipo.</p>
+          <button
+            onClick={async () => {
+              await signOut();
+              window.location.href = '/auth';
+            }}
+            className="px-6 h-11 rounded-full portal-cta text-sm cursor-pointer"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // Persona del equipo con la sesión abierta sin passkey: solo se le pide que vuelva a entrar con él

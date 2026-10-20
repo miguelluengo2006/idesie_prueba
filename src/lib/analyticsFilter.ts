@@ -1,5 +1,5 @@
 /** Páginas privadas: el tráfico del panel de administración, las vistas previas y los enlaces de acceso no entra en las estadísticas. */
-export const PRIVATE_PREFIXES = ['/portal', '/vista-cliente', '/auth/confirm', '/auth/set-password', '/invite'];
+export const PRIVATE_PREFIXES = ['/portal', '/auth/confirm', '/auth/set-password', '/invite'];
 
 export interface AnalyticsEvent {
   type: 'pageview' | 'event';

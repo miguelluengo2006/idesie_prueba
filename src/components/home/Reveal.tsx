@@ -7,13 +7,16 @@ export default function Reveal({
   children,
   delay = 0,
   className = '',
+  id,
 }: {
   children: React.ReactNode;
   delay?: number;
   className?: string;
+  id?: string;
 }) {
   return (
     <motion.div
+      id={id}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
@@ -39,8 +42,8 @@ export function SectionHead({
 }) {
   return (
     <Reveal className={`max-w-3xl ${className}`}>
-      <span className="text-xs tracking-[0.25em] uppercase text-[var(--signal)]">{eyebrow}</span>
-      <h2 className="font-kinetic font-black uppercase text-3xl md:text-5xl leading-[1.05] mt-4">{title}</h2>
+      <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[var(--signal)]">{eyebrow}</span>
+      <h2 className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.15] mt-4">{title}</h2>
       {lead && <p className="text-white/60 mt-5 text-base md:text-lg leading-relaxed">{lead}</p>}
     </Reveal>
   );

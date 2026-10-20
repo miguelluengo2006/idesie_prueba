@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { SectionPage } from '@/components/home/SubPage';
-import Simulator from '@/components/home/Simulator';
+import SimulatorPage from '@/components/home/SimulatorPage';
 import { CONTACT } from '@/lib/bim';
 
 const TITLE = 'Simulador profesional · Proyecto fin de máster';
@@ -14,9 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return (
-    <SectionPage title="Simulador profesional · Proyecto fin de máster">
-      <Simulator />
-    </SectionPage>
-  );
+  return <SimulatorPage />;
 }

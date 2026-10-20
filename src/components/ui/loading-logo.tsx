@@ -233,12 +233,12 @@ export function BrandedLoadingSpinner({
                   className="max-w-full max-h-full object-contain"
                   onError={(e) => {
                     // Fallback to the samgple logo if the image fails to load
-                    (e.target as HTMLImageElement).src = '/logo.svg';
+                    (e.target as HTMLImageElement).src = '/logo.png';
                   }}
                 />
               ) : (
                 <img
-                  src="/logo.svg"
+                  src="/logo.png"
                   alt="samgple"
                   className="max-w-full max-h-full object-contain"
                 />

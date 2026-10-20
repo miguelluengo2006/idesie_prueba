@@ -24,8 +24,9 @@ export default function AvisoLegalPage() {
 
       <H2>2. Objeto</H2>
       <p>
-        La Web ofrece información sobre los servicios de {LEGAL.brand} —creación de vídeos con inteligencia artificial y contenido para negocios y
-        empresas— y permite contratarlos online, solicitar propuestas, reservar llamadas y acceder a un área de cliente.
+        La Web ofrece información sobre la oferta formativa de {LEGAL.brand} (IDESIE Business &amp; Technology School) —másteres, microcredenciales,
+        simulador profesional y certificación de perfiles BIM—, y permite solicitar información, reservar llamadas con admisiones y matricularse o
+        reservar plaza online.
       </p>
 
       <H2>3. Condiciones de uso</H2>
@@ -41,12 +42,9 @@ export default function AvisoLegalPage() {
 
       <H2>4. Propiedad intelectual e industrial</H2>
       <p>
-        Los textos, diseños, logotipos, marcas, imágenes, vídeos de ejemplo, código y demás elementos de la Web son titularidad de {LEGAL.brand} o de
+        Los textos, diseños, logotipos, marcas, imágenes, código y demás elementos de la Web son titularidad de {LEGAL.brand} o de
         terceros que han autorizado su uso, y están protegidos por la normativa de propiedad intelectual e industrial. Queda prohibida su reproducción,
         distribución, comunicación pública o transformación sin autorización expresa, salvo lo permitido por la ley.
-      </p>
-      <p>
-        Los derechos sobre los vídeos y materiales entregados a un cliente se regulan en los Términos y condiciones.
       </p>
 
       <H2>5. Responsabilidad</H2>
@@ -58,7 +56,7 @@ export default function AvisoLegalPage() {
 
       <H2>6. Enlaces</H2>
       <p>
-        La Web puede contener enlaces a sitios de terceros (por ejemplo, la pasarela de pago de Stripe). El titular no controla ni responde de sus
+        La Web puede contener enlaces a sitios de terceros (por ejemplo, la pasarela de pago de Flywire o la entidad certificadora AECOMI). El titular no controla ni responde de sus
         contenidos ni de sus políticas.
       </p>
 

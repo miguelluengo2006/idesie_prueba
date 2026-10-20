@@ -9,9 +9,6 @@ export const PRICE_PER_ECTS = 96;
 /** Proyecto fin de máster (simulador profesional). */
 export const SIMULATOR_ECTS = 16;
 export const MASTER_ECTS = 60;
-/** Máster BIM completo: por partes (96 €/ECTS) o de una vez (online). */
-export const MASTER_PRICE_PARTS = MASTER_ECTS * PRICE_PER_ECTS;
-export const MASTER_PRICE_ONLINE = 4800;
 
 export const CONTACT = {
   name: 'IDESIE',
@@ -21,6 +18,8 @@ export const CONTACT = {
   phone: '+34 91 485 91 32',
   phoneHref: 'tel:+34914859132',
   email: 'info@idesie.com',
+  whatsapp: '646 79 90 05',
+  whatsappHref: 'https://wa.me/34646799005',
   aecomiUrl: 'https://www.aecomi.org',
 } as const;
 

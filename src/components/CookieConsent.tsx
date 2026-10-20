@@ -10,7 +10,7 @@ import { OPEN_SETTINGS_EVENT, readConsent, saveConsent } from '@/lib/cookieConse
  * Las cookies técnicas (sesión, este mismo aviso) no necesitan consentimiento y no se pueden desactivar.
  */
 /** En los paneles (agencia y clientes) solo hay cookies técnicas: no hace falta pedir nada. */
-const NO_BANNER = ['/portal', '/cuenta', '/vista-cliente'];
+const NO_BANNER = ['/portal'];
 
 export default function CookieConsent() {
   const pathname = usePathname() || '/';

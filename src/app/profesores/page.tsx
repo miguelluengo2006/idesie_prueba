@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 function Card({ p, delay }: { p: Professor; delay: number }) {
   return (
     <Reveal delay={delay} className="h-full">
-      <article className="h-full rounded-2xl border border-white/10 bg-black/40 p-6 hover:border-[var(--signal)]/50 transition-colors">
+      <article className="h-full ui-card p-6 hover:border-[var(--signal)]/50 transition-colors">
         <div className="flex items-center gap-4">
           <span
             aria-hidden="true"
@@ -50,7 +50,7 @@ export default function ProfesoresPage() {
         lead="Nuestro claustro combina la dirección de IDESIE con profesionales en activo de empresas de referencia del sector AEC. No enseñan lo que leyeron: enseñan lo que hacen."
       />
 
-      <section aria-labelledby="direccion-title" className="px-4 md:px-6 py-10 md:py-16">
+      <section aria-labelledby="direccion-title" className="field-white px-4 md:px-6 py-10 md:py-16">
         <div className="max-w-6xl mx-auto">
           <SectionHead eyebrow="Dirección" title={<span id="direccion-title">Quién dirige IDESIE</span>} />
           <div className="mt-10 grid md:grid-cols-2 gap-4">
@@ -61,7 +61,7 @@ export default function ProfesoresPage() {
         </div>
       </section>
 
-      <section aria-labelledby="claustro-title" className="px-4 md:px-6 py-10 md:py-16">
+      <section aria-labelledby="claustro-title" className="field-tint px-4 md:px-6 py-10 md:py-16">
         <div className="max-w-6xl mx-auto">
           <SectionHead eyebrow="Profesionales en activo" title={<span id="claustro-title">Claustro</span>} />
           <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

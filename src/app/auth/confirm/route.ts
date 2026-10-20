@@ -1,3 +1,4 @@
+import { GATE_COOKIE, gateCookieOptions, gateEnabled, signGate } from '@/lib/crmGate';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -42,7 +43,11 @@ export async function GET(request: Request) {
       },
     });
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
-    if (!error) return NextResponse.redirect(`${baseUrl}${next}`);
+    if (!error) {
+      const ok = NextResponse.redirect(`${baseUrl}${next}`);
+      if (gateEnabled()) ok.cookies.set(GATE_COOKIE, await signGate(), gateCookieOptions);
+      return ok;
+    }
   }
 
   return NextResponse.redirect(`${baseUrl}/auth/auth-code-error`);

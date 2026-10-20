@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { SectionPage } from '@/components/home/SubPage';
-import Catalog from '@/components/home/Catalog';
+import MicrosPage from '@/components/home/MicrosPage';
 import { CONTACT } from '@/lib/bim';
 
 const TITLE = 'Catálogo de microcredenciales BIM';
@@ -14,9 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return (
-    <SectionPage title="Catálogo de microcredenciales BIM">
-      <Catalog />
-    </SectionPage>
-  );
+  return <MicrosPage />;
 }

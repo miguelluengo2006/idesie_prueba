@@ -32,3 +32,13 @@ Los clientes siguen con su acceso normal (correo con enlace y contraseña).
 - El dominio se toma de `NEXT_PUBLIC_SITE_URL` (un passkey de otra web no vale aquí).
 - La sesión se abre en el servidor (enlace mágico de un solo uso generado y canjeado en la misma petición).
 - Los fallos cuentan para el bloqueo de IPs (`/portal/security`).
+
+## Enlace secreto de entrada (CRM oculto)
+- El login (`/auth`), el panel (`/portal`) y las APIs de acceso responden **404** a cualquiera que no haya entrado por el
+  enlace secreto, y no se anuncian en `robots.txt`. Con la cookie, llevan `noindex`.
+- Define `CRM_ENTRY_KEY` (mín. 24 caracteres) en Vercel y en `.env.local`. El enlace es `https://TU-DOMINIO/acceso/<clave>`:
+  deja una cookie firmada de 30 días en ese navegador y lleva al login. Ábrelo en el móvil y entra con **Entrar con huella o passkey**.
+- Guarda el enlace como marcador, no lo compartas ni lo pegues en chats con vista previa. Para cambiarlo, cambia la clave:
+  todas las cookies anteriores dejan de valer.
+- Los correos de invitación / recuperar contraseña siguen funcionando (llevan su propio token de un solo uso y dejan la cookie).
+- Si `CRM_ENTRY_KEY` no está definida, la puerta no se aplica (para no dejarte fuera al desplegar).

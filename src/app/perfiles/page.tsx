@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { SectionPage } from '@/components/home/SubPage';
-import ProfileExplorer from '@/components/home/ProfileExplorer';
+import ProfilesPage from '@/components/home/ProfilesPage';
 import { CONTACT } from '@/lib/bim';
 
 const TITLE = 'Perfiles profesionales BIM';
@@ -14,9 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return (
-    <SectionPage title="Perfiles profesionales BIM">
-      <ProfileExplorer />
-    </SectionPage>
-  );
+  return <ProfilesPage />;
 }

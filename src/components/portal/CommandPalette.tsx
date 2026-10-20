@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CornerDownLeft, Inbox, LayoutDashboard, Megaphone, PhoneCall, Search, Settings, ShieldCheck, UserRound, Users, type LucideIcon } from 'lucide-react';
+import { CornerDownLeft, Inbox, LayoutDashboard, Megaphone, Package, PhoneCall, Receipt, Search, Settings, ShieldCheck, Tag, UserRound, Users, type LucideIcon } from 'lucide-react';
 import { useLeadsContext } from '@/app/portal/leads/context';
 import type { Lead } from '@/app/portal/leads/context';
 import { statusMeta, timeAgo } from '@/components/portal/leadMeta';
@@ -25,6 +25,9 @@ const PAGES: Item[] = [
   { id: 'p-leads', label: 'Leads', icon: Inbox, href: '/portal/leads', group: 'Ir a' },
   { id: 'p-contacts', label: 'Contactos', icon: Users, href: '/portal/contacts', group: 'Ir a' },
   { id: 'p-campaigns', label: 'Campañas', icon: Megaphone, href: '/portal/campaigns', group: 'Ir a' },
+  { id: 'p-orders', label: 'Pedidos', icon: Receipt, href: '/portal/orders', group: 'Ir a' },
+  { id: 'p-coupons', label: 'Cupones', icon: Tag, href: '/portal/coupons', group: 'Ir a' },
+  { id: 'p-products', label: 'Productos', icon: Package, href: '/portal/products', group: 'Ir a' },
   { id: 'p-sec', label: 'Seguridad', icon: ShieldCheck, href: '/portal/security', group: 'Ir a' },
   { id: 'p-set', label: 'Ajustes', icon: Settings, href: '/portal/settings', group: 'Ir a' },
 ];

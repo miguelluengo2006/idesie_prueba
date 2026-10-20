@@ -1,23 +1,30 @@
 import type { Metadata } from 'next';
 import SiteHeader from '@/components/home/SiteHeader';
 import SiteFooter from '@/components/home/SiteFooter';
-import Hero from '@/components/home/Hero';
+import HeroCarousel from '@/components/home/HeroCarousel';
 import Stats from '@/components/home/Stats';
-import ProfileExplorer from '@/components/home/ProfileExplorer';
-import Route from '@/components/home/Route';
+import CertificateSection from '@/components/home/CertificateSection';
 import Simulator from '@/components/home/Simulator';
+import AudiencePicker from '@/components/home/AudiencePicker';
+import ProfileExplorer from '@/components/home/ProfileExplorer';
 import Programs from '@/components/home/Programs';
-import Catalog from '@/components/home/Catalog';
-import Certification from '@/components/home/Certification';
+import LearningByWorking from '@/components/home/LearningByWorking';
+import Alumni from '@/components/home/Alumni';
+import Alliances from '@/components/home/Alliances';
 import Companies from '@/components/home/Companies';
+import Professionals from '@/components/home/Professionals';
+import Agenda from '@/components/home/Agenda';
+import Orientation from '@/components/home/Orientation';
+import BackToTop from '@/components/home/BackToTop';
 import PaymentNotice from '@/components/home/PaymentNotice';
 import ContactSection from '@/components/home/ContactSection';
 import { BookCallProvider } from '@/components/home/BookCall';
 import { CONTACT } from '@/lib/bim';
+import { FACTS } from '@/lib/content';
 
 const TITLE = 'IDESIE Business & Tech School — Máster BIM, microcredenciales y certificación de perfiles';
 const DESCRIPTION =
-  'Elige el puesto al que quieres llegar y te damos el mapa: microcredenciales, Máster BIM y certificación de tu perfil profesional con AECOMI. Formación BIM en Madrid desde 2012.';
+  'Formamos en competencias: la escuela tecnológica para arquitectos e ingenieros. Certificación universitaria UTAMED y certificación profesional AECOMI. Formación BIM en Madrid desde ' + FACTS.founded + '.';
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -30,25 +37,29 @@ export default function HomePage() {
   return (
     <BookCallProvider businessName={CONTACT.name}>
       <div className="home-root min-h-screen relative">
-        <SiteHeader />
+        <SiteHeader overlay />
         <PaymentNotice />
+        {/* Fuera de <main>: `.home-root main > section` convierte cada sección en un panel con márgenes y el carrusel va a sangre. */}
+        <HeroCarousel />
 
         <main className="relative z-[2]">
-          <Hero />
           <Stats />
-          <ProfileExplorer />
-          <Route />
+          <CertificateSection />
           <Simulator />
+          <AudiencePicker />
+          <ProfileExplorer />
           <Programs />
-          <Catalog />
-          <Certification />
+          <LearningByWorking />
+          <Alumni />
+          <Alliances />
           <Companies />
-
-          {/* Contact */}
-          <ContactSection />
+          <Professionals />
+          <Agenda />
+          <Orientation />
         </main>
 
-        <SiteFooter className="w-[calc(100%-clamp(20px,5vw,72px))] max-w-[1320px] mx-auto mt-3 mb-4" />
+        <SiteFooter />
+        <BackToTop />
       </div>
     </BookCallProvider>
   );

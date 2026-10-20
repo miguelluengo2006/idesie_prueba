@@ -1,611 +1,276 @@
-import type { Metadata, Viewport } from 'next';
-import { Bricolage_Grotesque, DM_Sans, Instrument_Serif } from 'next/font/google';
-import LandingScripts from './LandingScripts';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ArrowRight, BadgeCheck, BriefcaseBusiness, MessageCircle, Plus, Sparkles, Users } from 'lucide-react';
+import { BookCallButton, BookCallProvider } from '@/components/home/BookCall';
+import IdesieLogo from '@/components/home/IdesieLogo';
 import CookieSettingsLink from '@/components/legal/CookieSettingsLink';
-import CartLink from '@/components/home/CartLink';
-import Pricing from '@/components/home/Pricing';
-import PaymentNotice from '@/components/home/PaymentNotice';
-import { EXAMPLE_VIDEOS } from '@/lib/exampleVideos';
-import { VAT_LABEL, WEB_PRICING_URL, WELCOME_FAQ, WELCOME_PACK, welcomeSpots } from '@/lib/packs';
-import './landing.css';
+import Section from '@/components/home/Section';
+import Reveal from '@/components/home/Reveal';
+import Tile from '@/components/home/Tile';
+import LogoTile from '@/components/home/LogoTile';
+import LeadForm from '@/components/landing/LeadForm';
+import PickMaster from '@/components/landing/PickMaster';
+import StickyCta from '@/components/landing/StickyCta';
+import WhatsAppLink from '@/components/landing/WhatsAppLink';
+import { CONTACT } from '@/lib/bim';
+import { COMPANY_LOGOS, FACTS } from '@/lib/content';
+import { MASTERS } from '@/lib/masters';
 
-/*
- * Landing: vídeos, influencers y anuncios con IA para negocios y ecommerce.
- *
- * Fuentes: next/font descarga las fuentes de Google en build y las sirve desde este mismo dominio
- * (la CSP del proyecto solo permite font-src 'self', así que un <link> a fonts.googleapis.com se bloquearía).
- */
-const bricolage = Bricolage_Grotesque({ subsets: ['latin'], weight: ['700', '800'], display: 'swap', variable: '--font-bricolage' });
-const instrument = Instrument_Serif({ subsets: ['latin'], weight: '400', style: 'italic', display: 'swap', variable: '--font-instrument' });
-const dmSans = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '700'], display: 'swap', variable: '--font-dmsans' });
+const TITLE = 'Máster BIM en Madrid y online | IDESIE Business & Tech School';
+const DESCRIPTION = 'Somos la innovación en BIM: te enseñamos a adaptarte a la IA. Máster BIM con prácticas remuneradas y certificación AECOMI. Quedan pocas plazas.';
 
-const TITLE = 'Vídeos, influencers y anuncios con IA para negocios y ecommerce | samgple';
-const DESCRIPTION =
-  'Vídeos, influencers y anuncios creados con IA, tan realistas que parecen grabados. Listos para tus redes y tus campañas en Meta y TikTok.';
-
+// Página de anuncios: no compite en buscadores con la home.
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  openGraph: {
-    title: TITLE,
-    description: DESCRIPTION,
-    type: 'website',
-    locale: 'es_ES',
-    siteName: 'samgple',
-    // TODO: images: [{ url: '/landing/og.jpg', width: 1200, height: 630 }],
-  },
-  twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION },
+  robots: { index: false, follow: true },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES' },
 };
 
-// The app-wide viewport blocks pinch-zoom; this page must stay zoomable (accessibility).
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
-  userScalable: true,
-  themeColor: '#0F0E0D',
-};
-
-/* ── Inline stroke icons (decorative → aria-hidden) ── */
-function Icon({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return (
-    <svg className={`lp-icon ${className}`.trim()} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      {children}
-    </svg>
-  );
-}
-
-const Check = () => (
-  <Icon>
-    <path d="M5 12.5 9.5 17 19 7.5" />
-  </Icon>
-);
-
-const ArrowRight = () => (
-  <Icon>
-    <path d="M5 12h14" />
-    <path d="m13 6 6 6-6 6" />
-  </Icon>
-);
-
-const VolumeOnIcon = () => (
-  <Icon className="lp-mute__svg">
-    <path d="M4 9.5v5h4l5 4v-13l-5 4H4Z" />
-    <path d="M16.5 9a4 4 0 0 1 0 6" />
-    <path d="M19 6.5a8 8 0 0 1 0 11" />
-  </Icon>
-);
-
-const VolumeOffIcon = () => (
-  <Icon className="lp-mute__svg">
-    <path d="M4 9.5v5h4l5 4v-13l-5 4H4Z" />
-    <path d="m16 9 5 6" />
-    <path d="m21 9-5 6" />
-  </Icon>
-);
-
-const CheckCircle = () => (
-  <Icon>
-    <circle cx="12" cy="12" r="9.5" />
-    <path d="m8 12.5 3 3 5-6" />
-  </Icon>
-);
-
-const HERO_CHECKS = ['Guiones que apruebas antes de producir', 'No tienes que salir en cámara', 'Listos para publicar'];
-
-const EXAMPLES = EXAMPLE_VIDEOS;
-
-const FAQ = [
-  {
-    q: '¿Se nota que está hecho con IA?',
-    a: 'Trabajamos para que parezca grabado de verdad. Mira los ejemplos de arriba y juzga tú.',
-  },
-  {
-    q: '¿Tengo que salir yo en los vídeos?',
-    a: 'No. Puedes aparecer si quieres, pero no hace falta que te pongas delante de la cámara.',
-  },
-  {
-    q: '¿Quién decide qué se cuenta en los vídeos?',
-    a: 'Tú. Escribimos los guiones tras un brief contigo, te los enviamos y no producimos nada hasta que das el visto bueno.',
-  },
-  {
-    q: '¿Y si no me convence un guion o un vídeo?',
-    a: 'Lo cambiamos. Puedes pedir cambios en el guion antes de producir y, después, una ronda de ajustes sobre el vídeo. Las rondas de cada pack están en su ficha.',
-  },
-  {
-    q: '¿Cuánto tardáis en entregar?',
-    a: 'Cada pack indica su plazo en su ficha. En los packs con guion a medida, el plazo cuenta desde que apruebas el guion. Un vídeo suelto, en 5 días.',
-  },
-  {
-    q: '¿Puedo tener un influencer propio para mi marca?',
-    a: 'Sí. Creamos un personaje con IA con la misma cara y estilo en todos tus vídeos y anuncios, para que tu tienda tenga su propia imagen.',
-  },
-  { q: '¿Hay permanencia?', a: 'No. Los packs son de pago único, sin suscripción ni permanencia.' },
+const CARDS = [
+  { slug: 'mbim' as const, facts: [0, 2], tag: 'El más completo' },
+  { slug: 'mbbe' as const, facts: [0, 2], tag: 'Especialidad MEP' },
+  { slug: 'mbim-online' as const, facts: [0, 1], tag: 'Desde donde estés' },
 ];
 
+const REASONS = [
+  { icon: BriefcaseBusiness, title: 'Aprendes trabajando', text: 'No es un máster con prácticas al final: trabajo y formación empiezan el mismo día, sobre proyectos reales.' },
+  { icon: Sparkles, title: 'BIM con IA', text: 'Aprendes a aplicar herramientas de inteligencia artificial para ganar tiempo en cada fase del proyecto.' },
+  { icon: BadgeCheck, title: 'Certificación profesional', text: 'IDESIE es entidad formativa acreditada por AECOMI, la asociación que certifica competencias BIM conforme a ISO/IEC 17024.' },
+  { icon: Users, title: 'Red de empresas', text: 'Estudios, ingenierías y constructoras colaboran con IDESIE en prácticas y contratación.' },
+];
+
+const STEPS = [
+  { n: '1', title: 'Cuéntanos tu caso', text: 'Déjanos tus datos: son 30 segundos.' },
+  { n: '2', title: 'Hablamos 30 minutos', text: 'Revisamos tu perfil y resolvemos tus dudas, sin presión.' },
+  { n: '3', title: 'Eliges con claridad', text: 'Te decimos con franqueza qué máster encaja contigo, o si todavía no.' },
+];
+
+const FAQS = MASTERS.mbim.faqs.slice(0, 2).concat(MASTERS.mbim.faqs.slice(3, 5));
+
 export default function LandingPage() {
-  // Plazas del Pack de Bienvenida: se editan a mano en src/lib/packs.ts → WELCOME_SPOTS_LEFT
-  const spots = welcomeSpots();
-  const packCtaHref = spots.soldOut ? WEB_PRICING_URL : '#reserva';
-  const packCtaLabel = spots.soldOut ? 'Ver todos los packs' : WELCOME_PACK.cta;
-
   return (
-    <div className={`lp mil-bg ${bricolage.variable} ${instrument.variable} ${dmSans.variable}`}>
-
-      {/* Barra de progreso de scroll (LandingScripts.tsx actualiza --lp-progress) */}
-      <div className="lp-progress" aria-hidden="true" />
-
-      {/* 1 · Header */}
-      <header className="lp-header" data-header>
-        <div className="lp-container lp-header__inner">
-          <a className="lp-logo" href="#inicio" aria-label="samgple, ir al inicio">
-            <span className="lp-logo__dot" aria-hidden="true" />
-            samgple
-          </a>
-          <nav className="lp-nav" aria-label="Principal">
-            <a href="#ejemplos">Ejemplos</a>
-            <a href="#como">Cómo trabajamos</a>
-            <a href="#packs">Packs</a>
-            <a href="#faq">Preguntas</a>
-          </nav>
-          <CartLink className="lp-cart" />
-          <a className="lp-btn lp-btn--primary" href={packCtaHref}>
-            <span className="lp-only-desktop">{spots.soldOut ? 'Ver packs' : 'Quiero mi pack'}</span>
-            <span className="lp-only-mobile">{spots.soldOut ? 'Packs' : 'Mi pack'}</span>
-          </a>
-        </div>
-      </header>
-
-      <main>
-        {/* Hero */}
-        <section className="lp-section lp-hero" id="inicio" aria-labelledby="hero-title">
-          <div className="lp-container lp-hero__grid">
-            <div>
-              <p className="lp-eyebrow">Vídeos con IA para negocios y ecommerce</p>
-              <h1 id="hero-title">
-                Tu negocio en vídeo. <em className="is-accent">Sin grabar,</em> sin editar y con guiones que tú apruebas.
-              </h1>
-              <p className="lp-hero__lead">
-                Vídeos, influencers y anuncios creados con IA, tan reales que parecen grabados. Listos para Instagram,
-                TikTok y tus campañas de Meta. Escribimos los guiones contigo y no producimos nada sin tu visto bueno.
-              </p>
-              <div className="lp-hero__actions">
-                <a className="lp-btn lp-btn--primary lp-btn--lg" href={packCtaHref}>
-                  {packCtaLabel} <ArrowRight />
-                </a>
-                <a className="lp-btn lp-btn--secondary lp-btn--lg" href="#packs">
-                  Ver todos los packs
-                </a>
-              </div>
-              <ul className="lp-checks">
-                {HERO_CHECKS.map((item) => (
-                  <li key={item}>
-                    <Check />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <p className="lp-scarcity">
-                <span className="lp-scarcity__dot" aria-hidden="true" />
-                <span>
-                  {spots.soldOut ? (
-                    'Pack de Bienvenida agotado'
-                  ) : (
-                    <>
-                      {WELCOME_PACK.name} · {WELCOME_PACK.price} € ({VAT_LABEL}) · Quedan <strong>{spots.left}</strong> de {spots.total} plazas
-                    </>
-                  )}
-                </span>
-              </p>
-            </div>
-
-            {/* Vídeo vertical 9:16 (380×676 en desktop). data-video-card: LandingScripts.tsx lo reproduce
-                mientras está en pantalla y lo pausa al salir; data-try-sound intenta activar el sonido
-                nada más entrar en vista (cae a silencio si el navegador lo bloquea). Un único botón
-                para silenciar/activar el sonido. */}
-            <div className="lp-video" data-video-card data-try-sound="true">
-              <video
-                src="https://pub-e87160a916994231bb484c99e8e7ef01.r2.dev/videoLANDING1.mp4"
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                aria-label="Vídeo destacado"
-              />
-              <button
-                type="button"
-                className="lp-mute is-muted"
-                data-mute-toggle
-                aria-pressed="false"
-                aria-label="Activar sonido"
-              >
-                <span className="lp-mute__icon lp-mute__icon--on" aria-hidden="true">
-                  <VolumeOnIcon />
-                </span>
-                <span className="lp-mute__icon lp-mute__icon--off" aria-hidden="true">
-                  <VolumeOffIcon />
-                </span>
-              </button>
+    <BookCallProvider businessName={CONTACT.name}>
+      <div className="home-root min-h-screen relative">
+        <header className="absolute inset-x-0 top-0 z-20 field-navy !bg-transparent">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
+            <Link href="/" aria-label="IDESIE, inicio">
+              <IdesieLogo tone="white" className="h-10" priority />
+            </Link>
+            <div className="flex items-center gap-3">
+              <WhatsAppLink label="Escribir por WhatsApp" className="btn min-h-11 gap-2 px-4 bg-[#25D366] text-[#0a1f44] font-semibold hover:bg-[#3ae07a] transition-colors">
+                <MessageCircle className="w-5 h-5" aria-hidden="true" />
+                <span className="hidden sm:inline">WhatsApp</span>
+              </WhatsAppLink>
+              <a href="#info" className="btn btn-ghost min-h-11 text-[#fff] border-[#7db4ff]/60">Pedir información</a>
             </div>
           </div>
-        </section>
+        </header>
 
-        {/* Ejemplos (arriba: es lo que más vende) */}
-        <section className="lp-section" id="ejemplos" aria-labelledby="ejemplos-title">
-          <div className="lp-container">
-            <div className="lp-head" data-reveal>
-              <h2 className="lp-head__title" id="ejemplos-title">
-                Mira lo que hacemos. <em className="is-accent">¿Adivinas cuál es IA?</em>
-              </h2>
-            </div>
-            <div className="lp-examples">
-              {/* TODO: rellena src (MP4 vertical 9:16, ligero) en EXAMPLES; mientras esté vacío se ve el
-                  hueco reservado. Con src, el vídeo se reproduce solo al entrar en la sección y se pausa
-                  al salir, con un único botón para silenciar/activar el sonido. */}
-              {EXAMPLES.map(({ label, src, poster }) => (
-                <figure className="lp-example" key={label} data-reveal>
-                  <span className="lp-example__tag">{label}</span>
-                  {src ? (
-                    <div className="lp-video" data-video-card>
-                      <video
-                        src={src}
-                        poster={poster || undefined}
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
-                        aria-label={`Vídeo de ejemplo: ${label}`}
-                      />
-                      <button
-                        type="button"
-                        className="lp-mute is-muted"
-                        data-mute-toggle
-                        aria-pressed="false"
-                        aria-label="Activar sonido"
-                      >
-                        <span className="lp-mute__icon lp-mute__icon--on" aria-hidden="true">
-                          <VolumeOnIcon />
-                        </span>
-                        <span className="lp-mute__icon lp-mute__icon--off" aria-hidden="true">
-                          <VolumeOffIcon />
-                        </span>
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="lp-video lp-video--empty" role="img" aria-label={`Espacio para vídeo: ${label}`}>
-                      <span className="lp-video__label">[Vídeo próximamente]</span>
-                    </div>
-                  )}
-                  <figcaption>[Vídeo de ejemplo]</figcaption>
-                </figure>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Cómo trabajamos: el cliente aprueba el guion antes de producir */}
-        <section className="lp-section" id="como" aria-labelledby="como-title">
-          <div className="lp-container">
-            <div className="lp-head" data-reveal>
-              <h2 className="lp-head__title" id="como-title">
-                Tú das el visto bueno. <em className="is-accent">Nada se produce sin él.</em>
-              </h2>
-              <p className="lp-head__side">
-                Los guiones los escribimos contigo y los apruebas antes de producir. Así los vídeos dicen lo que tu
-                marca quiere decir.
-              </p>
-            </div>
-            <ol className="lp-steps lp-steps--4">
-              <li className="lp-step" data-reveal>
-                <div className="lp-step__num" aria-hidden="true">01</div>
-                <h3>Nos cuentas tu negocio</h3>
-                <p>Un brief corto: qué vendes, a quién y cómo hablas. Con eso escribimos tus guiones.</p>
-              </li>
-              <li className="lp-step" data-reveal>
-                <div className="lp-step__num" aria-hidden="true">02</div>
-                <h3>Revisas y apruebas el guion</h3>
-                <p>Te enviamos los guiones, pides los cambios que quieras y no producimos hasta que los apruebes.</p>
-              </li>
-              <li className="lp-step" data-reveal>
-                <div className="lp-step__num" aria-hidden="true">03</div>
-                <h3>Producimos tus vídeos</h3>
-                <p>Con el guion aprobado, creamos los vídeos con IA, con voz, subtítulos y el formato de cada red.</p>
-              </li>
-              <li className="lp-step" data-reveal>
-                <div className="lp-step__num" aria-hidden="true">04</div>
-                <h3>Ajustamos y publicas</h3>
-                <p>Revisas los vídeos, te los ajustamos y los recibes listos para publicar.</p>
-              </li>
-            </ol>
-          </div>
-        </section>
-
-        {/* Pack de Bienvenida — protagonista de la landing */}
-        <section className="lp-section lp-section--army lp-pack" id="pack" aria-labelledby="pack-title">
-          <div className="lp-container lp-pack__grid">
-            <div className="lp-pack__offer" data-reveal>
-              <p className="lp-eyebrow">Oferta de entrada · Solo {spots.total} plazas</p>
-              <h2 id="pack-title">
-                {WELCOME_PACK.name}: <em className="is-accent">2 vídeos de tu producto</em> por {WELCOME_PACK.price} €
-              </h2>
-              <p className="lp-pack__price">
-                <span className="lp-pack__amount">{WELCOME_PACK.price} €</span>
-                <span className="lp-pack__iva">{VAT_LABEL}</span>
-              </p>
-              <p className="lp-pack__anchor">
-                {WELCOME_PACK.anchor}. <strong>Aquí tienes 2 por {WELCOME_PACK.price} € ({VAT_LABEL}).</strong>
-              </p>
-              <ul className="lp-pack__list">
-                {WELCOME_PACK.includes.map((item) => (
-                  <li key={item}>
-                    <Check />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <ul className="lp-pack__conditions" aria-label="Condiciones del pack">
-                {WELCOME_PACK.conditions.map((c) => (
-                  <li key={c}>{c}</li>
-                ))}
-              </ul>
-              <p className="lp-pack__bonus">
-                <span className="lp-pack__bonus-tag">Bonus</span>
-                {WELCOME_PACK.bonus}
-              </p>
-            </div>
-
-            <div className="lp-form-card lp-pack__card" id="reserva" data-reveal>
-              {/* Contador de plazas: el número sale de src/lib/packs.ts → WELCOME_SPOTS_LEFT (se cambia a mano) */}
-              <div className={`lp-meter${spots.left <= 10 ? ' is-low' : ''}`}>
-                <p className="lp-meter__label">
-                  <span className="lp-meter__dot" aria-hidden="true" />
-                  <span>
-                    {spots.soldOut ? (
-                      'Plazas agotadas'
-                    ) : (
-                      <>
-                        Quedan <strong>{spots.left}</strong> de {spots.total} plazas
-                      </>
-                    )}
-                  </span>
+        <main>
+          {/* 1 · Promesa y formulario a la vista */}
+          <section className="field-navy relative overflow-hidden px-4 md:px-6 pt-24 pb-14 md:pt-28 md:pb-20">
+            <div className="hero-glow" aria-hidden="true" />
+            <div className="relative max-w-6xl mx-auto">
+              <div className="max-w-3xl">
+                <h1 className="font-kinetic font-bold text-[clamp(2rem,5vw,4rem)] leading-[1.08] text-[#fff]">
+                  Somos la innovación en BIM. <span className="text-[#7db4ff]">Te enseñamos a adaptarte a la IA.</span>
+                </h1>
+                <p className="mt-6 text-lg md:text-xl text-[#c9d9f0] max-w-xl leading-relaxed">
+                  El Máster BIM de IDESIE, en Madrid y online: trabajas por la mañana, te formas por la tarde y sales siendo BIM Manager, con la inteligencia artificial como herramienta de cada día.
                 </p>
-                <div className="lp-meter__track" role="img" aria-label={`${spots.taken} de ${spots.total} plazas ya reservadas`}>
-                  <span style={{ width: `${(spots.taken / spots.total) * 100}%` }} />
-                </div>
-              </div>
-
-              {spots.soldOut ? (
-                <div className="lp-success">
-                  <h3>Plazas agotadas</h3>
-                  <p>El Pack de Bienvenida ya no está disponible. Mira el resto de packs.</p>
-                  <a className="lp-btn lp-btn--primary lp-btn--lg lp-btn--block" href={WEB_PRICING_URL}>
-                    Ver todos los packs
+                <p className="mt-6 flex items-center gap-3 text-lg font-semibold text-[#fff]">
+                  <span className="relative flex w-3 h-3 shrink-0" aria-hidden="true">
+                    <span className="absolute inset-0 rounded-full bg-[#ff6b5b] motion-safe:animate-ping opacity-75" />
+                    <span className="relative w-3 h-3 rounded-full bg-[#ff6b5b]" />
+                  </span>
+                  Quedan pocas plazas para la próxima convocatoria
+                </p>
+                <ul className="mt-8 space-y-3 text-[#fff] text-base md:text-lg">
+                  {['IA aplicada a cada fase del proyecto, no solo teoría', 'Prácticas remuneradas desde el primer mes (másteres presenciales)', `Desde ${FACTS.founded} · ${FACTS.students} alumnos formados`].map((t) => (
+                    <li key={t} className="flex gap-3">
+                      <BadgeCheck className="w-6 h-6 shrink-0 text-[#7db4ff] mt-0.5" aria-hidden="true" />
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-10 flex flex-wrap items-center gap-3">
+                  <a href="#info" className="btn btn-blue min-h-14 px-7 text-base">
+                    Quiero información <ArrowRight className="w-5 h-5" aria-hidden="true" />
                   </a>
+                  <WhatsAppLink className="btn min-h-14 gap-2 px-6 text-base bg-[#25D366] text-[#0a1f44] font-semibold hover:bg-[#3ae07a] transition-colors">
+                    <MessageCircle className="w-5 h-5" aria-hidden="true" /> Escríbenos por WhatsApp
+                  </WhatsAppLink>
                 </div>
-              ) : (
-                <>
-                  <form className="lp-form" id="pack-form" noValidate>
-                    <div>
-                      <h3 className="lp-pack__form-title">Cuéntanos lo básico y pasa al pago seguro</h3>
-                      <p className="lp-pack__form-hint">Son 5 datos y tardas menos de un minuto. Después pagas en Stripe.</p>
-                    </div>
-                    <div className="lp-field">
-                      <label htmlFor="pack-company">Nombre de la empresa</label>
-                      <input id="pack-company" name="company" type="text" autoComplete="organization" required aria-describedby="pack-company-error" />
-                      <p className="lp-error" id="pack-company-error" data-error-for="company" aria-live="polite" />
-                    </div>
-                    <div className="lp-field">
-                      <label htmlFor="pack-website">Web o tienda</label>
-                      <input id="pack-website" name="website" type="text" inputMode="url" autoComplete="url" placeholder="www.mitienda.com" required aria-describedby="pack-website-error" />
-                      <p className="lp-error" id="pack-website-error" data-error-for="website" aria-live="polite" />
-                    </div>
-                    <div className="lp-field">
-                      <label htmlFor="pack-product">Producto que quieres promocionar</label>
-                      <input id="pack-product" name="product" type="text" required aria-describedby="pack-product-error" />
-                      <p className="lp-error" id="pack-product-error" data-error-for="product" aria-live="polite" />
-                    </div>
-                    <fieldset className="lp-field lp-radios" aria-describedby="pack-ads-error">
-                      <legend>¿Ya haces anuncios en redes?</legend>
-                      <div className="lp-radios__row">
-                        <label className="lp-radio">
-                          <input type="radio" name="ads" value="Sí" required />
-                          <span>Sí</span>
-                        </label>
-                        <label className="lp-radio">
-                          <input type="radio" name="ads" value="No" required />
-                          <span>No</span>
-                        </label>
-                      </div>
-                      <p className="lp-error" id="pack-ads-error" data-error-for="ads" aria-live="polite" />
-                    </fieldset>
-                    <div className="lp-field">
-                      <label htmlFor="pack-phone">Tu WhatsApp</label>
-                      <input id="pack-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="+34 600 000 000" required aria-describedby="pack-phone-error" />
-                      <p className="lp-error" id="pack-phone-error" data-error-for="phone" aria-live="polite" />
-                    </div>
-                    {/* Honeypot anti-spam: hidden from people, bots fill it and the server drops the lead */}
-                    <div className="lp-hp" aria-hidden="true">
-                      <label htmlFor="pack-website-hp">No rellenar</label>
-                      <input id="pack-website-hp" name="hp" type="text" tabIndex={-1} autoComplete="off" />
-                    </div>
-                    <button type="submit" className="lp-btn lp-btn--primary lp-btn--lg lp-btn--block">
-                      Continuar al pago · {WELCOME_PACK.price} € ({VAT_LABEL})
-                    </button>
-                    <p className="lp-form__note">Todavía no pagas nada: el pago es el siguiente paso, en una pantalla segura de Stripe.</p>
-                  </form>
-
-                  <div className="lp-success" data-pack-success hidden tabIndex={-1} role="status">
-                    <CheckCircle />
-                    <h3>
-                      ¡Genial, <span data-pack-name>tu empresa</span>!
-                    </h3>
-                    <p data-pack-fallback>Ya tenemos tus datos. Último paso: completa el pago para reservar tu plaza.</p>
-                    {/* Normalmente el cliente pasa directo a Stripe. Este botón aparece si el pago no pudo abrirse solo. */}
-                    <button type="button" className="lp-btn lp-btn--primary lp-btn--lg lp-btn--block" data-pay-retry>
-                      Ir al pago · {WELCOME_PACK.price} € ({VAT_LABEL})
-                    </button>
-                    <p className="lp-error" data-pay-error aria-live="polite" />
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* Preguntas frecuentes del Pack de Bienvenida */}
-        <section className="lp-section" id="pack-faq" aria-labelledby="pack-faq-title">
-          <div className="lp-container lp-faq">
-            <h2 id="pack-faq-title" data-reveal>
-              Preguntas sobre el pack
-            </h2>
-            <div className="lp-faq__list" data-reveal>
-              {WELCOME_FAQ.map((item, i) => (
-                <details key={item.q} open={i === 0}>
-                  <summary>
-                    {item.q}
-                    <Icon>
-                      <path d="M5 12h14" />
-                      <path className="lp-plus-v" d="M12 5v14" />
-                    </Icon>
-                  </summary>
-                  <p>{item.a}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Elige tu pack — catálogo completo (mismas fichas que en la web) */}
-        <section className="lp-section" id="packs" aria-labelledby="precios-title">
-          <Pricing variant="landing" />
-        </section>
-
-        {/* FAQ general */}
-        <section className="lp-section" id="faq" aria-labelledby="faq-title">
-          <div className="lp-container lp-faq">
-            <h2 id="faq-title" data-reveal>
-              Preguntas frecuentes
-            </h2>
-            <div className="lp-faq__list" data-reveal>
-              {FAQ.map((item, i) => (
-                <details key={item.q} open={i === 0}>
-                  <summary>
-                    {item.q}
-                    <Icon>
-                      <path d="M5 12h14" />
-                      <path className="lp-plus-v" d="M12 5v14" />
-                    </Icon>
-                  </summary>
-                  <p>{item.a}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA final + formulario general */}
-        <section className="lp-section lp-section--army" id="empezar" aria-labelledby="empezar-title">
-          <div className="lp-container lp-cta">
-            <div data-reveal>
-              <h2 id="empezar-title">
-                Tus próximos vídeos, <em className="is-accent">con tu visto bueno.</em>
-              </h2>
-              <p className="lp-cta__lead">
-                Déjanos tus datos y te llamamos para ver qué vídeos necesita tu negocio y escribir los guiones contigo. Sin compromiso.
-              </p>
-            </div>
-
-            <div className="lp-form-card" data-reveal>
-              <form className="lp-form" id="lead-form" noValidate>
-                <div className="lp-field">
-                  <label htmlFor="lead-name">Nombre</label>
-                  <input
-                    id="lead-name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    required
-                    aria-describedby="lead-name-error"
-                  />
-                  <p className="lp-error" id="lead-name-error" data-error-for="name" aria-live="polite" />
-                </div>
-                <div className="lp-field">
-                  <label htmlFor="lead-phone">WhatsApp</label>
-                  <input
-                    id="lead-phone"
-                    name="phone"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    placeholder="+34 600 000 000"
-                    required
-                    aria-describedby="lead-phone-error"
-                  />
-                  <p className="lp-error" id="lead-phone-error" data-error-for="phone" aria-live="polite" />
-                </div>
-                <div className="lp-field">
-                  <label htmlFor="lead-business">¿Qué tipo de negocio tienes?</label>
-                  <input
-                    id="lead-business"
-                    name="business"
-                    type="text"
-                    autoComplete="organization"
-                    placeholder="Ej.: tienda online, clínica, restaurante…"
-                  />
-                </div>
-                <div className="lp-field">
-                  <label htmlFor="lead-interest">¿Qué te interesa?</label>
-                  <input
-                    id="lead-interest"
-                    name="interest"
-                    type="text"
-                    placeholder="Vídeos para redes, influencer IA, anuncios…"
-                  />
-                </div>
-                {/* Honeypot anti-spam: hidden from people, bots fill it and the server drops the lead */}
-                <div className="lp-hp" aria-hidden="true">
-                  <label htmlFor="lead-website">No rellenar</label>
-                  <input id="lead-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
-                </div>
-                <button type="submit" className="lp-btn lp-btn--primary lp-btn--lg lp-btn--block">
-                  Quiero mis primeros vídeos
-                </button>
-                <p className="lp-form__note">Te contactamos lo antes posible.</p>
-              </form>
-
-              <div className="lp-success" data-success hidden tabIndex={-1} role="status">
-                <CheckCircle />
-                <h3>¡Recibido!</h3>
-                <p>Te contactamos lo antes posible.</p>
               </div>
             </div>
+          </section>
+
+          {/* 2 · Prueba social */}
+          <Section field="tint" labelledBy="proof-title" className="!py-14 md:!py-20">
+            <h2 id="proof-title" className="font-kinetic font-bold text-2xl md:text-3xl text-center max-w-3xl mx-auto leading-tight">
+              Empresas del sector colaboran con IDESIE
+            </h2>
+            <ul className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" aria-label="Empresas que colaboran con IDESIE">
+              {COMPANY_LOGOS.slice(0, 10).map((l) => (
+                <li key={l.name}>
+                  <LogoTile logo={l} />
+                </li>
+              ))}
+            </ul>
+          </Section>
+
+          {/* 3 · Elegir máster */}
+          <Section field="white" id="masters" labelledBy="masters-title">
+            <Reveal className="max-w-3xl">
+              <h2 id="masters-title" className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.12]">
+                Tres caminos, <span className="ui-hl">un mismo objetivo</span>
+              </h2>
+              <p className="text-lg text-white/60 mt-5 leading-relaxed">Elige el que encaja con tu situación. Si dudas, te ayudamos en la llamada.</p>
+            </Reveal>
+            <ul className="mt-12 grid lg:grid-cols-3 gap-4">
+              {CARDS.map((c, i) => {
+                const m = MASTERS[c.slug];
+                return (
+                  <Tile as="li" key={c.slug} delay={i * 0.1} className="bg-[var(--card)] p-6 md:p-7 flex flex-col">
+                    <span className="self-start rounded-full bg-[#e9f0fc] text-[#0052cc] text-xs font-bold px-3 py-1">{c.tag}</span>
+                    <h3 className="font-kinetic font-bold text-2xl leading-snug mt-4">{m.name}</h3>
+                    <p className="text-sm font-semibold text-[#0063e6] mt-1">{m.mode}</p>
+                    <p className="text-white/60 leading-relaxed mt-4">{m.lead}</p>
+                    <dl className="mt-5 space-y-3 flex-1">
+                      {c.facts.map((fi) => (
+                        <div key={fi}>
+                          <dt className="font-kinetic font-bold text-xl">{m.facts[fi].value}</dt>
+                          <dd className="text-sm text-white/60 leading-snug">{m.facts[fi].label}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                    <PickMaster slug={c.slug} className="btn btn-blue mt-6 w-full justify-center min-h-12">
+                      Quiero este máster <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                    </PickMaster>
+                    <Link href={`/masters/${c.slug}`} className="mt-3 text-center text-sm font-semibold text-[#0063e6] hover:underline min-h-11 inline-flex items-center justify-center">
+                      Ver el programa completo
+                    </Link>
+                  </Tile>
+                );
+              })}
+            </ul>
+          </Section>
+
+          {/* 4 · Por qué IDESIE */}
+          <section className="field-blue px-4 md:px-6 py-20 md:py-28" aria-labelledby="why-title">
+            <div className="max-w-6xl mx-auto">
+              <h2 id="why-title" className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.12] max-w-3xl">
+                Por qué formarte en IDESIE
+              </h2>
+              <ul className="mt-12 grid sm:grid-cols-2 gap-4">
+                {REASONS.map((r, i) => (
+                  <Tile as="li" key={r.title} delay={i * 0.08} className={`p-7 ${i % 3 === 0 ? 'bg-[#0a1f44] text-[#fff]' : 'bg-[#fff] text-[#0a1f44]'}`}>
+                    <r.icon className={`w-8 h-8 ${i % 3 === 0 ? 'text-[#7db4ff]' : 'text-[#0063e6]'}`} aria-hidden="true" />
+                    <h3 className="font-kinetic font-bold text-xl mt-4">{r.title}</h3>
+                    <p className="mt-2 leading-relaxed opacity-85">{r.text}</p>
+                  </Tile>
+                ))}
+              </ul>
+              <p className="mt-6 text-sm text-[#fff]">Ejercer con certificación profesional depende de superar el proceso de evaluación de AECOMI; la acreditación del centro no lo garantiza.</p>
+            </div>
+          </section>
+
+          {/* 5 · Salidas */}
+          <Section field="white" labelledBy="roles-title">
+            <h2 id="roles-title" className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.12] max-w-3xl">
+              Salidas profesionales del <span className="ui-hl">Máster BIM</span>
+            </h2>
+            <ul className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {MASTERS.mbim.outcomes.roles.map((r, i) => (
+                <Tile as="li" key={r.role} delay={i * 0.08} className={`p-6 flex flex-col justify-between gap-6 min-h-44 ${i % 2 ? 'bg-[#e9f0fc] text-[#0a1f44]' : 'bg-[#0a1f44] text-[#fff]'}`}>
+                  <div>
+                    <h3 className="font-kinetic font-bold text-xl leading-snug">{r.role}</h3>
+                    <p className="mt-1 opacity-80">{r.focus}</p>
+                  </div>
+                  <p className={`font-kinetic font-bold text-lg ${i % 2 ? 'text-[#0063e6]' : 'text-[#7db4ff]'}`}>
+                    {r.salary}
+                    <span className="block text-sm font-sans font-normal opacity-80">bruto anual</span>
+                  </p>
+                </Tile>
+              ))}
+            </ul>
+            <p className="text-white/60 mt-5 max-w-2xl text-sm">{MASTERS.mbim.outcomes.note}</p>
+          </Section>
+
+          {/* 6 · Cómo funciona */}
+          <Section field="tint" labelledBy="steps-title">
+            <h2 id="steps-title" className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.12] max-w-3xl">Así de fácil es empezar</h2>
+            <ol className="mt-12 grid md:grid-cols-3 gap-4">
+              {STEPS.map((s, i) => (
+                <Tile as="li" key={s.n} delay={i * 0.1} className="bg-[#fff] text-[#0a1f44] p-7">
+                  <span className="font-kinetic font-bold text-5xl text-[#0063e6] leading-none">{s.n}</span>
+                  <h3 className="font-kinetic font-bold text-xl mt-5">{s.title}</h3>
+                  <p className="mt-2 text-[#0a1f44]/75 leading-relaxed">{s.text}</p>
+                </Tile>
+              ))}
+            </ol>
+          </Section>
+
+          {/* 7 · Objeciones */}
+          <Section field="white" labelledBy="faq-title">
+            <div className="grid lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-16 items-start">
+              <h2 id="faq-title" className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.12]">Lo que suelen preguntarnos</h2>
+              <div className="space-y-2.5">
+                {FAQS.map((f) => (
+                  <details key={f.q} name="faq" className="group rounded-2xl bg-[var(--card)] [&_summary::-webkit-details-marker]:hidden">
+                    <summary className="flex items-center gap-4 cursor-pointer px-5 md:px-6 py-4 md:py-5 min-h-16 font-semibold text-base md:text-lg leading-snug">
+                      <span className="flex-1">{f.q}</span>
+                      <span className="w-9 h-9 shrink-0 rounded-full bg-[#0a1f44] text-[#fff] grid place-items-center transition-transform duration-300 group-open:rotate-45">
+                        <Plus className="w-4 h-4" aria-hidden="true" />
+                      </span>
+                    </summary>
+                    <p className="px-5 md:px-6 pb-5 text-white/60 leading-relaxed">{f.a}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </Section>
+
+          {/* 8 · Cierre */}
+          <section className="field-navy relative overflow-hidden px-4 md:px-6 py-20 md:py-28" aria-labelledby="final-title">
+            <div className="hero-glow-b" aria-hidden="true" />
+            <div className="relative max-w-6xl mx-auto grid lg:grid-cols-[1fr_0.9fr] gap-10 lg:gap-14 items-center">
+              <div>
+                <h2 id="final-title" className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.12] text-[#fff]">
+                  Quedan pocas plazas: ¿hablamos y te decimos si encaja contigo?
+                </h2>
+                <p className="mt-5 text-lg text-[#c9d9f0] max-w-lg leading-relaxed">
+                  30 minutos, sin compromiso. Si prefieres elegir tú el día y la hora, reserva directamente.
+                </p>
+                <BookCallButton pack="Máster BIM · landing" className="btn btn-ghost mt-8 min-h-12 text-[#fff] border-[#7db4ff]/60 w-fit">
+                  Reservar mi llamada <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </BookCallButton>
+                <WhatsAppLink className="btn mt-4 min-h-12 gap-2 px-5 w-fit bg-[#25D366] text-[#0a1f44] font-semibold hover:bg-[#3ae07a] transition-colors">
+                  <MessageCircle className="w-5 h-5" aria-hidden="true" /> Escríbenos por WhatsApp
+                </WhatsAppLink>
+                <p className="mt-3 text-sm text-[#c9d9f0]">WhatsApp: {CONTACT.whatsapp}</p>
+              </div>
+              <div id="info" className="scroll-mt-24">
+                <LeadForm />
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <footer className="field-navy border-t border-[#7db4ff]/20 px-4 md:px-6 py-8 pb-28 md:pb-8">
+          <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4 text-sm text-[#c9d9f0]">
+            <p>© {new Date().getFullYear()} {CONTACT.name} {CONTACT.tagline} · {CONTACT.address}</p>
+            <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-1">
+              <Link href="/privacidad" className="hover:text-[#fff] min-h-11 inline-flex items-center">Privacidad</Link>
+              <Link href="/aviso-legal" className="hover:text-[#fff] min-h-11 inline-flex items-center">Aviso legal</Link>
+              <Link href="/cookies" className="hover:text-[#fff] min-h-11 inline-flex items-center">Cookies</Link>
+              <CookieSettingsLink />
+            </nav>
           </div>
-        </section>
-      </main>
-
-      {/* 13 · Footer */}
-      <footer className="lp-footer">
-        <div className="lp-container lp-footer__inner">
-          <p>© {new Date().getFullYear()} samgple</p>
-          <nav aria-label="Legal">
-            <a href="/aviso-legal">Aviso legal</a>
-            <a href="/privacidad">Privacidad</a>
-            <a href="/cookies">Cookies</a>
-            <a href="/terminos">Términos</a>
-            <CookieSettingsLink className="lp-footer__btn" />
-          </nav>
-        </div>
-      </footer>
-
-      {/* Solo móvil: barra fija inferior. Se oculta cuando el formulario del pack (#reserva) o el final (#empezar) están a la vista. */}
-      <div className="lp-mobile-bar" data-mobile-bar>
-        <a className="lp-btn lp-btn--primary lp-btn--lg lp-btn--block" href={packCtaHref}>
-          {packCtaLabel}
-        </a>
+        </footer>
+        <StickyCta />
       </div>
-
-      <PaymentNotice />
-      <LandingScripts />
-    </div>
+    </BookCallProvider>
   );
 }

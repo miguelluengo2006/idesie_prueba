@@ -14,6 +14,9 @@ import {
   LogOut,
   Megaphone,
   Menu,
+  Package,
+  Receipt,
+  Tag,
   PhoneCall,
   ShieldCheck,
   Search,
@@ -24,7 +27,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import KineticWordmark from '@/components/home/KineticWordmark';
+import IdesieLogo from '@/components/home/IdesieLogo';
 import { useAuth } from '@/components/AuthContext';
 import { useLeadsContext, newRequests, upcomingCalls } from '@/app/portal/leads/context';
 import type { PortalRole } from '@/components/portal/usePortalRole';
@@ -61,6 +64,14 @@ const AGENCY_GROUPS: NavGroup[] = [
     items: [
       { label: 'Contactos', href: '/portal/contacts', icon: Users },
       { label: 'Campañas', href: '/portal/campaigns', icon: Megaphone },
+    ],
+  },
+  {
+    label: 'Tienda',
+    items: [
+      { label: 'Pedidos', href: '/portal/orders', icon: Receipt },
+      { label: 'Cupones', href: '/portal/coupons', icon: Tag },
+      { label: 'Productos', href: '/portal/products', icon: Package },
     ],
   },
   {
@@ -257,7 +268,7 @@ export default function PortalSidebar({ role }: { role: PortalRole }) {
         </span>
       ) : (
         <>
-          <KineticWordmark name={businessName} className="text-lg" />
+          <IdesieLogo tone="white" className="h-8" />
           <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--signal)] border border-[var(--portal-line-strong)] rounded-md px-1.5 py-0.5">Panel</span>
         </>
       )}

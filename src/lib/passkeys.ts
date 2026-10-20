@@ -110,7 +110,7 @@ export async function isPasskeySession(sessionId: string, userId: string): Promi
 
 /* ── Dominio de la web ───────────────────────────────────────────────────── */
 
-/** Host de la web configurada, sin «www.»: así el passkey vale para samgple.com y para www.samgple.com. */
+/** Host de la web configurada, sin «www.»: así el passkey vale para idesie.com y para www.idesie.com. */
 function siteHost(): string | null {
   const site = process.env.NEXT_PUBLIC_SITE_URL || '';
   if (!site) return null;
@@ -143,7 +143,7 @@ export function relyingParty(headers: Headers): { rpID: string; origin: string; 
     rpID = base;
     if (host !== rpID && !host.endsWith(`.${rpID}`)) return null;
   }
-  return { rpID, origin, rpName: 'samgple' };
+  return { rpID, origin, rpName: 'IDESIE' };
 }
 
 /** Mensaje en español para cuando el origen no vale: dice desde qué dirección hay que usarlo. */

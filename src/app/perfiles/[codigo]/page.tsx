@@ -7,7 +7,6 @@ import SiteFooter from '@/components/home/SiteFooter';
 import { BookCallButton, BookCallProvider } from '@/components/home/BookCall';
 import {
   CONTACT,
-  MASTER_PRICE_ONLINE,
   PRICE_PER_ECTS,
   PROFILES,
   TOTAL_MICROS,
@@ -60,7 +59,7 @@ export default async function ProfilePage({ params }: { params: Promise<Params> 
         <SiteHeader />
 
         <main className="relative z-[2]">
-          <section className="px-4 md:px-6 pt-28 pb-16 md:pt-36 md:pb-20">
+          <section className="field-tint px-4 md:px-6 pt-28 pb-16 md:pt-36 md:pb-20">
             <div className="max-w-6xl mx-auto">
               <Link
                 href="/perfiles"
@@ -69,14 +68,14 @@ export default async function ProfilePage({ params }: { params: Promise<Params> 
                 <ArrowLeft className="w-4 h-4" aria-hidden="true" /> Todos los perfiles
               </Link>
 
-              <p className="text-xs tracking-[0.25em] uppercase text-[var(--signal)]">Perfil profesional · {profile.code}</p>
-              <h1 className="font-kinetic font-black uppercase text-3xl sm:text-4xl md:text-6xl leading-[1.02] mt-4">{profile.name}</h1>
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[var(--signal)]">Perfil profesional · {profile.code}</p>
+              <h1 className="font-kinetic font-bold text-3xl sm:text-4xl md:text-6xl leading-[1.02] mt-4">{profile.name}</h1>
               <p className="text-lg md:text-xl text-white/60 max-w-2xl leading-relaxed mt-6">{profile.long ?? profile.desc}</p>
 
               <dl className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {stats.map((s) => (
-                  <div key={s.label} className="rounded-2xl border border-white/10 bg-black/40 p-5">
-                    <dt className="text-xs tracking-[0.2em] uppercase text-white/50">{s.label}</dt>
+                  <div key={s.label} className="ui-card p-5">
+                    <dt className="text-xs font-semibold tracking-[0.2em] uppercase text-white/50">{s.label}</dt>
                     <dd className="font-kinetic font-bold text-lg md:text-xl mt-2">{s.value}</dd>
                   </div>
                 ))}
@@ -84,19 +83,19 @@ export default async function ProfilePage({ params }: { params: Promise<Params> 
             </div>
           </section>
 
-          <section aria-labelledby="mapa-title" className="px-4 md:px-6 py-16 md:py-24">
+          <section aria-labelledby="mapa-title" className="field-white px-4 md:px-6 py-16 md:py-24">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.5fr_1fr] gap-10 lg:gap-14 items-start">
               <div>
-                <span className="text-xs tracking-[0.25em] uppercase text-[var(--signal)]">Mapa formativo</span>
-                <h2 id="mapa-title" className="font-kinetic font-black uppercase text-2xl md:text-4xl leading-[1.05] mt-4">
+                <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[var(--signal)]">Mapa formativo</span>
+                <h2 id="mapa-title" className="font-kinetic font-bold text-2xl md:text-4xl leading-[1.05] mt-4">
                   Las competencias que necesitas
                 </h2>
 
                 <div className="mt-8 space-y-4">
                   {groups.map(({ area, micros, ects }) => (
-                    <article key={area.id} className="rounded-2xl border border-white/10 bg-black/40 p-5 md:p-6">
+                    <article key={area.id} className="ui-card p-5 md:p-6">
                       <header className="flex items-baseline justify-between gap-3 flex-wrap">
-                        <h3 className="font-kinetic font-bold text-sm md:text-base uppercase">{area.name}</h3>
+                        <h3 className="font-kinetic font-semibold text-base">{area.name}</h3>
                         <span className="text-xs font-semibold text-white/50">
                           {area.kind} · <span className="text-[var(--signal)]">{ects} ECTS</span>
                         </span>
@@ -114,8 +113,8 @@ export default async function ProfilePage({ params }: { params: Promise<Params> 
                   ))}
 
                   {experienceLabel && (
-                    <div className="rounded-2xl border border-[var(--signal)]/30 bg-[var(--signal)]/5 p-5 md:p-6">
-                      <p className="flex items-center gap-3 font-kinetic font-bold text-sm md:text-base uppercase">
+                    <div className="ui-card p-5 md:p-6">
+                      <p className="flex items-center gap-3 font-kinetic font-semibold text-base">
                         <Plus className="w-5 h-5 text-[var(--signal)] shrink-0" aria-hidden="true" /> {experienceLabel}
                       </p>
                       <p className="text-sm text-white/70 leading-relaxed mt-3">
@@ -136,25 +135,25 @@ export default async function ProfilePage({ params }: { params: Promise<Params> 
               </div>
 
               <aside aria-labelledby="llegar-title" className="lg:sticky lg:top-24 space-y-4">
-                <h2 id="llegar-title" className="font-kinetic font-black uppercase text-xl md:text-2xl">Cómo llegar</h2>
+                <h2 id="llegar-title" className="font-kinetic font-bold text-xl md:text-2xl">Cómo llegar</h2>
 
-                <div className="rounded-2xl bg-[var(--ink-solid)] text-[#f4f8ff] p-6">
-                  <h3 className="font-kinetic font-bold text-sm uppercase">Máster BIM blended</h3>
+                <div className="field-navy rounded-2xl p-6">
+                  <h3 className="font-kinetic font-semibold text-base">Máster BIM blended</h3>
                   <p className="text-sm text-[#c9d9f0] leading-relaxed mt-2">
                     {isFullMaster ? 'Las 23 microcredenciales' : `Las ${TOTAL_MICROS} microcredenciales (incluye estas ${profile.count})`} y el
                     simulador profesional como proyecto fin de máster, con trabajo en empresa desde el primer día.
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-black/40 p-6">
-                  <h3 className="font-kinetic font-bold text-sm uppercase">Máster BIM online · {formatEuro(MASTER_PRICE_ONLINE)}</h3>
+                <div className="ui-card p-6">
+                  <h3 className="font-kinetic font-semibold text-base">Máster BIM online</h3>
                   <p className="text-sm text-white/60 leading-relaxed mt-2">
                     Las {TOTAL_MICROS} microcredenciales y el simulador profesional como proyecto fin de máster, a tu ritmo.
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-black/40 p-6">
-                  <h3 className="font-kinetic font-bold text-sm uppercase">Módulo a módulo</h3>
+                <div className="ui-card p-6">
+                  <h3 className="font-kinetic font-semibold text-base">Módulo a módulo</h3>
                   <p className="text-sm text-white/60 leading-relaxed mt-2">
                     {isFullMaster ? 'Las 23 microcredenciales' : `Solo las ${profile.count} de este perfil, o las que te falten`}.{' '}
                     {formatEuro(PRICE_PER_ECTS)} por ECTS.
@@ -163,16 +162,16 @@ export default async function ProfilePage({ params }: { params: Promise<Params> 
 
                 <BookCallButton
                   pack={`Perfil ${profile.name}`}
-                  className="group w-full inline-flex items-center justify-between gap-3 pl-6 pr-2 py-2 rounded-full bg-[var(--signal)] text-black hover:bg-[var(--signal-dim)] transition-colors cursor-pointer"
+                  className="btn btn-blue w-full justify-between"
                 >
-                  <span className="text-sm font-medium tracking-wide">Solicitar orientación</span>
-                  <span className="w-9 h-9 rounded-full bg-black/20 flex items-center justify-center group-hover:rotate-45 transition-transform">
+                  Solicitar orientación
+                  <span className="btn-dot bg-[#fff]/20">
                     <ArrowUpRight className="w-4 h-4" />
                   </span>
                 </BookCallButton>
 
-                <div className="rounded-2xl border border-white/10 bg-black/40 p-6">
-                  <p className="text-xs tracking-[0.2em] uppercase text-white/50">Certificación AECOMI</p>
+                <div className="ui-card p-6">
+                  <p className="text-xs font-semibold tracking-[0.2em] uppercase text-white/50">Certificación AECOMI</p>
                   {profile.certifiable ? (
                     <>
                       <p className="text-sm leading-relaxed mt-2">
@@ -198,7 +197,7 @@ export default async function ProfilePage({ params }: { params: Promise<Params> 
           </section>
         </main>
 
-        <SiteFooter className="w-[calc(100%-clamp(20px,5vw,72px))] max-w-[1320px] mx-auto mt-3 mb-4" />
+        <SiteFooter />
       </div>
     </BookCallProvider>
   );

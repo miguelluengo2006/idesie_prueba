@@ -470,7 +470,49 @@ export default function ContactsPage() {
             <EmptyState icon={<Search className="w-6 h-6" />} title="Nada coincide" text="Prueba con otros filtros o borra la búsqueda." />
           ) : (
             <>
-              <ul className="space-y-2">
+              <div className="hidden md:block card-liquid rounded-3xl overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="pn-title text-left border-b border-white/10">
+                      <th scope="col" className="px-4 py-3 font-medium">Contacto</th>
+                      <th scope="col" className="px-3 py-3 font-medium">Teléfono</th>
+                      <th scope="col" className="px-3 py-3 font-medium">Empresa</th>
+                      <th scope="col" className="px-3 py-3 font-medium">Etiquetas</th>
+                      <th scope="col" className="px-3 py-3 font-medium">Estado</th>
+                      <th scope="col" className="px-3 py-3 font-medium">Alta</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {filtered.slice(0, visible).map((c) => {
+                      const st = contactStatus(c);
+                      return (
+                        <tr key={c.id} onClick={() => setModal({ contact: c })} className="hover:bg-white/[0.04] transition-colors cursor-pointer">
+                          <td className="px-4 py-3 max-w-[260px]">
+                            <button onClick={(e) => { e.stopPropagation(); setModal({ contact: c }); }} className="text-left cursor-pointer block w-full min-w-0">
+                              <span className="block font-semibold truncate">{c.name || c.email}</span>
+                              {c.name && <span className="block text-xs text-white/50 truncate">{c.email}</span>}
+                            </button>
+                          </td>
+                          <td className="px-3 py-3 text-xs text-white/60 tabular-nums whitespace-nowrap">{c.phone || '—'}</td>
+                          <td className="px-3 py-3 text-xs text-white/60 max-w-[160px] truncate">{c.company || '—'}</td>
+                          <td className="px-3 py-3 max-w-[220px]">
+                            <div className="flex flex-wrap gap-1">
+                              {c.tags.slice(0, 3).map((t) => <span key={t} className="px-2 py-px text-[11px] rounded-full border border-white/12 text-white/60">{t}</span>)}
+                              {c.tags.length > 3 && <span className="text-[11px] text-white/40 self-center">+{c.tags.length - 3}</span>}
+                            </div>
+                          </td>
+                          <td className="px-3 py-3"><span className={cn('px-2 py-0.5 text-[11px] rounded-full whitespace-nowrap', STATUS_BADGE[st])}>{STATUS_LABEL[st]}</span></td>
+                          <td className="px-3 py-3 text-xs text-white/50 whitespace-nowrap">
+                            {timeAgo(c.created_at)}
+                            <span className="block text-[11px] text-white/35">{CONTACT_SOURCES[c.source] || c.source}</span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <ul className="space-y-2 md:hidden">
                 {filtered.slice(0, visible).map((c) => {
                   const st = contactStatus(c);
                   return (

@@ -34,14 +34,14 @@ export default function CookiesPage() {
           <tr>
             <td><code>sb-…-auth-token</code> (Supabase)</td>
             <td>Técnica (propia)</td>
-            <td>Mantener tu sesión iniciada en el área de cliente y en el panel.</td>
+            <td>Mantener la sesión del equipo de IDESIE en el panel interno.</td>
             <td>Sesión / hasta cerrar sesión</td>
           </tr>
           <tr>
-            <td>Cookies de Stripe (<code>stripe.com</code>)</td>
+            <td>Cookies de Flywire (<code>flywire.com</code>)</td>
             <td>Técnica / seguridad (terceros)</td>
-            <td>Procesar el pago de forma segura y prevenir fraude en la página de pago alojada por Stripe.</td>
-            <td>Según Stripe</td>
+            <td>Procesar el pago de forma segura y prevenir fraude en la página de pago alojada por Flywire.</td>
+            <td>Según Flywire</td>
           </tr>
           <tr>
             <td>Vercel Web Analytics</td>
@@ -74,7 +74,7 @@ export default function CookiesPage() {
         <a href="https://support.mozilla.org/es/kb/habilitar-y-deshabilitar-cookies-sitios-web-rastrear-preferencias" target="_blank" rel="noopener noreferrer">Firefox</a>,{' '}
         <a href="https://support.apple.com/es-es/guide/safari/sfri11471/mac" target="_blank" rel="noopener noreferrer">Safari</a>,{' '}
         <a href="https://support.microsoft.com/es-es/microsoft-edge/eliminar-las-cookies-en-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" rel="noopener noreferrer">Edge</a>.
-        Si bloqueas las técnicas, parte de la web (como iniciar sesión) puede dejar de funcionar.
+        Si bloqueas las técnicas, parte de la web (como el panel interno) puede dejar de funcionar.
       </p>
 
       <H2>4. Más información</H2>

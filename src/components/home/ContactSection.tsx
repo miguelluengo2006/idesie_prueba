@@ -6,10 +6,10 @@ import { CONTACT } from '@/lib/bim';
 /** Sección de contacto: datos y formulario de reserva de llamada. Se usa en la home y en /contacto. */
 export default function ContactSection() {
   return (
-    <section id="contacto" className="px-4 md:px-6 py-24 md:py-32 scroll-mt-24">
+    <section id="contacto" className="field-white px-4 md:px-6 py-24 md:py-32 scroll-mt-24">
       <div className="max-w-4xl mx-auto">
-        <span className="text-xs tracking-[0.25em] uppercase text-[var(--signal)]">Hablemos</span>
-        <h2 className="font-kinetic font-black uppercase text-3xl md:text-5xl leading-[1.05] mt-4 mb-4">Agenda tu llamada</h2>
+        <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[var(--signal)]">Hablemos</span>
+        <h2 className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.15] mt-4 mb-4">Agenda tu <span className="ui-hl">llamada</span></h2>
         <p className="text-white/60 max-w-lg mb-8">
           Elige un hueco y respóndenos unas preguntas rápidas: en 30 minutos te orientamos sobre el perfil que mejor encaja contigo
           o con tu equipo. ¿Prefieres explorar antes?{' '}

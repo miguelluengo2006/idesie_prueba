@@ -1,22 +1,22 @@
 import Link from 'next/link';
-import KineticWordmark from '@/components/home/KineticWordmark';
+import IdesieLogo from '@/components/home/IdesieLogo';
 import CookieSettingsLink from '@/components/legal/CookieSettingsLink';
 import { LEGAL_LINKS } from '@/components/legal/LegalPage';
 import { CONTACT } from '@/lib/bim';
 
 /** Pie de página de la web: datos de contacto, navegación, acceso y todos los enlaces legales. */
 export default function SiteFooter({ className = '' }: { className?: string }) {
-  const link = 'hover:text-white transition-colors';
+  const link = 'hover:text-[#fff] transition-colors';
   return (
-    <footer className={`home-slab relative z-[2] ${className}`}>
-      <div className="max-w-6xl mx-auto px-5 md:px-8 py-10 md:py-12">
+    <footer className={`field-navy relative z-[2] ${className}`}>
+      <div className="max-w-6xl mx-auto px-5 md:px-6 py-14 md:py-16">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
             <Link href="/" aria-label="Inicio">
-              <KineticWordmark name={CONTACT.name} className="text-xl" />
+              <IdesieLogo tone="white" className="h-11" />
             </Link>
-            <p className="mt-3 text-sm text-white/70 max-w-xs">{CONTACT.slogan}</p>
-            <address className="mt-4 text-sm text-white/50 not-italic leading-relaxed">
+            <p className="mt-3 text-sm text-[#c9d9f0] max-w-xs">{CONTACT.slogan}</p>
+            <address className="mt-4 text-sm text-[#c9d9f0]/80 not-italic leading-relaxed">
               {CONTACT.address}
               <br />
               <a href={CONTACT.phoneHref} className={link}>{CONTACT.phone}</a>
@@ -25,11 +25,12 @@ export default function SiteFooter({ className = '' }: { className?: string }) {
             </address>
           </div>
 
-          <nav aria-label="Web" className="text-sm text-white/50">
-            <h2 className="mb-3 text-xs uppercase tracking-[0.2em] text-white/30">Web</h2>
+          <nav aria-label="Web" className="text-sm text-[#c9d9f0]/80">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#7db4ff]">Web</h2>
             <ul className="space-y-2">
               <li><Link href="/perfiles" className={link}>Perfiles profesionales</Link></li>
-              <li><Link href="/formacion" className={link}>Másteres y microcredenciales</Link></li>
+              <li><Link href="/masters" className={link}>Másteres y microcredenciales</Link></li>
+              <li><Link href="/tienda" className={link}>Tienda y matrícula online</Link></li>
               <li><Link href="/ia-bim" className={link}>BIM con IA</Link></li>
               <li><Link href="/metodologia" className={link}>Metodología</Link></li>
               <li><Link href="/profesores" className={link}>Profesores</Link></li>
@@ -39,8 +40,8 @@ export default function SiteFooter({ className = '' }: { className?: string }) {
             </ul>
           </nav>
 
-          <nav aria-label="Legal" className="text-sm text-white/50">
-            <h2 className="mb-3 text-xs uppercase tracking-[0.2em] text-white/30">Legal</h2>
+          <nav aria-label="Legal" className="text-sm text-[#c9d9f0]/80">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#7db4ff]">Legal</h2>
             <ul className="space-y-2">
               {LEGAL_LINKS.map((l) => (
                 <li key={l.href}><Link href={l.href} className={link}>{l.label}</Link></li>
@@ -49,8 +50,8 @@ export default function SiteFooter({ className = '' }: { className?: string }) {
             </ul>
           </nav>
 
-          <div className="text-sm text-white/50">
-            <h2 className="mb-3 text-xs uppercase tracking-[0.2em] text-white/30">Certificación</h2>
+          <div className="text-sm text-[#c9d9f0]/80">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#7db4ff]">Certificación</h2>
             <p className="leading-relaxed">
               Entidad formativa acreditada por{' '}
               <a href={CONTACT.aecomiUrl} target="_blank" rel="noopener noreferrer" className={`${link} underline underline-offset-2`}>
@@ -61,7 +62,7 @@ export default function SiteFooter({ className = '' }: { className?: string }) {
           </div>
         </div>
 
-        <p className="mt-10 pt-6 border-t border-white/10 text-xs text-white/30">
+        <p className="mt-10 pt-6 border-t border-[#fff]/15 text-xs text-[#c9d9f0]/60">
           © {new Date().getFullYear()} {CONTACT.name} {CONTACT.tagline}. Todos los derechos reservados.
         </p>
       </div>

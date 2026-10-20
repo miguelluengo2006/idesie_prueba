@@ -57,3 +57,29 @@ export function contactKeys(l: { email?: string | null; phone?: string | null })
   if (phone.length === 9) keys.push(`p:${phone}`);
   return keys;
 }
+
+/** Programa que le interesa: lo que eligió en el formulario («¿Qué te interesa?») o la línea «Interés:» del mensaje. */
+export function leadInterest(l: Pick<Lead, 'answers' | 'message'>): string | null {
+  const needs = l.answers?.needs?.filter(Boolean);
+  if (needs?.length) return needs.join(', ');
+  const m = /^Interés:\s*(.+)$/m.exec(l.message || '');
+  return m ? m[1].trim() : null;
+}
+
+/** Por dónde entró y, si vino de un anuncio, la campaña (utm_campaign o, si no, utm_source). */
+export function leadChannel(l: Pick<Lead, 'source' | 'kind' | 'answers'>): { label: string; campaign: string | null } {
+  const utm = l.answers?.utm;
+  const campaign = utm?.utm_campaign || utm?.utm_source || null;
+  if (l.source === 'manual') return { label: 'Manual', campaign };
+  if (l.source === 'landing') return { label: 'Landing', campaign };
+  return { label: l.kind === 'call' ? 'Web · llamada' : 'Web', campaign };
+}
+
+/** El comentario de la persona, sin las líneas que añade la web («Interés:», «Origen:») ni el relleno por defecto. */
+export function leadNote(message: string | null | undefined): string {
+  return (message || '')
+    .split('\n')
+    .filter((line) => !/^(Interés|Origen):/.test(line) && line.trim() !== 'Sin comentarios adicionales.')
+    .join('\n')
+    .trim();
+}
