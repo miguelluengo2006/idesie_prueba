@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Reveal, { SectionHead } from '@/components/home/Reveal';
 import { CtaBand, PageHero, SubPageShell } from '@/components/home/SubPage';
 import { CONTACT, SIMULATOR_ECTS } from '@/lib/bim';
+import { OG_IMAGES } from '@/lib/seo';
 import { FACTS } from '@/lib/content';
 
 const TITLE = 'Metodología Learning by Working';
@@ -9,10 +10,11 @@ const DESCRIPTION =
   'Aprender trabajando: máster blended 50/50, proyectos reales de empresas del sector AEC, tutores profesionales en activo y un simulador profesional como proyecto fin de máster.';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/metodologia' },
   title: TITLE,
   description: DESCRIPTION,
-  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES', images: OG_IMAGES },
+  twitter: { card: 'summary_large_image', images: ['/og-idesie.png'], title: TITLE, description: DESCRIPTION },
 };
 
 const STATS = [

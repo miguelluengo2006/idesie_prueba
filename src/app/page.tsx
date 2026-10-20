@@ -19,6 +19,7 @@ import BackToTop from '@/components/home/BackToTop';
 import ContactSection from '@/components/home/ContactSection';
 import { BookCallProvider } from '@/components/home/BookCall';
 import { CONTACT } from '@/lib/bim';
+import { OG_IMAGES } from '@/lib/seo';
 import { FACTS } from '@/lib/content';
 
 const TITLE = 'IDESIE Business & Tech School — Máster BIM, microcredenciales y certificación de perfiles';
@@ -26,10 +27,11 @@ const DESCRIPTION =
   'Formamos en competencias: la escuela tecnológica para arquitectos e ingenieros. Certificación universitaria UTAMED y certificación profesional AECOMI. Formación BIM en Madrid desde ' + FACTS.founded + '.';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/' },
   title: TITLE,
   description: DESCRIPTION,
-  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES', images: OG_IMAGES },
+  twitter: { card: 'summary_large_image', images: ['/og-idesie.png'], title: TITLE, description: DESCRIPTION },
 };
 
 export default function HomePage() {

@@ -6,16 +6,18 @@ import Section from '@/components/home/Section';
 import Reveal, { SectionHead } from '@/components/home/Reveal';
 import ComingSoon from '@/components/home/ComingSoon';
 import { MASTERS } from '@/lib/masters';
+import { OG_IMAGES } from '@/lib/seo';
 import { CONTACT } from '@/lib/bim';
 
 const TITLE = 'Másteres BIM: presencial y online | IDESIE';
 const DESCRIPTION = 'Máster BIM, Máster BIM & Building Engineering y Máster BIM Online: compara duración, metodología, prácticas y salidas, y descubre cómo enseñamos la IA dentro de cada máster.';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/masters' },
   title: TITLE,
   description: DESCRIPTION,
-  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES', images: OG_IMAGES },
+  twitter: { card: 'summary_large_image', images: ['/og-idesie.png'], title: TITLE, description: DESCRIPTION },
 };
 
 const COMPARE = [

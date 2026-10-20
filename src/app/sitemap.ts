@@ -2,45 +2,37 @@ import type { MetadataRoute } from 'next';
 import { PROFILES } from '@/lib/bim';
 import { MASTER_SLUGS } from '@/lib/masters';
 import { SEED_PRODUCTS } from '@/lib/shop';
+import { SITE_URL } from '@/lib/seo';
 
+// Fecha de la última revisión de contenidos: estable entre despliegues (una fecha nueva en cada visita le resta valor al sitemap)
+const UPDATED = new Date('2026-10-20');
+
+type Entry = MetadataRoute.Sitemap[number];
+const entry = (path: string, priority: number, changeFrequency: Entry['changeFrequency'] = 'monthly'): Entry => ({
+  url: `${SITE_URL}${path}`,
+  lastModified: UPDATED,
+  changeFrequency,
+  priority,
+});
+
+/** Solo páginas indexables: sin redirecciones, sin carrito ni pedidos, sin /landing (noindex) ni el panel. */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
-  const legal: MetadataRoute.Sitemap = ['aviso-legal', 'privacidad', 'cookies', 'terminos'].map((slug) => ({
-    url: `${siteUrl}/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'yearly',
-    priority: 0.2,
-  }));
-  const profiles: MetadataRoute.Sitemap = PROFILES.map((p) => ({
-    url: `${siteUrl}/perfiles/${p.code.toLowerCase()}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.7,
-  }));
-  const pages: MetadataRoute.Sitemap = ['ia-bim', 'metodologia', 'profesores', 'empresas', 'perfiles', 'masters', 'microcredenciales', 'simulador', 'certificacion', 'contacto', 'tienda'].map((slug) => ({
-    url: `${siteUrl}/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }));
-  const products: MetadataRoute.Sitemap = SEED_PRODUCTS.map((p) => ({
-    url: `${siteUrl}/tienda/${p.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.7,
-  }));
-  const masters: MetadataRoute.Sitemap = MASTER_SLUGS.map((slug) => ({
-    url: `${siteUrl}/masters/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }));
   return [
-    { url: siteUrl, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
-    ...pages,
-    ...masters,
-    ...products,
-    ...profiles,
-    ...legal,
+    entry('', 1, 'weekly'),
+    entry('/masters', 0.9),
+    ...MASTER_SLUGS.map((slug) => entry(`/masters/${slug}`, 0.9)),
+    entry('/tienda', 0.9, 'weekly'),
+    ...SEED_PRODUCTS.filter((p) => p.active).map((p) => entry(`/tienda/${p.slug}`, 0.8)),
+    entry('/microcredenciales', 0.8),
+    entry('/perfiles', 0.8),
+    ...PROFILES.map((p) => entry(`/perfiles/${p.code.toLowerCase()}`, 0.7)),
+    entry('/simulador', 0.8),
+    entry('/certificacion', 0.8),
+    entry('/ia-bim', 0.8),
+    entry('/metodologia', 0.7),
+    entry('/profesores', 0.7),
+    entry('/empresas', 0.7),
+    entry('/contacto', 0.6),
+    ...['aviso-legal', 'privacidad', 'cookies', 'terminos'].map((s) => entry(`/${s}`, 0.2, 'yearly')),
   ];
 }

@@ -5,6 +5,7 @@ import Section from '@/components/home/Section';
 import Reveal from '@/components/home/Reveal';
 import Catalog from '@/components/shop/Catalog';
 import { getCatalog } from '@/lib/shopServer';
+import { OG_IMAGES } from '@/lib/seo';
 import { CONTACT } from '@/lib/bim';
 
 export const dynamic = 'force-dynamic';
@@ -13,9 +14,10 @@ const TITLE = 'Tienda: másteres y cursos BIM';
 const DESCRIPTION = 'Matricúlate online en los másteres BIM de IDESIE, el título profesional CUALIFICAM o empieza gratis con el curso de Revit. Precios con IVA incluido.';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/tienda' },
   title: TITLE,
   description: DESCRIPTION,
-  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES' },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES', images: OG_IMAGES },
 };
 
 const PROMISES = [

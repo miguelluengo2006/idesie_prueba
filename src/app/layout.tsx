@@ -5,8 +5,16 @@ import { Suspense } from 'react';
 import CookieConsent from '@/components/CookieConsent';
 import MetaPixel from '@/components/MetaPixel';
 import WebAnalytics from '@/components/WebAnalytics';
+import JsonLd from '@/components/JsonLd';
+import { OG_IMAGES, SITE_URL, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  applicationName: 'IDESIE',
+  alternates: { canonical: '/' },
+  openGraph: { type: 'website', siteName: 'IDESIE Business & Technology School', locale: 'es_ES', images: OG_IMAGES },
+  twitter: { card: 'summary_large_image', images: ['/og-idesie.png'] },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } },
   title: { default: 'IDESIE Business & Tech School', template: '%s | IDESIE' },
   description: 'Escuela de formación BIM: microcredenciales, Máster BIM y certificación de perfiles profesionales con AECOMI.',
   icons: {
@@ -25,8 +33,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
     { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
@@ -51,6 +57,7 @@ export default function RootLayout({
         `}} />
       </head>
       <body className='antialiased'>
+        <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
         <AuthProvider>
           <Suspense fallback={null}>
             {children}

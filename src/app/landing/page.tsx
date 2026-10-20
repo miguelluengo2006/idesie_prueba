@@ -14,6 +14,7 @@ import StickyCta from '@/components/landing/StickyCta';
 import WhatsAppLink from '@/components/landing/WhatsAppLink';
 import { CONTACT } from '@/lib/bim';
 import { COMPANY_LOGOS, FACTS } from '@/lib/content';
+import { OG_IMAGES } from '@/lib/seo';
 import { MASTERS } from '@/lib/masters';
 
 const TITLE = 'Máster BIM en Madrid y online | IDESIE Business & Tech School';
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   robots: { index: false, follow: true },
-  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES' },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES', images: OG_IMAGES },
 };
 
 const CARDS = [

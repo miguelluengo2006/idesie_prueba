@@ -9,6 +9,8 @@ import AddButton from '@/components/shop/AddButton';
 import { getCatalog } from '@/lib/shopServer';
 import { priceLabel, reservationLabel } from '@/lib/shop';
 import { CONTACT } from '@/lib/bim';
+import JsonLd from '@/components/JsonLd';
+import { OG_IMAGES, breadcrumbJsonLd, courseJsonLd } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +23,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: p.name,
     description: p.summary,
-    openGraph: { title: `${p.name} · ${CONTACT.name}`, description: p.summary, type: 'website', siteName: CONTACT.name, locale: 'es_ES' },
+    alternates: { canonical: `/tienda/${p.slug}` },
+    openGraph: { title: `${p.name} · ${CONTACT.name}`, description: p.summary, type: 'website', siteName: CONTACT.name, locale: 'es_ES', images: OG_IMAGES },
   };
 }
 
@@ -38,6 +41,12 @@ export default async function Page({ params }: Props) {
 
   return (
     <SubPageShell>
+      <JsonLd
+        data={[
+          courseJsonLd({ name: p.name, description: p.summary, path: `/tienda/${p.slug}`, online: /online/i.test(p.modality ?? ''), priceEur: p.priceEur, credential: p.certification, duration: p.duration }),
+          breadcrumbJsonLd([{ name: 'Inicio', path: '/' }, { name: 'Tienda', path: '/tienda' }, { name: p.name, path: `/tienda/${p.slug}` }]),
+        ]}
+      />
       <section className="field-navy px-4 md:px-6 pt-32 md:pt-40 pb-16 md:pb-24">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.3fr_1fr] gap-12 items-end">
           <Reveal>

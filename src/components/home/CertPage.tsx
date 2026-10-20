@@ -10,6 +10,8 @@ import CertCompare from './CertCompare';
 import CertSteps from './CertSteps';
 import { CONTACT, PROFILES, formatEuro } from '@/lib/bim';
 import { SIMULATOR } from '@/lib/content';
+import JsonLd from '@/components/JsonLd';
+import { faqJsonLd } from '@/lib/seo';
 
 const CERT = PROFILES.filter((p) => p.certifiable);
 const NOW = [
@@ -35,6 +37,7 @@ const FAQS = [
 export default function CertPage() {
   return (
     <SubPageShell>
+      <JsonLd data={faqJsonLd(FAQS)} />
       <CertHero />
 
       <section className="field-blue px-4 md:px-6 py-20 md:py-28" aria-labelledby="dos-title">

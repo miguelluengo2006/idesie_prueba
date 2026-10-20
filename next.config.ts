@@ -1,3 +1,4 @@
+import { REDIRECTS } from './src/lib/redirects';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -31,10 +32,12 @@ const nextConfig: NextConfig = {
       },
     },
   }),
-  // La dirección antigua del carrito lleva al pago de la tienda. El único panel es el CRM (/portal).
+  // 301 desde las URLs antiguas de idesie.com (ver src/lib/redirects.ts). El único panel es el CRM (/portal).
   async redirects() {
     return [
-      { source: '/carrito', destination: '/checkout', permanent: false },
+      // Una sola versión del dominio: www → sin www
+      { source: '/:path*', has: [{ type: 'host', value: 'www.idesie.com' }], destination: 'https://idesie.com/:path*', permanent: true },
+      ...REDIRECTS.map((r) => ({ ...r, permanent: true })),
     ];
   },
   async headers() {

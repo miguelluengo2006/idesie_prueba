@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { ArrowRight } from 'lucide-react';
 import Reveal, { SectionHead } from '@/components/home/Reveal';
 import { CtaBand, PageHero, SubPageShell } from '@/components/home/SubPage';
+import { OG_IMAGES } from '@/lib/seo';
 import { CONTACT, MICROS, PROFILES, formatEuro, PRICE_PER_ECTS } from '@/lib/bim';
 
 const TITLE = 'BIM con IA para el sector AEC';
@@ -10,10 +11,11 @@ const DESCRIPTION =
   'Aprende a usar la inteligencia artificial en proyectos BIM de arquitectura, ingeniería y construcción: automatización, revisión de modelos, datos y documentación, con criterio profesional.';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/ia-bim' },
   title: TITLE,
   description: DESCRIPTION,
-  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES', images: OG_IMAGES },
+  twitter: { card: 'summary_large_image', images: ['/og-idesie.png'], title: TITLE, description: DESCRIPTION },
 };
 
 const ia = MICROS.find((m) => m.code === '21')!;

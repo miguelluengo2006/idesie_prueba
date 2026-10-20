@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Reveal, { SectionHead } from '@/components/home/Reveal';
 import { CtaBand, PageHero, SubPageShell } from '@/components/home/SubPage';
 import { CONTACT } from '@/lib/bim';
+import { OG_IMAGES } from '@/lib/seo';
 import { PROFESSORS, initials, type Professor } from '@/lib/professors';
 
 const TITLE = 'Claustro de profesores';
@@ -9,10 +10,11 @@ const DESCRIPTION =
   'Dirección de IDESIE y profesionales en activo de Hill International, ISG, L35, Sir Robert McAlpine y más: enseñan lo que hacen cada día en el sector AEC.';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/profesores' },
   title: TITLE,
   description: DESCRIPTION,
-  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', siteName: CONTACT.name, locale: 'es_ES', images: OG_IMAGES },
+  twitter: { card: 'summary_large_image', images: ['/og-idesie.png'], title: TITLE, description: DESCRIPTION },
 };
 
 function Card({ p, delay }: { p: Professor; delay: number }) {

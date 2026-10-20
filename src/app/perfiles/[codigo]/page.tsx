@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowUpRight, Plus } from 'lucide-react';
 import SiteHeader from '@/components/home/SiteHeader';
 import SiteFooter from '@/components/home/SiteFooter';
 import { BookCallButton, BookCallProvider } from '@/components/home/BookCall';
+import { OG_IMAGES } from '@/lib/seo';
 import {
   CONTACT,
   PRICE_PER_ECTS,
@@ -32,8 +33,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return {
     title,
     description,
-    openGraph: { title, description, type: 'website', siteName: CONTACT.name, locale: 'es_ES' },
-    twitter: { card: 'summary_large_image', title, description },
+    alternates: { canonical: `/perfiles/${profile.code.toLowerCase()}` },
+    openGraph: { title, description, type: 'website', siteName: CONTACT.name, locale: 'es_ES', images: OG_IMAGES },
+    twitter: { card: 'summary_large_image', images: ['/og-idesie.png'], title, description },
   };
 }
 
