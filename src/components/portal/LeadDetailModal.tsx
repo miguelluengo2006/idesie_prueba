@@ -100,10 +100,6 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
   const isCall = lead.kind === 'call' && !!lead.call_at;
   const isLanding = lead.source === 'landing';
   const order = lead.answers?.order;
-  const stripeRef = order ? order.payment_intent_id || order.subscription_id || order.invoice_id : null;
-  const stripeUrl = order && stripeRef
-    ? `https://dashboard.stripe.com/${order.livemode ? '' : 'test/'}${order.payment_intent_id ? 'payments' : order.subscription_id ? 'subscriptions' : 'invoices'}/${stripeRef}`
-    : null;
   const meta = statusMeta(lead.status, lead.kind);
   const phoneDigits = whatsappDigits(lead.phone);
   const hasAnswers = !!lead.answers && (!!lead.answers.needs?.length || !!lead.answers.budget || !!lead.answers.timeline);
@@ -267,11 +263,6 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
                       <div className="text-xs text-white/50 mt-0.5">{order.pack_name}</div>
                     )}
                     {!order.livemode && <div className="text-xs text-white/40 mt-0.5">Modo prueba</div>}
-                    {stripeUrl && (
-                      <a href={stripeUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs text-[var(--signal)] hover:underline">
-                        Ver en Stripe <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
                   </div>
                 </div>
               )}

@@ -45,7 +45,7 @@ GRANT ALL ON passkeys, passkey_challenges, passkey_sessions TO service_role;
 REVOKE ALL ON leads FROM anon, authenticated;
 REVOKE ALL ON team_members FROM anon, authenticated;
 
--- 5) Perfiles: desde el navegador solo se puede cambiar la marca y el nombre; la clave de Stripe, el correo
+-- 5) Perfiles: desde el navegador solo se puede cambiar la marca y el nombre; el correo
 --    de avisos y demás ajustes solo los cambia el servidor.
 REVOKE UPDATE ON profiles FROM authenticated;
 GRANT UPDATE (business_name, agency_logo_url, full_name, avatar_url, updated_at) ON profiles TO authenticated;

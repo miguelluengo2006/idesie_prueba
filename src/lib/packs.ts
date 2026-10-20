@@ -1,7 +1,7 @@
 /**
  * Packs y precios — ÚNICA fuente de datos.
- * La web (/), la landing (/landing) y el cobro con Stripe leen de aquí: cambia un precio o un texto en este
- * archivo y se actualiza en todos los sitios (incluido lo que se cobra en Stripe).
+ * La web (/), la landing (/landing) leen de aquí: cambia un precio o un texto en este
+ * archivo y se actualiza en todos los sitios.
  *
  * TODOS LOS PRECIOS SON CON IVA INCLUIDO: la cifra que ve el cliente es la que paga.
  */
@@ -33,7 +33,6 @@ export const WELCOME_SPOTS_LEFT = 30;
 export const WELCOME_SPOTS_TOTAL = 30;
 
 export const WELCOME_PACK = {
-  /** Identificador para el cobro con Stripe */
   id: 'bienvenida',
   name: 'Pack de Bienvenida',
   price: 20,
@@ -70,7 +69,7 @@ export const WELCOME_FAQ = [
   },
   {
     q: '¿Cómo pago y recibo factura?',
-    a: 'Pagas con tarjeta en una pantalla segura de Stripe. El precio ya lleva el IVA incluido y, al pagar, puedes añadir el NIF de tu empresa para recibir la factura con el IVA desglosado.',
+    a: 'Pagas con tarjeta en una pantalla segura. El precio ya lleva el IVA incluido y, al pagar, puedes añadir el NIF de tu empresa para recibir la factura con el IVA desglosado.',
   },
   {
     q: '¿Para qué redes sirve?',
@@ -85,7 +84,7 @@ export const WELCOME_FAQ = [
 export type PriceUnit = 'once' | 'month' | 'video';
 
 export interface Pack {
-  /** Identificador estable para el cobro con Stripe (no lo cambies si ya has vendido este pack) */
+  /** Identificador estable del pack */
   id: string;
   name: string;
   /** € con IVA incluido (lo que paga el cliente) */
@@ -358,65 +357,6 @@ export const EXTRAS: { name: string; price: string }[] = [
   { name: 'Revisión extra', price: '20 €' },
   { name: 'Entrega urgente (menos de 48 h)', price: '+30 %' },
 ];
-
-/* ════════════════════════════════════════════════════════════════════════════
- *  Cobro con Stripe
- * ════════════════════════════════════════════════════════════════════════════ */
-
-export interface PurchasablePack {
-  id: string;
-  /** Nombre completo para el recibo: "Anuncios UGC con IA · Pro" */
-  name: string;
-  /** Texto del recibo / de la pantalla de pago */
-  description: string;
-  /** € IVA incluido */
-  price: number;
-  /** Céntimos IVA incluido (lo que se cobra) */
-  cents: number;
-  /** 'payment' (pago único) o 'subscription' (mensual) */
-  mode: 'payment' | 'subscription';
-  commitment?: string;
-  group: string;
-}
-
-export function toPurchasable(pack: Pack, group: string): PurchasablePack {
-  return {
-    id: pack.id,
-    name: group === pack.name ? pack.name : `${group} · ${pack.name}`,
-    description: pack.includes.join(' · ').slice(0, 450),
-    price: pack.price,
-    cents: Math.round(pack.price * 100),
-    mode: pack.unit === 'month' ? 'subscription' : 'payment',
-    commitment: pack.commitment,
-    group,
-  };
-}
-
-/** Todo lo que se puede comprar en la web, por identificador. */
-export function getPurchasable(id: string): PurchasablePack | null {
-  if (id === WELCOME_PACK.id) {
-    return {
-      id: WELCOME_PACK.id,
-      name: WELCOME_PACK.name,
-      description: '2 vídeos de tu producto · Guion para vender · 9:16 con subtítulos · Entrega en 72 h',
-      price: WELCOME_PACK.price,
-      cents: WELCOME_PACK.price * 100,
-      mode: 'payment',
-      group: WELCOME_PACK.name,
-    };
-  }
-  if (id === SINGLE_VIDEO.id) return toPurchasable(SINGLE_VIDEO, SINGLE_VIDEO.name);
-  for (const group of PACK_GROUPS) {
-    const pack = group.packs.find((p) => p.id === id);
-    if (pack) return toPurchasable(pack, group.title);
-  }
-  return null;
-}
-
-/** Identificadores de todos los packs comprables (para tests y validaciones). */
-export function allPurchasableIds(): string[] {
-  return [WELCOME_PACK.id, ...PACK_GROUPS.flatMap((g) => g.packs.map((p) => p.id)), SINGLE_VIDEO.id];
-}
 
 /* ════════════════════════════════════════════════════════════════════════════
  *  Helpers

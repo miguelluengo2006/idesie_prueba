@@ -159,7 +159,7 @@ export interface LeadMailData {
   company?: string | null;
   message: string;
   kind: 'call' | 'proposal';
-  source: 'website' | 'landing' | 'stripe';
+  source: 'website' | 'landing';
   callAt?: Date | null;
   answers?: { needs?: string[]; budget?: string; timeline?: string } | null;
   pack?: { website?: string; product?: string; runs_ads?: string } | null;
@@ -192,7 +192,7 @@ export function leadEmail(lead: LeadMailData, opts: EmailOptions): RenderedEmail
   const highlightHtml = isCall
     ? highlight('Cuándo', formatCallDate(lead.callAt!, { withYear: true }), `${formatCallTime(lead.callAt!)} · hora de Madrid · 30 minutos`, 'call')
     : isPack
-      ? highlight('Pedido', 'Pack de Bienvenida · 20 € (IVA incluido)', 'Ha rellenado el formulario y pasa al pago con Stripe. Si paga, te llega otro aviso de compra.', 'pack')
+      ? highlight('Pedido', 'Pack de Bienvenida · 20 € (IVA incluido)', 'Ha rellenado el formulario y pasa al pago. Si paga, te llega otro aviso de compra.', 'pack')
       : '';
 
   const digits = whatsappDigits(lead.phone);
@@ -242,7 +242,7 @@ export function leadEmail(lead: LeadMailData, opts: EmailOptions): RenderedEmail
   const text = [
     `${badge.toUpperCase()} — ${who}`,
     isCall ? `Llamada: ${formatCallDate(lead.callAt!, { withYear: true })} a las ${formatCallTime(lead.callAt!)} (hora de Madrid, 30 min)` : '',
-    isPack ? 'Pedido: Pack de Bienvenida · 20 € (IVA incluido). Pasa al pago con Stripe.' : '',
+    isPack ? 'Pedido: Pack de Bienvenida · 20 € (IVA incluido). Pasa al pago.' : '',
     '',
     `Nombre: ${lead.name}`,
     lead.phone ? `Teléfono: ${lead.phone}` : '',
@@ -265,68 +265,6 @@ export function leadEmail(lead: LeadMailData, opts: EmailOptions): RenderedEmail
 }
 
 /* ── Compra ──────────────────────────────────────────────────────────────── */
-
-export interface PurchaseMailData {
-  packName: string;
-  amountEur: number;
-  monthly: boolean;
-  livemode: boolean;
-  customerName?: string | null;
-  customerEmail?: string | null;
-  customerPhone?: string | null;
-  stripeUrl?: string | null;
-}
-
-export function purchaseEmail(p: PurchaseMailData, opts: EmailOptions): RenderedEmail {
-  const brand = opts.brand || 'IDESIE';
-  const amount = `${p.amountEur.toLocaleString('es-ES')} €`;
-  const title = p.customerName || p.customerEmail || 'Cliente de Stripe';
-  const subject = `Nueva compra — ${p.packName} · ${amount} (IVA incluido)${p.livemode ? '' : ' [prueba]'}`;
-
-  const digits = whatsappDigits(p.customerPhone);
-  const buttons = [
-    button(opts.panelUrl, 'Abrir en el panel', true),
-    p.stripeUrl ? button(p.stripeUrl, 'Ver el pago en Stripe', false) : '',
-    digits.length >= 8 ? button(`https://wa.me/${digits}`, 'Escribir por WhatsApp', false) : '',
-    p.customerEmail ? button(`mailto:${p.customerEmail}`, 'Escribir por email', false) : '',
-  ].join('');
-
-  const html = layout({
-    brand,
-    preheader: `${amount} (IVA incluido) · ${p.packName}`,
-    badge: p.livemode ? 'Compra pagada' : 'Compra de prueba',
-    tone: 'paid',
-    title,
-    subtitle: 'Ha pagado en Stripe',
-    highlightHtml: highlight('Pagado', `${amount}${p.monthly ? ' al mes' : ''}`, `${p.packName} · IVA incluido`, 'paid'),
-    buttons,
-    panelUrl: opts.panelUrl,
-    rowsHtml: [
-      row('Pack', `<strong>${esc(p.packName)}</strong>`),
-      row('Importe', `${esc(amount)}${p.monthly ? ' al mes' : ''} (IVA incluido)`),
-      p.customerName ? row('Cliente', esc(p.customerName)) : '',
-      p.customerEmail ? row('Email', `<a href="mailto:${esc(p.customerEmail)}" style="color:${C.button};text-decoration:none;">${esc(p.customerEmail)}</a>`) : '',
-      p.customerPhone ? row('Teléfono', esc(p.customerPhone)) : '',
-    ].join(''),
-    extraHtml: `<div style="margin-top:22px;font:400 13px/1.6 ${FONT};color:${C.muted};">Ya está guardada en Solicitudes como <strong style="color:${C.ink};">Ganada</strong>. Stripe le envía el recibo y la factura.${p.livemode ? '' : ' Es un pago de prueba: no se ha cobrado dinero real.'}</div>`,
-    receivedAt: opts.receivedAt || new Date(),
-  });
-
-  const text = [
-    `COMPRA PAGADA — ${p.packName} · ${amount}${p.monthly ? ' al mes' : ''} (IVA incluido)${p.livemode ? '' : ' [prueba]'}`,
-    '',
-    p.customerName ? `Cliente: ${p.customerName}` : '',
-    p.customerEmail ? `Email: ${p.customerEmail}` : '',
-    p.customerPhone ? `Teléfono: ${p.customerPhone}` : '',
-    '',
-    `Panel: ${opts.panelUrl}`,
-    p.stripeUrl ? `Stripe: ${p.stripeUrl}` : '',
-  ]
-    .filter((l, i, arr) => l !== '' || (arr[i - 1] !== '' && i > 0))
-    .join('\n');
-
-  return { subject, html, text };
-}
 
 /* ── Invitación al equipo ────────────────────────────────────────────────── */
 

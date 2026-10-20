@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { leadEmail, purchaseEmail } from '@/lib/emailTemplates';
+import { leadEmail } from '@/lib/emailTemplates';
 
 const opts = { panelUrl: 'https://samgple.com/portal/leads?open=abc', receivedAt: new Date('2026-09-25T10:00:00Z') };
 
@@ -44,21 +44,3 @@ describe('leadEmail', () => {
   });
 });
 
-describe('purchaseEmail', () => {
-  it('compra pagada con IVA incluido y enlace a Stripe', () => {
-    const m = purchaseEmail(
-      { packName: 'Pack de Bienvenida', amountEur: 20, monthly: false, livemode: true, customerName: 'Ana', customerEmail: 'ana@x.es', customerPhone: '+34 692168981', stripeUrl: 'https://dashboard.stripe.com/payments/pi_1' },
-      opts
-    );
-    expect(m.subject).toBe('Nueva compra — Pack de Bienvenida · 20 € (IVA incluido)');
-    expect(m.html).toContain('https://dashboard.stripe.com/payments/pi_1');
-    expect(m.html).toContain('Compra pagada');
-  });
-
-  it('marca las compras de prueba', () => {
-    const m = purchaseEmail({ packName: 'UGC Mensual', amountEur: 790, monthly: true, livemode: false }, opts);
-    expect(m.subject).toContain('[prueba]');
-    expect(m.html).toContain('al mes');
-    expect(m.html).toContain('no se ha cobrado dinero real');
-  });
-});

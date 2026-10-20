@@ -16,7 +16,6 @@ import Professionals from '@/components/home/Professionals';
 import Agenda from '@/components/home/Agenda';
 import Orientation from '@/components/home/Orientation';
 import BackToTop from '@/components/home/BackToTop';
-import PaymentNotice from '@/components/home/PaymentNotice';
 import ContactSection from '@/components/home/ContactSection';
 import { BookCallProvider } from '@/components/home/BookCall';
 import { CONTACT } from '@/lib/bim';
@@ -38,7 +37,6 @@ export default function HomePage() {
     <BookCallProvider businessName={CONTACT.name}>
       <div className="home-root min-h-screen relative">
         <SiteHeader overlay />
-        <PaymentNotice />
         {/* Fuera de <main>: `.home-root main > section` convierte cada sección en un panel con márgenes y el carrusel va a sangre. */}
         <HeroCarousel />
 

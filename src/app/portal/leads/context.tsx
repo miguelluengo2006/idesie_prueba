@@ -10,7 +10,7 @@ export interface LeadAnswers {
   pack?: { id: string; website: string; product: string; runs_ads: string };
   /** Ad attribution captured by the landing (utm_source, utm_campaign, fbclid…) */
   utm?: Record<string, string>;
-  /** Compra pagada en Stripe (precio con IVA incluido) */
+  /** Compra pagada (precio con IVA incluido) */
   order?: {
     session_id: string;
     pack_id: string;

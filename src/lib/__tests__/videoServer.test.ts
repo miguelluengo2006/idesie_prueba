@@ -39,7 +39,7 @@ describe('creditsForOrder', () => {
 });
 
 describe('grantCredits', () => {
-  it('adds the videos of the pack to the ledger with the Stripe session as reference', async () => {
+  it('adds the videos of the pack to the ledger with the payment session as reference', async () => {
     const r = await grantCredits(order, 'Ana@Example.com');
     expect(r).toEqual({ credits: 10, isNew: true });
     expect(h.inserts[0]).toMatchObject({ customer_email: 'ana@example.com', delta: 10, reason: 'purchase', ref: 'cs_live_1' });

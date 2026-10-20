@@ -1,7 +1,7 @@
 # Avisos de leads por email con Resend
 
 Cada vez que llega un lead (llamada agendada, Pack de Bienvenida, formulario de la landing o propuesta de la web)
-o una compra pagada en Stripe, se envía un correo con el diseño de samgple a tu bandeja. El lead **siempre** se
+o una compra pagada, se envía un correo con el diseño de samgple a tu bandeja. El lead **siempre** se
 guarda en el panel; el email es un aviso extra: si falla, no se pierde nada.
 
 ## Configurar (5 minutos)
@@ -37,7 +37,7 @@ Sin `LEAD_NOTIFY_EMAIL`, el aviso va al email de la cuenta del panel (o a `ADMIN
 | Pack de Bienvenida | Formulario de la landing (antes de pagar) | `Nuevo lead del Pack de Bienvenida — Empresa` |
 | Lead de la landing | Formulario general de la landing | `Nuevo lead de la landing — Nombre (Empresa)` |
 | Propuesta web | Formulario de propuesta de la web | `Nueva propuesta solicitada — Nombre (Empresa)` |
-| Compra pagada | Pago completado en Stripe | `Nueva compra — Pack · 30 € (IVA incluido)` |
+| Compra pagada | Pago confirmado por Flywire | `Nueva compra — Pack · 30 € (IVA incluido)` |
 
 Cada correo lleva el teléfono, los botones **Abrir en el panel**, **Escribir por WhatsApp** y **Responder por email**,
 las respuestas del formulario y el origen del anuncio (campaña, fuente…). «Responder» del correo va directo al cliente
