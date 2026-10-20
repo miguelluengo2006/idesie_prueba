@@ -35,8 +35,7 @@ const nextConfig: NextConfig = {
   // 301 desde las URLs antiguas de idesie.com (ver src/lib/redirects.ts). El único panel es el CRM (/portal).
   async redirects() {
     return [
-      // Una sola versión del dominio: www → sin www
-      { source: '/:path*', has: [{ type: 'host', value: 'www.idesie.com' }], destination: 'https://idesie.com/:path*', permanent: true },
+      // La versión del dominio (con o sin www) se decide en Vercel → Domains, no aquí: una regla duplicada provoca bucles de redirección
       ...REDIRECTS.map((r) => ({ ...r, permanent: true })),
     ];
   },
