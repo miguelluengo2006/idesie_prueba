@@ -12,7 +12,7 @@ import { CONTACT, PROFILES } from '@/lib/bim';
 
 /**
  * Menú de la web: exactamente el de la propuesta de la home (`contenido /2026`).
- * Barra superior: Agenda, Alumni, Talento IDESIE, Empresas, Consultoría BIM, Campus Virtual.
+ * Barra superior: Tienda, Contacto, Talento IDESIE, Empresas, Consultoría BIM, Campus Virtual.
  * Barra principal: Programas (desplegable) · Microcredenciales · Perfiles Profesionales · Simulador Profesional · Certificación.
  */
 
@@ -23,8 +23,8 @@ interface NavLink {
 }
 
 const ACCESOS: NavLink[] = [
-  { href: '/#agenda', label: 'Agenda' },
-  { href: '/#alumni', label: 'Alumni' },
+  { href: '/tienda', label: 'Tienda' },
+  { href: '/contacto', label: 'Contacto' },
   { href: '/empresas', label: 'Talento IDESIE' },
   { href: '/#empresas', label: 'Empresas' },
   { href: '/#empresas', label: 'Consultoría BIM' },
