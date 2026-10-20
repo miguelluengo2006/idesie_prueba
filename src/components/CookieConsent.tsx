@@ -45,19 +45,18 @@ export default function CookieConsent() {
 
   if (!open || NO_BANNER.some((p) => pathname.startsWith(p))) return null;
 
-  const btn = 'px-4 py-2.5 rounded-full border border-[#0d1522]/30 text-sm font-medium text-[#0d1522] hover:bg-[#0d1522]/5 transition-colors cursor-pointer';
+  const btn = 'px-3 md:px-4 py-2.5 min-h-11 rounded-full border border-[#0d1522]/30 text-sm font-medium text-[#0d1522] hover:bg-[#0d1522]/5 transition-colors cursor-pointer';
 
   return (
     <div
       role="dialog"
       aria-modal="false"
       aria-labelledby="cookie-title"
-      className="fixed inset-x-3 bottom-3 md:left-auto md:right-4 md:bottom-4 md:max-w-md z-[200] rounded-2xl border border-[#0d1522]/20 bg-[#ffffff] p-5 shadow-2xl text-[#0d1522] [color-scheme:light]"
+      className="fixed inset-x-3 bottom-3 md:left-auto md:right-4 md:bottom-4 md:max-w-md z-[200] rounded-2xl border border-[#0d1522]/20 bg-[#ffffff] p-4 md:p-5 shadow-2xl max-h-[85svh] overflow-y-auto text-[#0d1522] [color-scheme:light]"
     >
       <h2 id="cookie-title" className="text-sm font-semibold mb-1.5">Tu privacidad</h2>
       <p className="text-xs text-[#0d1522]/70 leading-relaxed">
-        Usamos cookies técnicas imprescindibles para que la web funcione. Con tu permiso, también cookies de análisis y de publicidad.
-        Puedes aceptarlas, rechazarlas o elegir, y cambiarlo cuando quieras. Más información en la{' '}
+        Usamos cookies técnicas para que la web funcione y, con tu permiso, de análisis y publicidad. Puedes elegir y cambiarlo cuando quieras. Más información en la{' '}
         <Link href="/cookies" className="underline underline-offset-2 hover:text-[#0d1522]">política de cookies</Link>.
       </p>
 
@@ -78,7 +77,7 @@ export default function CookieConsent() {
         </div>
       )}
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-3 md:mt-4 flex flex-wrap gap-2">
         {custom ? (
           <button type="button" className={btn} onClick={() => choose(analytics, marketing)}>Guardar selección</button>
         ) : (

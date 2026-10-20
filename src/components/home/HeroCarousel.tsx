@@ -9,7 +9,7 @@ import { CONTACT, MICROS } from '@/lib/bim';
 import { PHOTOS, SIMULATOR, type Photo } from '@/lib/content';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const AUTOPLAY_MS = 7000;
+const AUTOPLAY_MS = 4000;
 
 const AI_MICROS = ['21', '18', '19', '20'].map((code) => MICROS.find((m) => m.code === code)!);
 
@@ -157,9 +157,10 @@ export default function HeroCarousel() {
       role="region"
       aria-roledescription="carrusel"
       aria-label="Programas destacados"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocusCapture={() => setHover(true)}
+      // Solo se pausa con ratón o teclado: en el móvil un toque dejaba «hover» activo y el carrusel se quedaba parado
+      onPointerEnter={(e) => e.pointerType === 'mouse' && setHover(true)}
+      onPointerLeave={(e) => e.pointerType === 'mouse' && setHover(false)}
+      onFocusCapture={(e) => e.target.matches(':focus-visible') && setHover(true)}
       onBlurCapture={() => setHover(false)}
       onKeyDown={(e) => {
         if (e.key === 'ArrowRight') go(index + 1);
@@ -191,7 +192,6 @@ export default function HeroCarousel() {
             className="[grid-area:1/1] relative transition-[opacity,visibility] duration-700 ease-out"
             style={{ background: slide.bg, opacity: active ? 1 : 0, visibility: active ? 'visible' : 'hidden', zIndex: active ? 1 : 0 }}
           >
-            <Image src={slide.photo.src} alt="" fill sizes="100vw" priority={i === 0} className="lg:hidden object-cover opacity-25" />
             <div className="hc-grid" aria-hidden="true" />
             <motion.div
               variants={container}

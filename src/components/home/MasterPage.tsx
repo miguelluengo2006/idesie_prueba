@@ -117,7 +117,7 @@ export default function MasterPage({ master }: { master: Master }) {
               ))}
             </ul>
           </Reveal>
-          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+          <div className="relative aspect-[3/2] lg:aspect-[4/3] rounded-2xl overflow-hidden">
             <Image src={PHOTOS.auditorio.src} alt={PHOTOS.auditorio.alt} fill sizes="(min-width: 1024px) 40vw, 92vw" className="object-cover" />
           </div>
         </div>

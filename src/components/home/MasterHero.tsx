@@ -61,7 +61,7 @@ export default function MasterHero({ master }: { master: Master }) {
           transition={{ duration: 1, delay: 0.2, ease: EASE }}
           className="relative"
         >
-          <motion.div style={{ y: photoY }} className="relative aspect-[4/5] rounded-[2rem] overflow-hidden ring-1 ring-[#fff]/20 shadow-[0_40px_80px_-30px_rgba(0,40,120,0.8)]">
+          <motion.div style={{ y: photoY }} className="relative aspect-[3/2] lg:aspect-[4/5] rounded-[2rem] overflow-hidden ring-1 ring-[#fff]/20 shadow-[0_40px_80px_-30px_rgba(0,40,120,0.8)]">
             <Image src={PHOTOS.clase.src} alt={PHOTOS.clase.alt} fill priority sizes="(min-width: 1024px) 42vw, 92vw" className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a1f44]/70 via-transparent to-transparent" aria-hidden="true" />
           </motion.div>

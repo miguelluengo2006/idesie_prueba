@@ -95,14 +95,15 @@ export default function RhythmToggle({
             <p className="font-semibold text-lg mt-5">{small}</p>
             <p className="text-lg md:text-xl leading-relaxed mt-3 max-w-xl opacity-90">{col.text}</p>
           </div>
-          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+          <div className="relative lg:aspect-[4/3] rounded-2xl overflow-hidden">
             <Image
               key={field.photo.src}
               src={field.photo.src}
               alt={field.photo.alt}
-              fill
+              width={field.photo.width}
+              height={field.photo.height}
               sizes="(min-width: 1024px) 40vw, 92vw"
-              className="object-cover rhythm-in"
+              className="w-full h-auto lg:h-full lg:object-cover rhythm-in"
             />
           </div>
         </div>
