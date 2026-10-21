@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MessageCircle } from 'lucide-react';
 import CallButton from './CallButton';
-import WhatsAppLink from './WhatsAppLink';
 
 /** Barra fija solo en móvil: aparece al pasar el primer pantallazo y se esconde cuando la oferta o el cierre ya están a la vista. */
 export default function StickyCta({ label }: { label: string }) {
@@ -29,13 +27,10 @@ export default function StickyCta({ label }: { label: string }) {
 
   return (
     <div
-      className={`md:hidden fixed inset-x-0 bottom-0 z-40 bg-[#0a1f44] px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex gap-2 border-t border-[#7db4ff]/25 transition-transform duration-300 motion-reduce:transition-none ${show ? 'translate-y-0' : 'translate-y-full'}`}
+      className={`md:hidden fixed inset-x-0 bottom-0 z-40 bg-[#0a1f44] px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex border-t border-[#7db4ff]/25 transition-transform duration-300 motion-reduce:transition-none ${show ? 'translate-y-0' : 'translate-y-full'}`}
       aria-hidden={!show}
       inert={!show}
     >
-      <WhatsAppLink tabIndex={show ? 0 : -1} label="Escribir por WhatsApp" className="min-h-12 w-14 grid place-items-center rounded-xl bg-[#25D366] text-[#0a1f44]">
-        <MessageCircle className="w-6 h-6" aria-hidden="true" />
-      </WhatsAppLink>
       <CallButton place="sticky-movil" tabIndex={show ? 0 : -1} className="btn btn-blue flex-1 justify-center min-h-12">
         {label}
       </CallButton>

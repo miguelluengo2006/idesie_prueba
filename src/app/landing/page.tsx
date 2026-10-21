@@ -14,7 +14,7 @@ import MonthScrubber from '@/components/landing/MonthScrubber';
 import LandingTracker from '@/components/landing/LandingTracker';
 import CallButton from '@/components/landing/CallButton';
 import StickyCta from '@/components/landing/StickyCta';
-import WhatsAppLink from '@/components/landing/WhatsAppLink';
+import WhatsAppFloat from '@/components/landing/WhatsAppFloat';
 import { CONTACT } from '@/lib/bim';
 import { COMPANY_LOGOS, FACTS, PHOTOS } from '@/lib/content';
 import { OG_IMAGES } from '@/lib/seo';
@@ -62,10 +62,6 @@ export default function LandingPage() {
               <IdesieLogo tone="white" className="h-10" priority />
             </Link>
             <div className="flex items-center gap-3">
-              <WhatsAppLink label="Escribir por WhatsApp" className="btn min-h-11 gap-2 px-4 bg-[#25D366] text-[#0a1f44] font-semibold hover:bg-[#3ae07a] transition-colors">
-                <MessageCircle className="w-5 h-5" aria-hidden="true" />
-                <span className="hidden sm:inline">WhatsApp</span>
-              </WhatsAppLink>
               <CallButton place="cabecera" className="hidden md:inline-flex btn btn-blue min-h-11">
                 Agendar llamada
               </CallButton>
@@ -118,8 +114,8 @@ export default function LandingPage() {
                   />
                 </div>
                 <div className="absolute -bottom-5 left-4 right-4 md:left-auto md:-left-8 md:right-auto md:w-60 rounded-2xl bg-[#fff] text-[#0a1f44] p-5 shadow-[0_24px_60px_-20px_rgba(0,20,70,0.6)]">
-                  <p className="font-kinetic font-bold text-3xl text-[#0063e6]">{M.facts[2].value}</p>
-                  <p className="text-sm leading-snug mt-1 text-[#0a1f44]/80">Ingresos aproximados mientras estudias, por nómina.</p>
+                  <p className="font-kinetic font-bold text-3xl text-[#0063e6]">16 meses</p>
+                  <p className="text-sm leading-snug mt-1 text-[#0a1f44]/80">Prácticas remuneradas por nómina desde el primer mes.</p>
                 </div>
               </div>
             </div>
@@ -155,19 +151,14 @@ export default function LandingPage() {
             </Reveal>
             <ul className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {M.outcomes.roles.map((r, i) => (
-                <Tile as="li" key={r.role} delay={i * 0.08} className={`p-6 flex flex-col justify-between gap-6 min-h-44 ${i % 2 ? 'bg-[#fff] text-[#0a1f44]' : 'bg-[#0a1f44] text-[#fff]'}`}>
+                <Tile as="li" key={r.role} delay={i * 0.08} className={`p-6 flex flex-col justify-between gap-6 min-h-36 ${i % 2 ? 'bg-[#fff] text-[#0a1f44]' : 'bg-[#0a1f44] text-[#fff]'}`}>
                   <div>
                     <h3 className="font-kinetic font-bold text-xl leading-snug">{r.role}</h3>
                     <p className="mt-1 opacity-80">{r.focus}</p>
                   </div>
-                  <p className={`font-kinetic font-bold text-lg ${i % 2 ? 'text-[#0063e6]' : 'text-[#7db4ff]'}`}>
-                    {r.salary}
-                    <span className="block text-sm font-sans font-normal opacity-80">bruto anual</span>
-                  </p>
                 </Tile>
               ))}
             </ul>
-            <p className="mt-5 max-w-2xl text-sm text-[#0a1f44]/70">{M.outcomes.note}</p>
           </Section>
 
           {/* 6 · Empresas */}
@@ -225,9 +216,6 @@ export default function LandingPage() {
                 <CallButton place="oferta" className="btn btn-blue mt-7 w-full justify-center min-h-14 text-base">
                   {cta}
                 </CallButton>
-                <WhatsAppLink className="mt-4 min-h-11 w-full inline-flex items-center justify-center gap-2 rounded-full border-2 border-[#0a1f44]/20 font-semibold hover:border-[#0a1f44] transition-colors">
-                  <MessageCircle className="w-5 h-5" aria-hidden="true" /> ¿Prefieres escribirnos? WhatsApp
-                </WhatsAppLink>
               </div>
             </div>
           </section>
@@ -280,9 +268,6 @@ export default function LandingPage() {
                 <CallButton place="cierre" className="btn btn-blue min-h-14 px-8 text-base">
                   {cta}
                 </CallButton>
-                <WhatsAppLink className="btn min-h-14 gap-2 px-6 text-base bg-[#25D366] text-[#0a1f44] font-semibold hover:bg-[#3ae07a] transition-colors">
-                  <MessageCircle className="w-5 h-5" aria-hidden="true" /> WhatsApp
-                </WhatsAppLink>
               </div>
               <p className="mt-4 text-sm text-[#c9d9f0]">WhatsApp: {CONTACT.whatsapp}</p>
             </div>
@@ -302,6 +287,7 @@ export default function LandingPage() {
           </div>
         </footer>
         <StickyCta label={cta} />
+        <WhatsAppFloat />
       </div>
     </BookCallProvider>
   );
