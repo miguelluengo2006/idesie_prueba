@@ -50,6 +50,11 @@ export function clearShopCart() {
   write([]);
 }
 
+/** Deja en el carrito exactamente estos productos (la landing vende un solo programa: no arrastra lo que hubiera). */
+export function setShopCart(slugs: string[]) {
+  write([...new Set(slugs)].slice(0, MAX_CART_ITEMS));
+}
+
 export function useShopCart() {
   const slugs = useSyncExternalStore(subscribe, read, () => EMPTY);
   const add = useCallback((slug: string) => {

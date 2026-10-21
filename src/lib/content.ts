@@ -355,9 +355,9 @@ export interface Photo {
 }
 
 export const PHOTOS = {
-  clase: { src: '/img/clase-portatiles.webp', width: 1151, height: 664, alt: 'Alumnos trabajando con sus portátiles en una clase de IDESIE' },
-  tableta: { src: '/img/trabajo-tableta.webp', width: 991, height: 496, alt: 'Manos de un equipo revisando datos en una tableta' },
-  aula: { src: '/img/aula-profesor.webp', width: 959, height: 300, alt: 'Un profesor imparte clase a alumnos con portátiles' },
-  auditorio: { src: '/img/auditorio.webp', width: 539, height: 347, alt: 'Sesión de IDESIE en un auditorio con alumnos y ponente' },
-  reunion: { src: '/img/reunion-equipo.webp', width: 678, height: 249, alt: 'Cuatro profesionales reunidas en torno a una mesa de trabajo' },
+  clase: { src: '/img/clase-alumnos.webp', width: 2000, height: 1143, alt: 'Alumnos trabajando con sus portátiles en una clase de IDESIE' },
+  tableta: { src: '/img/trabajo-tableta-hd.webp', width: 1800, height: 1350, alt: 'Manos de un equipo revisando planos y datos en una tableta' },
+  aula: { src: '/img/aula-profesor-hd.webp', width: 1800, height: 1208, alt: 'Un profesor imparte clase a alumnos con portátiles de IDESIE' },
+  auditorio: { src: '/img/alumnos-grupo.webp', width: 1536, height: 1024, alt: 'Grupo de alumnos de IDESIE con sus libros de BIM' },
+  reunion: { src: '/img/reunion-equipo-hd.webp', width: 1536, height: 994, alt: 'Profesionales reunidos en torno a una mesa de trabajo con una maqueta BIM en el portátil' },
 } satisfies Record<string, Photo>;

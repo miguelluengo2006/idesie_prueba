@@ -5,6 +5,8 @@
  * El ID va en la variable de entorno NEXT_PUBLIC_META_PIXEL_ID (Vercel → Settings → Environment Variables).
  * También vale META_PIXEL_ID (next.config.ts la copia). Vacío = píxel apagado. Al ser NEXT_PUBLIC_, hay que volver a desplegar tras cambiarla.
  */
+import { whenConsented } from '@/lib/cookieConsent';
+
 export const META_PIXEL_ID = (process.env.NEXT_PUBLIC_META_PIXEL_ID || '').trim();
 
 /** Rutas donde nunca se carga (panel de administración y acceso). */
@@ -46,8 +48,28 @@ export function metaTrack(event: string, params?: Record<string, unknown>, event
   else window.fbq('track', event, params ?? {});
 }
 
-/** Como metaTrack, pero una sola vez por `key` en este navegador (p. ej. la compra al recargar /gracias). */
+/** Evento propio (no estándar): sirve para crear públicos y medir el embudo de la landing. */
+export function metaTrackCustom(event: string, params?: Record<string, unknown>) {
+  if (typeof window === 'undefined' || typeof window.fbq !== 'function') return;
+  window.fbq('trackCustom', event, params ?? {});
+}
+
+/**
+ * Ejecuta `fn` cuando el píxel esté listo: con ID, con consentimiento de publicidad y ya instalado.
+ * Úsalo para eventos que ocurren nada más cargar la página, cuando la persona aún puede estar decidiendo sobre las cookies.
+ */
+export function whenPixelReady(fn: () => void): () => void {
+  if (typeof window === 'undefined' || !META_PIXEL_ID) return () => {};
+  return whenConsented('marketing', () => {
+    loadMetaPixel(META_PIXEL_ID); // idempotente
+    fn();
+  });
+}
+
+/** Como metaTrack, pero una sola vez por `key` en este navegador (p. ej. la compra al recargar /pedido). */
 export function metaTrackOnce(key: string, event: string, params?: Record<string, unknown>) {
+  // Sin píxel cargado no se marca como enviado: se intentará de nuevo cuando lo haya
+  if (typeof window === 'undefined' || typeof window.fbq !== 'function') return;
   const storageKey = `meta_evt_${key}`;
   try {
     if (localStorage.getItem(storageKey)) return;

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { CheckCircle2, Clock, Loader2, XCircle } from 'lucide-react';
 import { formatEur, toCents } from '@/lib/shop';
 import { CONTACT } from '@/lib/bim';
+import { metaTrackOnce, whenPixelReady } from '@/lib/metaPixel';
 
 interface Info { number: string; status: 'pending' | 'paid' | 'failed' | 'cancelled' | 'refunded'; totalEur: number; firstName: string; items: { name: string; priceEur: number }[] }
 
@@ -37,6 +38,13 @@ export default function OrderStatus({ token }: { token: string }) {
     tick();
     return () => { stop = true; };
   }, [token]);
+
+  // La compra se cuenta una sola vez, y solo cuando el pago está confirmado (no al ir a la pasarela)
+  const paid = info?.status === 'paid' ? info : null;
+  useEffect(() => {
+    if (!paid || paid.totalEur <= 0) return;
+    return whenPixelReady(() => metaTrackOnce(`order-${paid.number}`, 'Purchase', { value: paid.totalEur, currency: 'EUR', content_type: 'product', content_name: paid.items.map((i) => i.name).join(', ') }));
+  }, [paid]);
 
   if (missing) {
     return <Box icon={<XCircle className="w-12 h-12 text-[#c0392b]" aria-hidden="true" />} title="No encontramos este pedido" text="Revisa el enlace o escríbenos y lo localizamos." />;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { metaTrack } from '@/lib/metaPixel';
 import { ArrowLeft, ArrowUpRight, CalendarPlus, CheckCircle2, Clock, Loader2 } from 'lucide-react';
 import {
   BOOKING_TZ,
@@ -154,6 +155,9 @@ export default function BookCallForm({
         }
         throw new Error(data.error || 'No se pudo agendar la llamada');
       }
+      // Dos eventos estándar: Schedule (cita) y Lead (contacto conseguido); eventID evita duplicados con un posible envío desde servidor
+      metaTrack('Schedule', { content_name: pack || 'Llamada' }, data.id ? `call-${data.id}` : undefined);
+      metaTrack('Lead', { content_name: pack || 'Llamada' }, data.id ? `lead-${data.id}` : undefined);
       setBookingId(data.id || null);
       setStatus('sent');
     } catch (err: any) {

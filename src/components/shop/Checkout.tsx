@@ -58,7 +58,7 @@ export default function Checkout() {
   useEffect(() => {
     if (quote?.ok && !tracked.current) {
       tracked.current = true;
-      metaTrack('InitiateCheckout', { value: quote.totalCents / 100, currency: 'EUR', num_items: quote.lines.length });
+      metaTrack('InitiateCheckout', { value: quote.totalCents / 100, currency: 'EUR', num_items: quote.lines.length, content_type: 'product', content_ids: quote.lines.map((l) => l.slug) });
     }
   }, [quote]);
 
@@ -81,7 +81,8 @@ export default function Checkout() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'No se pudo registrar el pedido. Inténtalo de nuevo.');
-      metaTrack('Purchase', { value: data.totalCents / 100, currency: 'EUR' }, `order-${data.number}`);
+      // La compra se registra en /pedido cuando el pago está confirmado; aquí solo se avisa de que pasa a pagar
+      if (!data.free) metaTrack('AddPaymentInfo', { value: data.totalCents / 100, currency: 'EUR', content_type: 'product', content_ids: slugs });
       clearShopCart();
       // Gratis: ya está confirmado. De pago: a la pasarela de Flywire; al volver, /pedido/<token> muestra el estado.
       window.location.assign(data.free || !data.paymentUrl ? `/pedido/${data.token}` : data.paymentUrl);

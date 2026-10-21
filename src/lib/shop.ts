@@ -125,6 +125,9 @@ export const SEED_PRODUCTS: ShopProduct[] = [
 
 /* ── Dinero ─────────────────────────────────────────────────────────────── */
 
+/** Producto que vende la landing de anuncios. */
+export const FULL_TIME_SLUG = 'master-bim-full-time';
+
 export const toCents = (eur: number) => Math.round(eur * 100);
 export const fromCents = (cents: number) => cents / 100;
 
