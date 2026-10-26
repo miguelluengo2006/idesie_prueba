@@ -70,14 +70,6 @@ function post(body: any): Promise<Response> {
   return POST(req as any) as Promise<Response>;
 }
 
-/** A weekday well inside the booking window, so validateSlot accepts it. */
-function bookableDate(): string {
-  const d = new Date();
-  d.setUTCDate(d.getUTCDate() + 7);
-  while ([0, 6].includes(d.getUTCDay())) d.setUTCDate(d.getUTCDate() + 1);
-  return d.toISOString().slice(0, 10);
-}
-
 beforeEach(() => {
   state.owner = { id: 'owner-1' };
   state.ownerMail = {};
@@ -94,15 +86,13 @@ beforeEach(() => {
 
 // ─── Booked call ──────────────────────────────────────────────────────────────
 
-describe('POST /api/public/contact — booked call', () => {
+describe('POST /api/public/contact — llamada (el hueco se elige en Calendly)', () => {
   const call = () => ({
     kind: 'call',
     name: 'Laura Pérez',
     email: 'laura@empresa.com',
     phone: '+34 600 111 222',
     company: 'Marea',
-    date: bookableDate(),
-    time: '11:00',
     answers: { needs: ['Máster BIM'], budget: 'Sin definir', timeline: 'Lo antes posible' },
   });
 
@@ -117,7 +107,8 @@ describe('POST /api/public/contact — booked call', () => {
       phone: '+34 600 111 222',
       answers: { needs: ['Máster BIM'], budget: 'Sin definir', timeline: 'Lo antes posible' },
     });
-    expect(new Date(state.inserted.call_at).toString()).not.toBe('Invalid Date');
+    // Sin franja propia: el día y la hora los gestiona Calendly
+    expect(state.inserted.call_at).toBeUndefined();
     expect((await res.json()).id).toBe('lead-1');
   });
 
@@ -127,14 +118,9 @@ describe('POST /api/public/contact — booked call', () => {
     expect(state.inserted).toBeNull();
   });
 
-  it('rejects a slot that is not offered', async () => {
-    expect((await post({ ...call(), time: '11:30' })).status).toBe(400);
-    expect(state.inserted).toBeNull();
-  });
-
-  it('answers 409 when the slot was taken in the meantime (unique index)', async () => {
-    state.insertError = { code: '23505', message: 'duplicate key' };
-    expect((await post(call())).status).toBe(409);
+  it('no exige día ni hora', async () => {
+    expect((await post({ ...call(), date: '2020-01-01', time: '03:33' })).status).toBe(200);
+    expect(state.inserted.call_at).toBeUndefined();
   });
 
   it('answers 503 when there is no agency owner yet', async () => {
@@ -173,7 +159,6 @@ describe('POST /api/public/contact — landing lead', () => {
       phone: '+34 600 000 000',
       company: 'Tienda online',
       message: 'Influencer IA',
-      call_at: null,
     });
     // only known attribution keys survive
     expect(state.inserted.answers).toEqual({ utm: { utm_source: 'facebook', utm_campaign: 'otoño', fbclid: 'abc123' } });
@@ -209,7 +194,7 @@ describe('POST /api/public/contact — landing lead', () => {
   });
 
   it('does not let the website form skip the email by claiming source=landing on a call', async () => {
-    const res = await post({ ...lead(), kind: 'call', date: bookableDate(), time: '10:00', email: '' });
+    const res = await post({ ...lead(), kind: 'call', email: '' });
     expect(res.status).toBe(400);
   });
 

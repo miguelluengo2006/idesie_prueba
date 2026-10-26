@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext } from 'react';
+import type { Cohort, LeadStatus } from '@/lib/admissions';
 
 export interface LeadAnswers {
   needs?: string[];
@@ -43,25 +44,31 @@ export interface Lead {
   company: string | null;
   phone: string | null;
   message: string;
-  status: 'new' | 'contacted' | 'won' | 'lost';
+  status: LeadStatus;
   /** 'call' = a booked call (has call_at + answers); 'proposal' = free-text request */
   kind: 'proposal' | 'call';
   call_at: string | null;
   answers: LeadAnswers | null;
-  /** 'website' (booking / proposal form) or 'landing' (ads landing) */
+  /** 'website' (formulario de la web), 'landing' (landing de anuncios), 'facebook' (importado de Meta) o 'manual' */
   source: string;
+  /** Convocatoria del máster a la que va (opcional) */
+  cohort_id: string | null;
   notes: string | null;
   created_at: string;
+  /** Último cambio (la etapa incluida): sirve para saber cuánto lleva en ella */
+  updated_at?: string | null;
 }
 
 interface LeadsContextValue {
   leads: Lead[];
+  cohorts: Cohort[];
   loading: boolean;
   refetch: () => Promise<void>;
 }
 
 export const LeadsContext = createContext<LeadsContextValue>({
   leads: [],
+  cohorts: [],
   loading: true,
   refetch: async () => {},
 });

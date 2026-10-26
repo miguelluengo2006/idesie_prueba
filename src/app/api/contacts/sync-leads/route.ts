@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       name: l.name,
       phone: l.phone,
       company: l.company,
-      tags: l.status === 'won' ? ['Lead', 'Matriculado'] : ['Lead'],
+      tags: l.status === 'enrolled' || l.status === 'paid' ? ['Lead', 'Matriculado'] : ['Lead'],
     }));
     const result = await upsertContacts(supabaseAdmin, auth.ownerId, inputs, { source: 'lead', consent: false });
     return NextResponse.json({ ...result, leads: leads.length });

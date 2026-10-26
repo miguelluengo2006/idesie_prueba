@@ -16,6 +16,7 @@ import {
   Menu,
   Package,
   Receipt,
+  Route,
   Tag,
   PhoneCall,
   ShieldCheck,
@@ -57,6 +58,7 @@ const AGENCY_GROUPS: NavGroup[] = [
       { label: 'Resumen', href: '/portal', icon: LayoutDashboard, exact: true },
       { label: 'Llamadas', href: '/portal/calls', icon: PhoneCall, badge: 'calls' },
       { label: 'Leads', href: '/portal/leads', icon: Inbox, badge: 'leads' },
+      { label: 'Proceso', href: '/portal/timeline', icon: Route },
     ],
   },
   {

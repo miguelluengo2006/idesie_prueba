@@ -21,6 +21,8 @@ export const CONTACT = {
   whatsapp: '646 79 90 05',
   whatsappHref: 'https://wa.me/34646799005',
   aecomiUrl: 'https://www.aecomi.org',
+  // Calendario donde se elige el día y la hora de la llamada de 30 min
+  calendlyUrl: 'https://calendly.com/idesie-info/30min',
 } as const;
 
 export type AreaKind = 'Técnica' | 'Transversal';

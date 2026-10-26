@@ -11,7 +11,7 @@ export default function ContactSection() {
         <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[var(--signal)]">Hablemos</span>
         <h2 className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.15] mt-4 mb-4">Agenda tu <span className="ui-hl">llamada</span></h2>
         <p className="text-white/60 max-w-lg mb-8">
-          Elige un hueco y respóndenos unas preguntas rápidas: en 30 minutos te orientamos sobre el perfil que mejor encaja contigo
+          Déjanos tus datos, elige el hueco que mejor te venga y en 30 minutos te orientamos sobre el perfil que mejor encaja contigo
           o con tu equipo. ¿Prefieres explorar antes?{' '}
           <Link href="/perfiles" className="text-[var(--signal)] hover:underline">Mira los perfiles profesionales</Link>.
         </p>

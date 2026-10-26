@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CornerDownLeft, Inbox, LayoutDashboard, Megaphone, Package, PhoneCall, Receipt, Search, Settings, ShieldCheck, Tag, UserRound, Users, type LucideIcon } from 'lucide-react';
+import { CornerDownLeft, Inbox, LayoutDashboard, Megaphone, Package, PhoneCall, Receipt, Route, Search, Settings, ShieldCheck, Tag, UserRound, Users, type LucideIcon } from 'lucide-react';
 import { useLeadsContext } from '@/app/portal/leads/context';
 import type { Lead } from '@/app/portal/leads/context';
 import { statusMeta, timeAgo } from '@/components/portal/leadMeta';
@@ -23,6 +23,7 @@ const PAGES: Item[] = [
   { id: 'p-home', label: 'Resumen', icon: LayoutDashboard, href: '/portal', group: 'Ir a' },
   { id: 'p-calls', label: 'Llamadas', icon: PhoneCall, href: '/portal/calls', group: 'Ir a' },
   { id: 'p-leads', label: 'Leads', icon: Inbox, href: '/portal/leads', group: 'Ir a' },
+  { id: 'p-process', label: 'Proceso de admisión', icon: Route, href: '/portal/timeline', group: 'Ir a' },
   { id: 'p-contacts', label: 'Contactos', icon: Users, href: '/portal/contacts', group: 'Ir a' },
   { id: 'p-campaigns', label: 'Campañas', icon: Megaphone, href: '/portal/campaigns', group: 'Ir a' },
   { id: 'p-orders', label: 'Pedidos', icon: Receipt, href: '/portal/orders', group: 'Ir a' },

@@ -6,7 +6,7 @@ import { resolveLeadMailer, sendLeadMail } from '@/lib/leadMailer';
 import { leadAlertText, sendTelegram } from '@/lib/telegram';
 import { leadEmail } from '@/lib/emailTemplates';
 import { VAT_LABEL, WELCOME_PACK, welcomeSpots } from '@/lib/packs';
-import { validateSlot, sanitizeAnswers } from '@/lib/booking';
+import { sanitizeAnswers } from '@/lib/booking';
 import { upsertContacts } from '@/lib/crmServer';
 
 const PHONE_RE = /^[+()\d\s.-]{6,25}$/;
@@ -25,7 +25,8 @@ function sanitizeUtm(input: any): Record<string, string> | null {
 }
 
 // POST /api/public/contact - request from the public site (no auth).
-//   kind "call"     → a booked call: date + time slot, phone and answers to the pre-call questions
+//   kind "call"     → quiere una llamada: teléfono y respuestas previas. El día y la hora los elige en Calendly,
+//                      así que aquí no hay franja: se guarda como lead y el panel lo ve en Leads
 //   kind "proposal" → free-text proposal request (default when no kind is sent)
 //   source "landing" → the ads landing form: WhatsApp + name (+ business/interest); email is optional
 //                      and ad attribution (utm_*, fbclid) is stored with the lead
@@ -72,18 +73,12 @@ export async function POST(req: NextRequest) {
     }
 
     let pack: { id: string; website: string; product: string; runs_ads: string } | null = null;
-    let callAt: Date | null = null;
     let answers: ReturnType<typeof sanitizeAnswers> | null = null;
 
     if (kind === 'call') {
       if (!phone || !PHONE_RE.test(phone)) {
         return NextResponse.json({ error: 'Introduce un teléfono válido' }, { status: 400 });
       }
-      const slot = validateSlot(body.date, body.time);
-      if (!slot.ok || !slot.at) {
-        return NextResponse.json({ error: slot.error || 'Elige un día y una hora válidos' }, { status: 400 });
-      }
-      callAt = slot.at;
       answers = sanitizeAnswers(body.answers);
       // The extra comment is optional for calls; the column is NOT NULL, so keep a readable placeholder.
       if (!message) message = 'Sin comentarios adicionales.';
@@ -152,7 +147,6 @@ export async function POST(req: NextRequest) {
         message,
         source,
         kind,
-        call_at: callAt ? callAt.toISOString() : null,
         answers:
           answers ??
           (source === 'landing' && (utm || pack) ? { ...(pack ? { pack } : {}), ...(utm ? { utm } : {}) } : null),
@@ -161,10 +155,6 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (insertError) {
-      // uq_leads_call_slot: someone else took this slot between the availability check and now.
-      if (insertError.code === '23505') {
-        return NextResponse.json({ error: 'Esa franja acaba de reservarse. Elige otra.' }, { status: 409 });
-      }
       console.error('Contact form: failed to save lead:', insertError);
       return NextResponse.json({ error: 'No se pudo enviar. Inténtalo de nuevo.' }, { status: 500 });
     }
@@ -186,8 +176,8 @@ export async function POST(req: NextRequest) {
     // Best-effort Telegram alert (needs TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID) — never blocks the lead.
     const siteBase = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin;
     await sendTelegram(
-      leadAlertText({ id: lead?.id, name, email: email || null, phone: phone || null, company: company || null, message, kind, source, callAt, packName: pack ? 'Bienvenida' : null, utmSource: utm?.utm_source || null }),
-      { label: 'Abrir en el panel', url: `${siteBase}/portal/${callAt ? 'calls' : 'leads'}${lead?.id ? `?open=${lead.id}` : ''}` }
+      leadAlertText({ id: lead?.id, name, email: email || null, phone: phone || null, company: company || null, message, kind, source, packName: pack ? 'Bienvenida' : null, utmSource: utm?.utm_source || null }),
+      { label: 'Abrir en el panel', url: `${siteBase}/portal/leads${lead?.id ? `?open=${lead.id}` : ''}` }
     );
 
     // Best-effort email notification — the lead is already saved regardless of this.
@@ -197,10 +187,10 @@ export async function POST(req: NextRequest) {
       try {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin;
         const mail = leadEmail(
-          { name, email: email || null, phone: phone || null, company: company || null, message, kind, source, callAt, answers, pack, utm },
+          { name, email: email || null, phone: phone || null, company: company || null, message, kind, source, answers, pack, utm },
           {
             brand: owner.business_name || undefined,
-            panelUrl: `${siteUrl}/portal/${callAt ? 'calls' : 'leads'}${lead?.id ? `?open=${lead.id}` : ''}`,
+            panelUrl: `${siteUrl}/portal/leads${lead?.id ? `?open=${lead.id}` : ''}`,
           }
         );
         await sendLeadMail(mailer, { ...mail, replyTo: email || undefined, idempotencyKey: lead?.id ? `lead-${lead.id}` : undefined });
@@ -211,7 +201,7 @@ export async function POST(req: NextRequest) {
       console.warn('Contact form: no email configured (RESEND_API_KEY, Ajustes → Email, or SMTP_* env vars) — lead saved, no email sent.');
     }
 
-    return NextResponse.json({ success: true, id: lead?.id, callAt: callAt ? callAt.toISOString() : null });
+    return NextResponse.json({ success: true, id: lead?.id });
   } catch (error: any) {
     console.error('Contact form error:', error);
     return NextResponse.json({ error: 'No se pudo enviar. Inténtalo de nuevo.' }, { status: 500 });

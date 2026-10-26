@@ -4,12 +4,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   ArrowRight,
-  BadgeCheck,
   BellRing,
   Building2,
   Check,
+  CreditCard,
   Download,
-  Hourglass,
   Inbox,
   KanbanSquare,
   List,
@@ -19,6 +18,8 @@ import {
   PhoneCall,
   Plus,
   Search,
+  Upload,
+  UserCheck,
 } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
 import { useLeadsContext } from './context';
@@ -27,26 +28,29 @@ import { isPendingCall, upcomingCalls } from './context';
 import { cn } from '@/lib/utils';
 import LeadDetailModal from '@/components/portal/LeadDetailModal';
 import NewLeadModal from '@/components/portal/NewLeadModal';
+import ImportLeadsModal from '@/components/portal/ImportLeadsModal';
+import CohortModal from '@/components/portal/CohortModal';
+import CohortPanel, { COHORT_ALL, COHORT_NONE } from '@/components/portal/CohortPanel';
+import { PIPELINE, nextStatus, type Cohort } from '@/lib/admissions';
 import { contactKeys, leadChannel, leadInterest, leadNote, statusMeta, statusOptions, timeAgo, whatsappUrl } from '@/components/portal/leadMeta';
 import { EmptyState, Page, Skeleton } from '@/components/portal/ui';
 import { addDays, callDayKey, formatCallDate, formatCallTime, todayInBookingTz } from '@/lib/booking';
 import { exportLeadsCsv } from '@/lib/leadsCsv';
 
 type StatusFilter = 'all' | Lead['status'];
-type ViewFilter = 'all' | 'todo' | 'call' | 'follow' | 'won';
 
 const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
   { value: 'all', label: 'Todos' },
-  { value: 'new', label: 'Nuevos' },
-  { value: 'contacted', label: 'En seguimiento' },
-  { value: 'won', label: 'Matriculados' },
+  ...PIPELINE.map((p) => ({ value: p.status as StatusFilter, label: p.label })),
   { value: 'lost', label: 'Descartados' },
 ];
 
+// Tablero: una columna por etapa y, al final, los descartados. «Pasar a…» lleva a la etapa siguiente.
 const BOARD: { status: Lead['status']; title: string; next: Lead['status'] | null; nextLabel: string }[] = [
-  { status: 'new', title: 'Nuevos', next: 'contacted', nextLabel: 'En seguimiento' },
-  { status: 'contacted', title: 'En seguimiento', next: 'won', nextLabel: 'Matriculado' },
-  { status: 'won', title: 'Matriculados', next: null, nextLabel: '' },
+  ...PIPELINE.map((p) => {
+    const next = nextStatus(p.status);
+    return { status: p.status, title: p.label, next, nextLabel: PIPELINE.find((x) => x.status === next)?.label || '' };
+  }),
   { status: 'lost', title: 'Descartados', next: null, nextLabel: '' },
 ];
 
@@ -61,21 +65,24 @@ function callWhen(iso: string): string {
 /** De dónde viene el lead, para la fila de la lista. */
 const originOf = (l: Lead) => {
   if (l.source === 'manual') return 'Añadido a mano';
+  if (l.source === 'facebook') return 'Facebook';
   return l.kind === 'call' ? 'Llamada desde la web' : 'Formulario de la web';
 };
 
 export default function LeadsPage() {
   const { session } = useAuth();
-  const { leads, loading, refetch } = useLeadsContext();
+  const { leads, cohorts, loading, refetch } = useLeadsContext();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<StatusFilter>('all');
-  const [view, setView] = useState<ViewFilter>('all');
   const [mode, setMode] = useState<'list' | 'board'>('list');
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [newLeadOpen, setNewLeadOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [cohortSel, setCohortSel] = useState<string>(COHORT_ALL);
+  const [cohortModal, setCohortModal] = useState<{ cohort?: Cohort } | null>(null);
 
   // La vista (lista o tablero) se recuerda en este navegador
   useEffect(() => {
@@ -130,43 +137,22 @@ export default function LeadsPage() {
     };
   }, [leads]);
 
-  const matchesView = (l: Lead, v: ViewFilter) => {
-    if (v === 'todo') return l.status === 'new' && l.kind !== 'call';
-    if (v === 'call') return !!callOf(l);
-    if (v === 'follow') return l.status === 'contacted';
-    if (v === 'won') return l.status === 'won';
-    return true;
-  };
+  const cohortName = useMemo(() => new Map(cohorts.map((c) => [c.id, c.name])), [cohorts]);
 
   const scoped = useMemo(() => {
     const q = query.trim().toLowerCase();
     return leads.filter((l) => {
-      if (!matchesView(l, view)) return false;
+      if (cohortSel === COHORT_NONE ? l.cohort_id : cohortSel !== COHORT_ALL && l.cohort_id !== cohortSel) return false;
       if (!q) return true;
       return [l.name, l.email, l.company, l.phone, l.message].some((v) => v?.toLowerCase().includes(q));
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [leads, view, query, callOf]);
+  }, [leads, cohortSel, query]);
 
   const counts = useMemo(() => {
-    const c: Record<string, number> = { all: scoped.length, new: 0, contacted: 0, won: 0, lost: 0 };
+    const c: Record<string, number> = { all: scoped.length };
     for (const l of scoped) c[l.status] = (c[l.status] || 0) + 1;
     return c;
   }, [scoped]);
-
-  const totals = useMemo(() => {
-    let todo = 0;
-    let follow = 0;
-    let won = 0;
-    let withCall = 0;
-    for (const l of leads) {
-      if (l.status === 'new' && l.kind !== 'call') todo += 1;
-      if (l.status === 'contacted') follow += 1;
-      if (l.status === 'won') won += 1;
-      if (callOf(l)) withCall += 1;
-    }
-    return { todo, follow, won, withCall };
-  }, [leads, callOf]);
 
   const sorted = (rows: Lead[]) =>
     rows.slice().sort((a, b) => {
@@ -198,9 +184,38 @@ export default function LeadsPage() {
     />
   ) : null;
 
+  const importButton = (
+    <button
+      onClick={() => setImportOpen(true)}
+      className="flex items-center gap-1.5 px-3 h-9 border border-white/15 hover:border-[var(--portal-line-strong)] text-white/70 hover:text-white rounded-full text-xs font-medium transition-colors cursor-pointer"
+      aria-label="Importar leads de Facebook"
+    >
+      <Upload className="w-4 h-4" aria-hidden="true" />
+      <span className="hidden md:inline">Importar Facebook</span>
+    </button>
+  );
+  const importModal = importOpen ? (
+    <ImportLeadsModal token={session?.access_token} cohorts={cohorts} onClose={() => setImportOpen(false)} onImported={refetch} />
+  ) : null;
+  const cohortModalEl = cohortModal ? (
+    <CohortModal
+      token={session?.access_token}
+      cohort={cohortModal.cohort}
+      onClose={() => setCohortModal(null)}
+      onSaved={(id) => {
+        setCohortModal(null);
+        // Si se acaba de crear una, se enseña; si se eliminó, se vuelve a todos los leads
+        if (id && !cohortModal.cohort) setCohortSel(id);
+        else if (!id) setCohortSel(COHORT_ALL);
+        refetch();
+      }}
+    />
+  ) : null;
+
   const actions = (
     <>
       {newLeadButton}
+      {importButton}
       <div className="hidden sm:flex rounded-full border border-white/12 p-0.5 bg-white/[0.03]" role="group" aria-label="Vista">
         {([['list', List, 'Lista'], ['board', KanbanSquare, 'Tablero']] as const).map(([m, Icon, label]) => (
           <button
@@ -238,13 +253,14 @@ export default function LeadsPage() {
 
   if (leads.length === 0) {
     return (
-      <Page title="Leads" actions={newLeadButton}>
+      <Page title="Leads" actions={<>{newLeadButton}{importButton}</>}>
         <EmptyState
           icon={<Inbox className="w-6 h-6" />}
           title="Sin leads todavía"
-          text="Cuando alguien agende una llamada o pida información desde la web, aparecerá aquí. También puedes añadir uno a mano."
+          text="Cuando alguien pida una llamada o información desde la web, aparecerá aquí. También puedes añadir uno a mano o importar los de Facebook."
         />
         {newLeadModal}
+        {importModal}
       </Page>
     );
   }
@@ -286,18 +302,13 @@ export default function LeadsPage() {
                   <PhoneCall className="w-3.5 h-3.5 shrink-0" />
                   Llamada · {callWhen(call.call_at!)}
                 </span>
-              ) : !compact ? (
-                <span className="inline-flex items-center gap-1.5 text-xs text-white/40 border border-white/12 rounded-full px-2.5 py-0.5">
-                  <PhoneCall className="w-3.5 h-3.5 shrink-0" />
-                  Sin llamada agendada
-                </span>
               ) : null}
-              <span className="text-xs text-white/50">{originOf(lead)}{interest ? ` · ${interest}` : ''}</span>
+              <span className="text-xs text-white/50">{originOf(lead)}{interest ? ` · ${interest}` : ''}{lead.cohort_id && cohortName.get(lead.cohort_id) ? ` · ${cohortName.get(lead.cohort_id)}` : ''}</span>
             </div>
             {!compact && note && lead.kind !== 'call' && <p className="text-sm text-white/50 line-clamp-1 mt-2">{note}</p>}
           </button>
 
-          {!compact && (lead.phone || lead.email || (step?.next && lead.kind !== 'call')) && (
+          {!compact && (lead.phone || lead.email || lead.status === 'new') && (
             <div className="flex flex-col border-l border-white/10 divide-y divide-white/10 shrink-0 w-12">
               {lead.phone && (
                 <a href={`tel:${lead.phone}`} aria-label={`Llamar a ${lead.name}`} className="flex-1 min-h-10 flex items-center justify-center hover:bg-white/[0.06] text-white/70">
@@ -314,12 +325,12 @@ export default function LeadsPage() {
                   <Mail className="w-4 h-4" />
                 </a>
               )}
-              {lead.status === 'new' && lead.kind !== 'call' && (
+              {lead.status === 'new' && (
                 <button
-                  onClick={() => move(lead, 'contacted')}
+                  onClick={() => move(lead, 'admission')}
                   disabled={busyId === lead.id}
-                  aria-label="Marcar como contactada"
-                  title="Marcar como contactada"
+                  aria-label="Pasar a admisión"
+                  title="Pasar a admisión"
                   className="flex-1 min-h-10 flex items-center justify-center hover:bg-[var(--signal)]/15 text-[var(--signal)] disabled:opacity-40 cursor-pointer"
                 >
                   <Check className="w-4 h-4" />
@@ -328,7 +339,7 @@ export default function LeadsPage() {
             </div>
           )}
         </div>
-        {compact && step?.next && lead.kind !== 'call' && (
+        {compact && step?.next && (
           <button
             onClick={() => move(lead, step.next!)}
             disabled={busyId === lead.id}
@@ -391,6 +402,7 @@ export default function LeadsPage() {
                   >
                     {statusOptions(lead.kind).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
+                  {lead.cohort_id && cohortName.get(lead.cohort_id) && <span className="block mt-1 pl-1 text-[11px] text-white/40 truncate max-w-36">{cohortName.get(lead.cohort_id)}</span>}
                 </td>
                 <td className="px-3 py-3 whitespace-nowrap">
                   {call ? (
@@ -417,26 +429,45 @@ export default function LeadsPage() {
 
   return (
     <Page title="Leads" subtitle={`${leads.length} en total`} actions={actions}>
-      {/* Resumen: cada tarjeta filtra la lista */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <CohortPanel
+        cohorts={cohorts}
+        leads={leads}
+        selected={cohortSel}
+        onSelect={setCohortSel}
+        onNew={() => setCohortModal({})}
+        onEdit={(cohort) => setCohortModal({ cohort })}
+      />
+
+      {/* Resumen por etapa: en la lista, cada tarjeta filtra */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {([
-          { v: 'todo', label: 'Por contactar', value: String(totals.todo), icon: BellRing, tone: 'text-yellow-400', hint: 'Nuevos sin atender' },
-          { v: 'call', label: 'Llamada agendada', value: String(totals.withCall), icon: PhoneCall, tone: 'text-blue-400', hint: 'Próximas llamadas' },
-          { v: 'follow', label: 'En seguimiento', value: String(totals.follow), icon: Hourglass, tone: 'text-yellow-400', hint: 'Ya contactados' },
-          { v: 'won', label: 'Matriculados', value: String(totals.won), icon: BadgeCheck, tone: 'text-green-400', hint: 'Han dado el paso' },
-        ] as const).map((k, i) => (
-          <button
-            key={k.v}
-            onClick={() => setView(view === k.v ? 'all' : k.v)}
-            aria-pressed={view === k.v}
-            className={cn('card-liquid rounded-3xl p-4 text-left cursor-pointer pn-in', view === k.v && 'shadow-[0_0_0_2px_var(--signal),0_0_30px_-8px_var(--signal)]')}
-            style={{ animationDelay: `${i * 50}ms` }}
-          >
-            <div className="pn-title mb-1.5 flex items-center gap-1.5"><k.icon className={cn('w-3.5 h-3.5', k.tone)} /> {k.label}</div>
-            <div className="text-2xl md:text-3xl font-semibold tabular-nums">{k.value}</div>
-            <div className="text-xs text-white/45 mt-0.5 truncate">{k.hint}</div>
-          </button>
-        ))}
+          { v: 'new', label: 'Nuevos', icon: BellRing, tone: 'text-[var(--signal)]' },
+          { v: 'admission', label: 'Admisión', icon: Inbox, tone: 'text-yellow-400' },
+          { v: 'call', label: 'Llamada', icon: PhoneCall, tone: 'text-blue-400' },
+          { v: 'enrolled', label: 'Matriculados', icon: UserCheck, tone: 'text-olive-400' },
+          { v: 'paid', label: 'Pagados', icon: CreditCard, tone: 'text-green-400' },
+        ] as const).map((k, i) => {
+          const body = (
+            <>
+              <div className="pn-title mb-1.5 flex items-center gap-1.5"><k.icon className={cn('w-3.5 h-3.5', k.tone)} aria-hidden="true" /> {k.label}</div>
+              <div className="text-2xl md:text-3xl font-semibold tabular-nums">{counts[k.v] ?? 0}</div>
+            </>
+          );
+          const base = 'card-liquid rounded-3xl p-4 text-left pn-in';
+          return mode === 'list' ? (
+            <button
+              key={k.v}
+              onClick={() => setStatus(status === k.v ? 'all' : k.v)}
+              aria-pressed={status === k.v}
+              className={cn(base, 'cursor-pointer', status === k.v && 'shadow-[0_0_0_2px_var(--signal),0_0_30px_-8px_var(--signal)]')}
+              style={{ animationDelay: `${i * 50}ms` }}
+            >
+              {body}
+            </button>
+          ) : (
+            <div key={k.v} className={base} style={{ animationDelay: `${i * 50}ms` }}>{body}</div>
+          );
+        })}
       </div>
 
       {/* Barra de filtros */}
@@ -491,11 +522,11 @@ export default function LeadsPage() {
           </>
         )
       ) : (
-        <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-4 md:overflow-visible">
+        <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4 md:mx-0 md:px-0">
           {BOARD.map((col) => {
             const rows = sorted(scoped.filter((l) => l.status === col.status));
             return (
-              <section key={col.status} className="snap-start shrink-0 w-[82%] sm:w-[48%] md:w-auto min-w-0 flex flex-col gap-2.5">
+              <section key={col.status} className="snap-start shrink-0 w-[82%] sm:w-[48%] md:w-64 md:flex-1 min-w-0 flex flex-col gap-2.5">
                 <h2 className="pn-title flex items-center justify-between px-1">
                   <span className="flex items-center gap-2"><span className={cn('w-1.5 h-1.5 rounded-full', statusMeta(col.status).dotColor)} />{col.title}</span>
                   <span className="tabular-nums text-white/60">{rows.length}</span>
@@ -512,7 +543,9 @@ export default function LeadsPage() {
       )}
 
       {newLeadModal}
-      <LeadDetailModal lead={selected} onClose={closeModal} accessToken={session?.access_token} onChange={refetch} allLeads={leads} onOpenLead={setSelectedId} />
+      {importModal}
+      {cohortModalEl}
+      <LeadDetailModal lead={selected} onClose={closeModal} accessToken={session?.access_token} onChange={refetch} allLeads={leads} onOpenLead={setSelectedId} cohorts={cohorts} />
     </Page>
   );
 }

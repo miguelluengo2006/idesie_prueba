@@ -68,7 +68,7 @@ export default function CallsPage() {
     return {
       upcoming,
       unmarked: calls.filter((l) => l.status === 'new' && !upcomingIds.has(l.id)).sort(byTime(false)),
-      done: calls.filter((l) => l.status === 'contacted' || l.status === 'won').sort(byTime(false)),
+      done: calls.filter((l) => l.status === 'call' || l.status === 'enrolled' || l.status === 'paid').sort(byTime(false)),
       cancelled: calls.filter((l) => l.status === 'lost').sort(byTime(false)),
     };
   }, [leads, now]);
@@ -247,7 +247,7 @@ export default function CallsPage() {
                           {actionable && (
                             <div className="flex gap-1.5">
                               <button
-                                onClick={() => setStatus(l, 'contacted')}
+                                onClick={() => setStatus(l, 'call')}
                                 disabled={busyId === l.id}
                                 className="flex-1 flex items-center justify-center gap-1 px-3 h-9 rounded-xl text-xs font-semibold portal-cta disabled:opacity-50 cursor-pointer"
                               >

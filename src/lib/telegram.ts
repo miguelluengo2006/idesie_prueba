@@ -63,6 +63,8 @@ export function leadAlertText(l: LeadAlert): string {
   if (l.kind === 'call' && l.callAt) {
     lines.push('📞 <b>Llamada agendada</b>');
     lines.push(`🗓 <b>${esc(formatCallDate(l.callAt))} · ${esc(formatCallTime(l.callAt))}</b> (${BOOKING_TZ.split('/')[1]})`);
+  } else if (l.kind === 'call') {
+    lines.push('📞 <b>Quiere una llamada</b> (elige hueco en Calendly)');
   } else if (l.packName) {
     lines.push('🎁 <b>Nueva solicitud · Pack de Bienvenida</b>');
   } else {

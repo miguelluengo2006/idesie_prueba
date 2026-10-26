@@ -171,19 +171,23 @@ export function leadEmail(lead: LeadMailData, opts: EmailOptions): RenderedEmail
   const receivedAt = opts.receivedAt || new Date();
   const isCall = lead.kind === 'call' && !!lead.callAt;
   const isPack = !!lead.pack;
+  // Quien pide una llamada elige el hueco en Calendly: aquí solo sabemos que la quiere
+  const wantsCall = lead.kind === 'call' && !lead.callAt;
   const who = lead.company ? `${lead.name} (${lead.company})` : lead.name;
   const when = isCall ? `${formatCallDate(lead.callAt!)} · ${formatCallTime(lead.callAt!)}` : '';
 
   const subject = isCall
     ? `Nueva llamada agendada — ${who} · ${when}`
-    : isPack
+    : wantsCall
+      ? `Quiere una llamada — ${who}`
+      : isPack
       ? `Nuevo lead del Pack de Bienvenida — ${who}`
       : lead.source === 'landing'
         ? `Nuevo lead de la landing — ${who}`
         : `Nueva propuesta solicitada — ${who}`;
 
   const tone: Tone = isCall ? 'call' : isPack ? 'pack' : 'lead';
-  const badge = isCall ? 'Llamada agendada' : isPack ? 'Pack de Bienvenida · 20 €' : lead.source === 'landing' ? 'Lead de la landing' : 'Propuesta desde la web';
+  const badge = isCall ? 'Llamada agendada' : wantsCall ? 'Quiere una llamada' : isPack ? 'Pack de Bienvenida · 20 €' : lead.source === 'landing' ? 'Lead de la landing' : 'Propuesta desde la web';
 
   const preheader = isCall
     ? `${when} (hora de Madrid) · ${lead.phone || lead.email || 'sin contacto'}`

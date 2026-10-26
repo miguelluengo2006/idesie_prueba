@@ -81,7 +81,7 @@ function BookCallModal({ businessName, pack, onClose }: { businessName: string; 
           Agenda una llamada
         </h2>
         <p className="text-white/50 text-sm mb-8 max-w-md">
-          Elige el hueco que mejor te venga y respóndenos unas preguntas rápidas para preparar la conversación.
+          Déjanos tus datos y elige el hueco que mejor te venga: así preparamos la conversación contigo.
         </p>
         <BookCallForm businessName={businessName} pack={pack} onClose={onClose} />
       </motion.div>

@@ -1,6 +1,7 @@
 import type { Lead } from '@/app/portal/leads/context';
+import { PIPELINE, type LeadStatus } from '@/lib/admissions';
 
-export type LeadStatus = Lead['status'];
+export type { LeadStatus };
 
 interface StatusMeta {
   label: string;
@@ -10,22 +11,25 @@ interface StatusMeta {
 
 const BASE: Record<LeadStatus, Omit<StatusMeta, 'label'>> = {
   new: { badgeClass: 'bg-[var(--signal)]/15 text-[var(--signal)] border border-[var(--signal)]/30', dotColor: 'bg-[var(--signal)]' },
-  contacted: { badgeClass: 'bg-blue-500/10 text-blue-400 border border-blue-500/20', dotColor: 'bg-blue-400' },
-  won: { badgeClass: 'bg-olive-500/10 text-olive-400 border border-olive-500/20', dotColor: 'bg-olive-400' },
+  admission: { badgeClass: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/25', dotColor: 'bg-yellow-400' },
+  call: { badgeClass: 'bg-blue-500/10 text-blue-400 border border-blue-500/20', dotColor: 'bg-blue-400' },
+  enrolled: { badgeClass: 'bg-olive-500/10 text-olive-400 border border-olive-500/20', dotColor: 'bg-olive-400' },
+  paid: { badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/25', dotColor: 'bg-green-400' },
   lost: { badgeClass: 'bg-gray-800/30 text-gray-400 border border-gray-700', dotColor: 'bg-gray-500' },
 };
 
-const REQUEST_LABELS: Record<LeadStatus, string> = { new: 'Nuevo', contacted: 'En seguimiento', won: 'Matriculado', lost: 'Descartado' };
-// Same pipeline, worded for a scheduled call
-const CALL_LABELS: Record<LeadStatus, string> = { new: 'Agendada', contacted: 'Realizada', won: 'Matriculado', lost: 'Cancelada' };
+const LABELS: Record<LeadStatus, string> = {
+  ...(Object.fromEntries(PIPELINE.map((p) => [p.status, p.label])) as Record<(typeof PIPELINE)[number]['status'], string>),
+  lost: 'Descartado',
+};
 
-export function statusMeta(status: LeadStatus, kind: Lead['kind'] = 'proposal'): StatusMeta {
-  return { ...BASE[status], label: (kind === 'call' ? CALL_LABELS : REQUEST_LABELS)[status] };
+// `kind` se conserva por compatibilidad con quien ya lo pasa: las etapas son las mismas para solicitudes y llamadas
+export function statusMeta(status: LeadStatus, _kind: Lead['kind'] = 'proposal'): StatusMeta {
+  return { ...BASE[status], label: LABELS[status] };
 }
 
-export function statusOptions(kind: Lead['kind']): { value: LeadStatus; label: string }[] {
-  const labels = kind === 'call' ? CALL_LABELS : REQUEST_LABELS;
-  return (Object.keys(labels) as LeadStatus[]).map((value) => ({ value, label: labels[value] }));
+export function statusOptions(_kind?: Lead['kind']): { value: LeadStatus; label: string }[] {
+  return (Object.keys(LABELS) as LeadStatus[]).map((value) => ({ value, label: LABELS[value] }));
 }
 
 export function timeAgo(dateStr: string): string {
@@ -72,6 +76,7 @@ export function leadChannel(l: Pick<Lead, 'source' | 'kind' | 'answers'>): { lab
   const campaign = utm?.utm_campaign || utm?.utm_source || null;
   if (l.source === 'manual') return { label: 'Manual', campaign };
   if (l.source === 'landing') return { label: 'Landing', campaign };
+  if (l.source === 'facebook') return { label: 'Facebook', campaign };
   return { label: l.kind === 'call' ? 'Web · llamada' : 'Web', campaign };
 }
 

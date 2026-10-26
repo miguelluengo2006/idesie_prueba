@@ -65,12 +65,12 @@ type FeedEvent = { id: string; at: string; icon: React.ReactNode; title: string;
 function feedOf(leads: Lead[]): FeedEvent[] {
   const events: FeedEvent[] = [];
   for (const l of leads) {
-    if (l.status === 'won') {
+    if (l.status === 'enrolled' || l.status === 'paid') {
       events.push({
         id: `${l.id}-won`,
         at: l.created_at,
         icon: <GraduationCap className="w-4 h-4" />,
-        title: `${l.name} se ha matriculado`,
+        title: `${l.name} ${l.status === 'paid' ? 'ha pagado la matrícula' : 'se ha matriculado'}`,
         sub: l.answers?.needs?.join(', ') || l.company || 'Matrícula',
         href: `/portal/leads?open=${l.id}`,
         tone: 'green',
@@ -131,8 +131,8 @@ export default function AdminDashboard() {
     const weekEnd = addDays(today, 7);
     const inWeek = upcoming.filter((l) => callDayKey(l.call_at!) <= weekEnd);
     const todayCalls = upcoming.filter((l) => callDayKey(l.call_at!) === today);
-    const won = leads.filter((l) => l.status === 'won').length;
-    const closed = leads.filter((l) => l.status === 'won' || l.status === 'lost').length;
+    const won = leads.filter((l) => l.status === 'enrolled' || l.status === 'paid').length;
+    const closed = won + leads.filter((l) => l.status === 'lost').length;
 
     // Serie diaria (últimos 14 días) para la gráfica pequeña
     const keys = Array.from({ length: SPARK_DAYS }, (_, i) => addDays(today, i - (SPARK_DAYS - 1)));
@@ -145,8 +145,9 @@ export default function AdminDashboard() {
     const unmarked = leads.filter((l) => isPendingCall(l) && new Date(l.call_at!).getTime() + 30 * 60000 < now).length;
     const funnel = {
       leads: leads.filter((l) => l.kind !== 'call' || l.call_at).length,
-      followed: leads.filter((l) => l.status === 'contacted' || l.status === 'won').length,
+      followed: leads.filter((l) => l.status !== 'new' && l.status !== 'lost').length,
       won,
+      paid: leads.filter((l) => l.status === 'paid').length,
     };
 
     return {
@@ -396,8 +397,9 @@ export default function AdminDashboard() {
           <ul className="space-y-4">
             {[
               { label: 'Leads y llamadas', v: stats.funnel.leads, status: 'new' as const },
-              { label: 'En seguimiento', v: stats.funnel.followed, status: 'contacted' as const },
-              { label: 'Matriculados', v: stats.funnel.won, status: 'won' as const },
+              { label: 'En admisión', v: stats.funnel.followed, status: 'admission' as const },
+              { label: 'Matriculados', v: stats.funnel.won, status: 'enrolled' as const },
+              { label: 'Pagados', v: stats.funnel.paid, status: 'paid' as const },
             ].map((row) => {
               const pct = stats.funnel.leads ? Math.round((row.v / stats.funnel.leads) * 100) : 0;
               return (

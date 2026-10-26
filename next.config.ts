@@ -66,7 +66,8 @@ const nextConfig: NextConfig = {
           "font-src 'self' data:",
           "media-src 'self' https://pub-e87160a916994231bb484c99e8e7ef01.r2.dev",
           "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.facebook.com https://connect.facebook.net",
-          "frame-src 'self'",
+          // Calendly: el calendario de las llamadas se muestra incrustado en el formulario
+          "frame-src 'self' https://calendly.com",
           "object-src 'none'",
           "base-uri 'self'",
           "form-action 'self'",

@@ -24,6 +24,7 @@ import type { Lead } from '@/app/portal/leads/context';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
 import { formatCallDate, formatCallTime } from '@/lib/booking';
 import { contactKeys, statusMeta, statusOptions, timeAgo } from '@/components/portal/leadMeta';
+import { formatStartDate, type Cohort } from '@/lib/admissions';
 import { cn } from '@/lib/utils';
 
 interface LeadDetailModalProps {
@@ -35,6 +36,8 @@ interface LeadDetailModalProps {
   allLeads?: Lead[];
   /** Abre otra solicitud de la misma persona desde su historial */
   onOpenLead?: (id: string) => void;
+  /** Convocatorias del máster, para asignar el lead a una */
+  cohorts?: Cohort[];
 }
 
 const ANSWER_ROWS: { key: 'budget' | 'timeline'; label: string }[] = [
@@ -54,7 +57,7 @@ const initials = (name: string) =>
 
 const isPaid = (l: Lead) => !!l.answers?.order && l.answers.order.livemode !== false;
 
-export default function LeadDetailModal({ lead, onClose, accessToken, onChange, allLeads, onOpenLead }: LeadDetailModalProps) {
+export default function LeadDetailModal({ lead, onClose, accessToken, onChange, allLeads, onOpenLead, cohorts }: LeadDetailModalProps) {
   const [tab, setTab] = useState<Tab>('resumen');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
@@ -296,6 +299,22 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
                   ))}
                 </div>
               </div>
+
+              {cohorts && cohorts.length > 0 && (
+                <div>
+                  <label htmlFor="lead-cohort" className="block text-xs uppercase tracking-widest text-white/40 mb-2">Convocatoria</label>
+                  <select
+                    id="lead-cohort"
+                    value={lead.cohort_id || ''}
+                    disabled={saving}
+                    onChange={(e) => updateLead({ cohort_id: e.target.value || null })}
+                    className="w-full sm:w-auto sm:min-w-64 h-10 rounded-xl border border-white/15 bg-transparent pl-3 pr-8 text-sm cursor-pointer disabled:opacity-50"
+                  >
+                    <option value="">Sin convocatoria</option>
+                    {cohorts.map((c) => <option key={c.id} value={c.id}>{c.name} · {formatStartDate(c.starts_at)}</option>)}
+                  </select>
+                </div>
+              )}
 
               {hasAnswers && lead.answers && (
                 <div>

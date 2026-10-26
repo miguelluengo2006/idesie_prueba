@@ -3,8 +3,7 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { requireAgencyPrincipal } from '@/lib/agencyAccess';
 import { getEffectiveOwnerId, canWrite } from '@/lib/teamUtils';
 import { isValidUUID, sanitizeString } from '@/lib/validation';
-
-const VALID_STATUSES = ['new', 'contacted', 'won', 'lost'];
+import { isLeadStatus } from '@/lib/admissions';
 
 async function authenticate(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
@@ -15,7 +14,7 @@ async function authenticate(req: NextRequest) {
   return user;
 }
 
-// PATCH /api/leads/[id] - update status/notes
+// PATCH /api/leads/[id] - update status/notes/cohort
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!isValidUUID(id)) return NextResponse.json({ error: 'Invalid lead ID' }, { status: 400 });
@@ -51,10 +50,24 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const updates: Record<string, any> = {};
 
   if (body.status !== undefined) {
-    if (!VALID_STATUSES.includes(body.status)) {
+    if (!isLeadStatus(body.status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
     updates.status = body.status;
+  }
+
+  // Convocatoria: un id de una convocatoria propia, o null para quitarla
+  if (body.cohort_id !== undefined) {
+    if (body.cohort_id === null) {
+      updates.cohort_id = null;
+    } else {
+      if (typeof body.cohort_id !== 'string' || !isValidUUID(body.cohort_id)) {
+        return NextResponse.json({ error: 'Convocatoria no válida' }, { status: 400 });
+      }
+      const { data: cohort } = await supabaseAdmin.from('cohorts').select('id').eq('id', body.cohort_id).eq('owner_id', ownerId).maybeSingle();
+      if (!cohort) return NextResponse.json({ error: 'Convocatoria no encontrada' }, { status: 404 });
+      updates.cohort_id = body.cohort_id;
+    }
   }
 
   if (body.notes !== undefined) {

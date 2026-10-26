@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { requireAgencyPrincipal } from '@/lib/agencyAccess';
 import { getEffectiveOwnerId, canWrite } from '@/lib/teamUtils';
-import { isValidEmail, sanitizeString } from '@/lib/validation';
+import { isValidEmail, isValidUUID, sanitizeString } from '@/lib/validation';
+import { isLeadStatus } from '@/lib/admissions';
 import { upsertContacts } from '@/lib/crmServer';
 
 async function authenticate(req: NextRequest) {
@@ -62,9 +63,20 @@ export async function POST(req: NextRequest) {
   if (email && !isValidEmail(email)) return NextResponse.json({ error: 'El email no es válido' }, { status: 400 });
   if (!email && !phone) return NextResponse.json({ error: 'Pon al menos un email o un teléfono' }, { status: 400 });
 
+  // Etapa y convocatoria opcionales: así se añade a alguien directamente a mitad del proceso (p. ej. desde la línea de tiempo)
+  const status = body.status === undefined ? 'new' : body.status;
+  if (!isLeadStatus(status)) return NextResponse.json({ error: 'Etapa no válida' }, { status: 400 });
+  let cohortId: string | null = null;
+  if (body.cohort_id) {
+    if (typeof body.cohort_id !== 'string' || !isValidUUID(body.cohort_id)) return NextResponse.json({ error: 'Convocatoria no válida' }, { status: 400 });
+    const { data: cohort } = await supabaseAdmin.from('cohorts').select('id').eq('id', body.cohort_id).eq('owner_id', ownerId).maybeSingle();
+    if (!cohort) return NextResponse.json({ error: 'Convocatoria no encontrada' }, { status: 404 });
+    cohortId = cohort.id;
+  }
+
   const { data, error } = await supabaseAdmin
     .from('leads')
-    .insert({ owner_id: ownerId, name, email, phone: phone || null, company: company || null, message, source: 'manual', kind: 'proposal' })
+    .insert({ owner_id: ownerId, name, email, phone: phone || null, company: company || null, message, source: 'manual', kind: 'proposal', status, cohort_id: cohortId })
     .select('*')
     .single();
   if (error) {
