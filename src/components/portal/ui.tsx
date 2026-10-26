@@ -21,17 +21,17 @@ export function Page({
 }) {
   return (
     <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
-      <header className="flex-shrink-0 px-4 md:px-8 pt-4 md:pt-6 pb-3">
+      <header className="flex-shrink-0 px-4 md:px-8 pt-5 md:pt-8 pb-4">
         <div className={cn('mx-auto w-full flex items-end justify-between gap-3', width)}>
           <div className="min-w-0">
-            <h1 className="text-xl md:text-2xl font-semibold tracking-tight truncate">{title}</h1>
-            {subtitle && <p className="text-xs md:text-sm text-white/45 mt-0.5 truncate capitalize-first">{subtitle}</p>}
+            <h1 className="text-[22px] md:text-[28px] leading-tight font-semibold truncate">{title}</h1>
+            {subtitle && <p className="text-sm md:text-[15px] text-white/50 mt-1 truncate capitalize-first">{subtitle}</p>}
           </div>
           {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
         </div>
       </header>
       <div className="flex-1 overflow-y-auto overscroll-contain">
-        <div className={cn('px-4 md:px-8 pb-8 pt-2 mx-auto space-y-4 md:space-y-5', width)}>{children}</div>
+        <div className={cn('px-4 md:px-8 pb-10 pt-1 mx-auto space-y-5 md:space-y-6', width)}>{children}</div>
       </div>
     </div>
   );
@@ -125,7 +125,7 @@ export function Skeleton({ className }: { className?: string }) {
 export function EmptyState({ icon, title, text, action }: { icon: React.ReactNode; title: string; text?: string; action?: React.ReactNode }) {
   return (
     <div className="text-center py-14 px-4">
-      <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-[var(--signal)]/10 border border-[var(--portal-line-strong)] text-[var(--signal)] shadow-[0_0_28px_-8px_var(--portal-glow)]">
+      <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-[var(--signal)]/10 text-[var(--signal)]">
         {icon}
       </div>
       <h3 className="text-base font-semibold mb-1">{title}</h3>

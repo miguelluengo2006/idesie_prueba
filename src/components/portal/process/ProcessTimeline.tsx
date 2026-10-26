@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, BellRing, ClipboardList, CreditCard, MessageCircle, PhoneCall, Plus, UserCheck, UserX, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BellRing, ClipboardList, CreditCard, PhoneCall, Plus, UserCheck, UserX, type LucideIcon } from 'lucide-react';
 import type { Lead } from '@/app/portal/leads/context';
-import { PIPELINE, passRate, reachCounts, sinceLabel, type LeadStatus, type Stage } from '@/lib/admissions';
-import { leadChannel, leadInterest, statusMeta, whatsappUrl } from '@/components/portal/leadMeta';
+import { PIPELINE, passRate, reachCounts, sinceLabel, type Cohort, type LeadStatus, type Stage } from '@/lib/admissions';
+import { leadChannel, leadInterest, leadWaContext, statusMeta } from '@/components/portal/leadMeta';
+import WhatsAppMenu from '@/components/portal/WhatsAppMenu';
 import { CountUp } from '@/components/portal/ui';
 import { cn } from '@/lib/utils';
 
@@ -33,6 +34,7 @@ export default function ProcessTimeline({
   onOpen,
   onAdd,
   flashId,
+  cohorts,
 }: {
   /** Leads ya con la etapa efectiva (incluye los cambios aún sin confirmar) */
   leads: Lead[];
@@ -42,6 +44,8 @@ export default function ProcessTimeline({
   onAdd: (stage: Stage) => void;
   /** Lead que acaba de moverse: se resalta un momento */
   flashId: string | null;
+  /** Para que los mensajes de WhatsApp mencionen la convocatoria */
+  cohorts?: Cohort[];
 }) {
   const reduce = useReducedMotion();
   const [dragId, setDragId] = useState<string | null>(null);
@@ -171,6 +175,7 @@ export default function ProcessTimeline({
                           next={next}
                           dragging={dragId === lead.id}
                           flash={flashId === lead.id}
+                          cohorts={cohorts}
                           spring={spring}
                           onOpen={() => onOpen(lead)}
                           onMove={(to) => onMove(lead, to)}
@@ -227,6 +232,7 @@ function PersonCard({
   next,
   dragging,
   flash,
+  cohorts,
   spring,
   onOpen,
   onMove,
@@ -238,13 +244,13 @@ function PersonCard({
   next: LeadStatus | null;
   dragging: boolean;
   flash: boolean;
+  cohorts?: Cohort[];
   spring: object;
   onOpen: () => void;
   onMove: (to: LeadStatus) => void;
   onDragStart: () => void;
   onDragEnd: () => void;
 }) {
-  const wa = whatsappUrl(lead.phone);
   const interest = leadInterest(lead);
   const channel = leadChannel(lead);
   const since = sinceLabel(lead.updated_at || lead.created_at);
@@ -263,7 +269,7 @@ function PersonCard({
         onDragEnd={onDragEnd}
         className={cn(
           'group rounded-2xl p-3 bg-[#ffffff] border border-[rgba(13,21,34,0.1)] cursor-grab active:cursor-grabbing transition-[box-shadow,border-color] hover:border-[var(--signal)]',
-          flash && 'shadow-[0_0_0_2px_var(--signal),0_10px_30px_-10px_var(--signal)]'
+          flash && '!border-[var(--signal)] shadow-[0_0_0_3px_rgba(0,99,230,0.18)]'
         )}
       >
         <button type="button" onClick={onOpen} className="w-full flex items-start gap-2.5 text-left cursor-pointer">
@@ -288,11 +294,7 @@ function PersonCard({
                 <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
               </button>
             )}
-            {wa && (
-              <a href={wa} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp a ${lead.name}`} title="WhatsApp" className={iconBtn}>
-                <MessageCircle className="w-3.5 h-3.5" aria-hidden="true" />
-              </a>
-            )}
+            <WhatsAppMenu phone={lead.phone} name={lead.name} status={lead.status} context={leadWaContext(lead, cohorts)} className="!w-7 !h-7" />
           </div>
           {next && (
             <button

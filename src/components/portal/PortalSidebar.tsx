@@ -101,9 +101,9 @@ function useBadges() {
 
 function Badge({ n, dot }: { n: number; dot?: boolean }) {
   if (n <= 0) return null;
-  if (dot) return <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[var(--signal)] shadow-[0_0_8px_var(--signal)]" />;
+  if (dot) return <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[var(--signal)]" />;
   return (
-    <span className="min-w-[20px] h-5 px-1.5 rounded-md bg-[var(--signal)] text-black text-[11px] font-bold font-mono flex items-center justify-center shadow-[0_0_14px_-2px_var(--signal)]">
+    <span className="min-w-[22px] h-[22px] px-1.5 rounded-full bg-[var(--signal)] text-black text-xs font-semibold tabular-nums flex items-center justify-center">
       {n > 99 ? '99+' : n}
     </span>
   );
@@ -118,21 +118,12 @@ function NavLink({ item, active, collapsed, count, onNavigate }: { item: NavItem
       aria-current={active ? 'page' : undefined}
       title={collapsed ? item.label : undefined}
       className={cn(
-        'group relative flex items-center rounded-xl text-sm font-medium transition-all',
-        collapsed ? 'justify-center h-11 w-11 mx-auto' : 'gap-3 px-2.5 py-2',
-        active
-          ? 'bg-[var(--signal)]/10 text-white shadow-[inset_0_0_0_1px_var(--portal-line-strong),0_0_22px_-8px_var(--portal-glow)]'
-          : 'text-white/55 hover:text-white hover:bg-white/[0.05]'
+        'group relative flex items-center rounded-xl text-sm transition-colors',
+        collapsed ? 'justify-center h-11 w-11 mx-auto' : 'gap-3 px-3 py-2.5',
+        active ? 'bg-black/[0.06] text-white font-semibold' : 'text-white/60 font-medium hover:text-white hover:bg-black/[0.04]'
       )}
     >
-      <span
-        className={cn(
-          'flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-colors',
-          active ? 'bg-[var(--signal)] text-black shadow-[0_0_16px_-2px_var(--signal)]' : 'bg-white/[0.05] text-white/60 group-hover:text-white'
-        )}
-      >
-        <Icon className="w-[17px] h-[17px]" />
-      </span>
+      <Icon className={cn('w-[18px] h-[18px] shrink-0 transition-colors', active ? 'text-[var(--signal)]' : 'text-white/50 group-hover:text-white/80')} />
       {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
       {!collapsed && <Badge n={count} />}
       {collapsed && <Badge n={count} dot />}
@@ -265,7 +256,7 @@ export default function PortalSidebar({ role }: { role: PortalRole }) {
   const brand = (compact?: boolean) => (
     <Link href="/portal" className="flex items-center gap-2.5 min-w-0" title={compact ? businessName : undefined}>
       {compact ? (
-        <span className="w-9 h-9 rounded-xl bg-[var(--signal)] text-black flex items-center justify-center font-kinetic font-bold text-lg shadow-[0_0_18px_-2px_var(--signal)]">
+        <span className="w-9 h-9 rounded-xl bg-[var(--signal)] text-black flex items-center justify-center font-kinetic font-bold text-lg">
           {businessName.charAt(0).toLowerCase()}
         </span>
       ) : (
@@ -282,7 +273,7 @@ export default function PortalSidebar({ role }: { role: PortalRole }) {
       {/* Desktop: panel flotante */}
       <aside
         className={cn(
-          'hidden md:flex shrink-0 flex-col justify-between gap-6 m-3 mr-0 rounded-2xl border border-[var(--portal-line)] bg-black/95 backdrop-blur-xl px-2.5 py-4 overflow-y-auto overflow-x-hidden shadow-[0_20px_60px_-30px_var(--portal-glow)] transition-[width] duration-200',
+          'hidden md:flex shrink-0 flex-col justify-between gap-6 m-3 mr-0 rounded-2xl border border-[var(--portal-line)] bg-[#ffffff] px-3 py-4 overflow-y-auto overflow-x-hidden transition-[width] duration-200',
           collapsed ? 'w-[68px]' : 'w-60'
         )}
       >
@@ -320,7 +311,7 @@ export default function PortalSidebar({ role }: { role: PortalRole }) {
       </aside>
 
       {/* Móvil: cabecera fina */}
-      <header className="md:hidden flex-shrink-0 h-14 px-4 flex items-center justify-between border-b border-white/10 bg-black/90 backdrop-blur-xl">
+      <header className="md:hidden flex-shrink-0 h-14 px-4 flex items-center justify-between border-b border-white/10 bg-[#ffffff]">
         {brand()}
         <div className="flex items-center gap-2">
         {role === 'agency' && (
@@ -398,7 +389,7 @@ export function PortalBottomNav({ role }: { role: PortalRole }) {
       className="md:hidden flex-shrink-0 px-3 pt-2"
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 10px)' }}
     >
-      <div className="grid grid-cols-5 rounded-2xl border border-[var(--portal-line-strong)] bg-black/95 backdrop-blur-xl shadow-[0_10px_40px_-12px_var(--portal-glow)] p-1">
+      <div className="grid grid-cols-5 rounded-2xl border border-[var(--portal-line)] bg-[#ffffff] shadow-[0_8px_24px_-12px_rgba(13,21,34,0.2)] p-1">
         {items.map((item) => {
           const active = item.exact ? pathname === item.href : pathname?.startsWith(item.href) ?? false;
           const n = item.badge ? badges[item.badge] : 0;

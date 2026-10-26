@@ -112,7 +112,7 @@ export default function ProcessPage() {
           action={addButton}
         />
       ) : (
-        <ProcessTimeline leads={shown} onMove={move} onOpen={(l) => setSelectedId(l.id)} onAdd={setAddStage} flashId={flashId} />
+        <ProcessTimeline leads={shown} onMove={move} onOpen={(l) => setSelectedId(l.id)} onAdd={setAddStage} flashId={flashId} cohorts={cohorts} />
       )}
 
       {addStage && (

@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CalendarX, Check, Mail, MessageCircle, Phone, PhoneCall, X } from 'lucide-react';
+import { CalendarX, Check, Mail, Phone, PhoneCall, X } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
 import { usePortalRoleContext } from '@/app/portal/context';
 import { useLeadsContext, upcomingCalls } from '@/app/portal/leads/context';
 import type { Lead } from '@/app/portal/leads/context';
 import LeadDetailModal from '@/components/portal/LeadDetailModal';
-import { statusMeta, whatsappUrl } from '@/components/portal/leadMeta';
+import { leadWaContext, statusMeta } from '@/components/portal/leadMeta';
+import WhatsAppMenu from '@/components/portal/WhatsAppMenu';
 import { EmptyState, Page, Skeleton, untilLabel } from '@/components/portal/ui';
 import { addDays, callDayKey, formatCallDate, formatCallTime, todayInBookingTz } from '@/lib/booking';
 import { cn } from '@/lib/utils';
@@ -142,12 +143,12 @@ export default function CallsPage() {
                 aria-pressed={active}
                 className={cn(
                   'relative flex flex-col items-center gap-0.5 rounded-2xl py-2 md:py-2.5 transition-all cursor-pointer border',
-                  active ? 'bg-[var(--signal)] text-black border-transparent shadow-[0_0_20px_-4px_var(--signal)]' : 'bg-white/[0.03] border-transparent hover:border-[var(--portal-line-strong)]'
+                  active ? 'bg-[var(--signal)] text-black border-transparent' : 'bg-white/[0.03] border-transparent hover:border-[var(--portal-line-strong)]'
                 )}
               >
                 <span className={cn('text-[10px] uppercase tracking-wider font-mono', active ? 'text-black/70' : 'text-white/45')}>{d.key === today ? 'Hoy' : weekday(d.key)}</span>
                 <span className="font-kinetic text-lg leading-none">{dayNum(d.key)}</span>
-                <span className={cn('h-1.5 w-1.5 rounded-full mt-0.5', d.count > 0 ? (active ? 'bg-black' : 'bg-[var(--signal)] shadow-[0_0_8px_var(--signal)]') : 'bg-transparent')} aria-hidden="true" />
+                <span className={cn('h-1.5 w-1.5 rounded-full mt-0.5', d.count > 0 ? (active ? 'bg-black' : 'bg-[var(--signal)]') : 'bg-transparent')} aria-hidden="true" />
                 {d.count > 0 && <span className="sr-only">{d.count} llamadas</span>}
               </button>
             );
@@ -194,12 +195,11 @@ export default function CallsPage() {
               {items.map((l, idx) => {
                 const meta = statusMeta(l.status, 'call');
                 const actionable = l.status === 'new';
-                const wa = whatsappUrl(l.phone);
                 const isNext = l.id === nextId;
                 return (
                   <li
                     key={l.id}
-                    className={cn('card-liquid rounded-3xl pn-in overflow-hidden', isNext && 'shadow-[0_0_0_1px_var(--portal-line-strong),0_20px_60px_-30px_var(--portal-glow)]')}
+                    className={cn('card-liquid rounded-3xl pn-in overflow-hidden', isNext && '!border-[var(--signal)]')}
                     style={{ animationDelay: `${Math.min(idx, 6) * 40}ms` }}
                   >
                     <div className="flex items-stretch">
@@ -237,11 +237,7 @@ export default function CallsPage() {
                               <a href={`tel:${l.phone.replace(/[^\d+]/g, '')}`} aria-label={`Llamar a ${l.name}`} className="w-10 h-10 rounded-xl border border-white/12 flex items-center justify-center hover:border-[var(--portal-line-strong)] hover:text-[var(--signal)]">
                                 <Phone className="w-4 h-4" />
                               </a>
-                              {wa && (
-                                <a href={wa} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp a ${l.name}`} className="w-10 h-10 rounded-xl border border-white/12 flex items-center justify-center hover:border-[var(--portal-line-strong)] text-green-400">
-                                  <MessageCircle className="w-4 h-4" />
-                                </a>
-                              )}
+                              <WhatsAppMenu phone={l.phone} name={l.name} status={l.status} context={leadWaContext(l)} className="!w-10 !h-10 !rounded-xl border border-white/12" />
                             </div>
                           )}
                           {actionable && (

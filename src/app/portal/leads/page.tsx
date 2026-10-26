@@ -13,7 +13,6 @@ import {
   KanbanSquare,
   List,
   Mail,
-  MessageCircle,
   Phone,
   PhoneCall,
   Plus,
@@ -32,7 +31,8 @@ import ImportLeadsModal from '@/components/portal/ImportLeadsModal';
 import CohortModal from '@/components/portal/CohortModal';
 import CohortPanel, { COHORT_ALL, COHORT_NONE } from '@/components/portal/CohortPanel';
 import { PIPELINE, nextStatus, type Cohort } from '@/lib/admissions';
-import { contactKeys, leadChannel, leadInterest, leadNote, statusMeta, statusOptions, timeAgo, whatsappUrl } from '@/components/portal/leadMeta';
+import { contactKeys, leadChannel, leadInterest, leadNote, leadWaContext, statusMeta, statusOptions, timeAgo } from '@/components/portal/leadMeta';
+import WhatsAppMenu from '@/components/portal/WhatsAppMenu';
 import { EmptyState, Page, Skeleton } from '@/components/portal/ui';
 import { addDays, callDayKey, formatCallDate, formatCallTime, todayInBookingTz } from '@/lib/booking';
 import { exportLeadsCsv } from '@/lib/leadsCsv';
@@ -268,7 +268,6 @@ export default function LeadsPage() {
   const Card = ({ lead, compact }: { lead: Lead; compact?: boolean }) => {
     const meta = statusMeta(lead.status, lead.kind);
     const call = callOf(lead);
-    const wa = whatsappUrl(lead.phone);
     const interest = leadInterest(lead);
     const note = leadNote(lead.message);
     const step = BOARD.find((b) => b.status === lead.status);
@@ -315,10 +314,10 @@ export default function LeadsPage() {
                   <Phone className="w-4 h-4" />
                 </a>
               )}
-              {wa && (
-                <a href={wa} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp a ${lead.name}`} className="flex-1 min-h-10 flex items-center justify-center hover:bg-white/[0.06] text-green-400">
-                  <MessageCircle className="w-4 h-4" />
-                </a>
+              {lead.phone && (
+                <div className="flex-1 min-h-10 flex items-center justify-center hover:bg-white/[0.06]">
+                  <WhatsAppMenu phone={lead.phone} name={lead.name} status={lead.status} context={leadWaContext(lead, cohorts)} />
+                </div>
               )}
               {lead.email && (
                 <a href={`mailto:${lead.email}`} aria-label={`Email a ${lead.name}`} className="flex-1 min-h-10 flex items-center justify-center hover:bg-white/[0.06] text-white/70">
@@ -369,7 +368,6 @@ export default function LeadsPage() {
         <tbody className="divide-y divide-white/10">
           {filtered.map((lead) => {
             const call = callOf(lead);
-            const wa = whatsappUrl(lead.phone);
             const interest = leadInterest(lead);
             const channel = leadChannel(lead);
             const act = 'w-8 h-8 inline-flex items-center justify-center rounded-full hover:bg-white/[0.08] text-white/65 hover:text-white';
@@ -415,7 +413,7 @@ export default function LeadsPage() {
                 <td className="px-3 py-3">
                   <div className="flex items-center justify-end gap-0.5">
                     {lead.phone && <a href={`tel:${lead.phone}`} aria-label={`Llamar a ${lead.name}`} title="Llamar" className={act}><Phone className="w-4 h-4" /></a>}
-                    {wa && <a href={wa} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp a ${lead.name}`} title="WhatsApp" className={cn(act, 'text-green-400 hover:text-green-300')}><MessageCircle className="w-4 h-4" /></a>}
+                    <WhatsAppMenu phone={lead.phone} name={lead.name} status={lead.status} context={leadWaContext(lead, cohorts)} />
                     {lead.email && <a href={`mailto:${lead.email}`} aria-label={`Email a ${lead.name}`} title="Email" className={act}><Mail className="w-4 h-4" /></a>}
                   </div>
                 </td>
@@ -459,7 +457,7 @@ export default function LeadsPage() {
               key={k.v}
               onClick={() => setStatus(status === k.v ? 'all' : k.v)}
               aria-pressed={status === k.v}
-              className={cn(base, 'cursor-pointer', status === k.v && 'shadow-[0_0_0_2px_var(--signal),0_0_30px_-8px_var(--signal)]')}
+              className={cn(base, 'cursor-pointer', status === k.v && '!border-[var(--signal)]')}
               style={{ animationDelay: `${i * 50}ms` }}
             >
               {body}

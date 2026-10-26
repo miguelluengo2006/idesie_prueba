@@ -10,6 +10,7 @@ import Modal from '@/components/portal/Modal';
 import TagInput from '@/components/portal/TagInput';
 import { crm } from '@/components/portal/crmApi';
 import { timeAgo } from '@/components/portal/leadMeta';
+import WhatsAppMenu from '@/components/portal/WhatsAppMenu';
 import {
   CONTACT_SOURCES,
   STATUS_LABEL,
@@ -434,7 +435,7 @@ export default function ContactsPage() {
                 key={k.v}
                 onClick={() => setStatus(status === k.v ? 'all' : k.v)}
                 aria-pressed={status === k.v}
-                className={cn('card-liquid rounded-3xl p-4 text-left cursor-pointer pn-in', status === k.v && k.v !== 'all' && 'shadow-[0_0_0_2px_var(--signal),0_0_30px_-8px_var(--signal)]')}
+                className={cn('card-liquid rounded-3xl p-4 text-left cursor-pointer pn-in', status === k.v && k.v !== 'all' && '!border-[var(--signal)]')}
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <div className="pn-title mb-1.5">{k.label}</div>
@@ -493,7 +494,12 @@ export default function ContactsPage() {
                               {c.name && <span className="block text-xs text-white/50 truncate">{c.email}</span>}
                             </button>
                           </td>
-                          <td className="px-3 py-3 text-xs text-white/60 tabular-nums whitespace-nowrap">{c.phone || '—'}</td>
+                          <td className="px-3 py-3 text-xs text-white/60 tabular-nums whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                              {c.phone || '—'}
+                              <WhatsAppMenu phone={c.phone} name={c.name || c.email} className="!w-7 !h-7" />
+                            </span>
+                          </td>
                           <td className="px-3 py-3 text-xs text-white/60 max-w-[160px] truncate">{c.company || '—'}</td>
                           <td className="px-3 py-3 max-w-[220px]">
                             <div className="flex flex-wrap gap-1">
@@ -528,7 +534,12 @@ export default function ContactsPage() {
                           </div>
                           <div className="flex items-center gap-x-3 gap-y-0.5 text-xs text-white/50 mt-1 flex-wrap">
                             {c.name && <span className="flex items-center gap-1 truncate max-w-[240px]"><Mail className="w-3 h-3 shrink-0" />{c.email}</span>}
-                            {c.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3 shrink-0" />{c.phone}</span>}
+                            {c.phone && (
+                              <span className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                <Phone className="w-3 h-3 shrink-0" />{c.phone}
+                                <WhatsAppMenu phone={c.phone} name={c.name || c.email} className="!w-7 !h-7" />
+                              </span>
+                            )}
                             {c.company && <span className="flex items-center gap-1 truncate"><Building2 className="w-3 h-3 shrink-0" />{c.company}</span>}
                           </div>
                           {c.tags.length > 0 && (

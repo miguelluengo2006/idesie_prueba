@@ -11,7 +11,6 @@ import {
   GraduationCap,
   Inbox,
   Megaphone,
-  MessageCircle,
   Phone,
   PhoneCall,
   Sparkles,
@@ -22,7 +21,8 @@ import { cn } from '@/lib/utils';
 import { formatCallDate, formatCallTime, callDayKey, todayInBookingTz, addDays } from '@/lib/booking';
 import { useLeadsContext, newRequests, upcomingCalls, isPendingCall } from '@/app/portal/leads/context';
 import type { Lead } from '@/app/portal/leads/context';
-import { statusMeta, timeAgo, whatsappUrl } from '@/components/portal/leadMeta';
+import { leadWaContext, statusMeta, timeAgo } from '@/components/portal/leadMeta';
+import WhatsAppMenu from '@/components/portal/WhatsAppMenu';
 import { CountUp, EmptyState, Page, Panel, Skeleton, Sparkline, untilLabel } from '@/components/portal/ui';
 import ActivityChart from './ActivityChart';
 
@@ -181,7 +181,6 @@ export default function AdminDashboard() {
   }
 
   const next = stats.next;
-  const nextWa = whatsappUrl(next?.phone);
   const todos: { n: number; label: string; href: string; icon: React.ReactNode }[] = [
     { n: stats.newList.length, label: stats.newList.length === 1 ? 'lead por responder' : 'leads por responder', href: '/portal/leads', icon: <Inbox className="w-4 h-4" /> },
     { n: stats.unmarked, label: stats.unmarked === 1 ? 'llamada sin marcar' : 'llamadas sin marcar', href: '/portal/calls', icon: <PhoneCall className="w-4 h-4" /> },
@@ -214,11 +213,7 @@ export default function AdminDashboard() {
                       <Phone className="w-4 h-4" /> Llamar
                     </a>
                   )}
-                  {nextWa && (
-                    <a href={nextWa} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/15 text-sm hover:border-[var(--portal-line-strong)]">
-                      <MessageCircle className="w-4 h-4 text-green-400" /> WhatsApp
-                    </a>
-                  )}
+                  <WhatsAppMenu phone={next.phone} name={next.name} status={next.status} context={leadWaContext(next)} variant="button" className="!h-auto !py-2.5 !px-4 !text-sm" />
                   <Link href={`/portal/calls?open=${next.id}`} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/15 text-sm hover:border-[var(--portal-line-strong)]">
                     <UserRound className="w-4 h-4" /> Ver ficha
                   </Link>
@@ -412,7 +407,7 @@ export default function AdminDashboard() {
                     <span className="tabular-nums"><b>{row.v}</b><span className="text-white/35 text-xs ml-1.5">{pct}%</span></span>
                   </div>
                   <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden">
-                    <div className="h-full rounded-full bg-gradient-to-r from-[var(--signal-dim)] to-[var(--signal)] shadow-[0_0_12px_var(--portal-glow)] transition-[width] duration-700" style={{ width: `${Math.max(pct, row.v ? 3 : 0)}%` }} />
+                    <div className="h-full rounded-full bg-[var(--signal)] transition-[width] duration-700" style={{ width: `${Math.max(pct, row.v ? 3 : 0)}%` }} />
                   </div>
                 </li>
               );

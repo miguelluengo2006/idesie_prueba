@@ -1186,16 +1186,16 @@ select {
   --signal: #0063e6;
   --signal-dim: #0052cc;
   --portal-ink: #0d1522;
-  --portal-line: rgba(13, 21, 34, 0.13);
-  --portal-line-strong: rgba(13, 21, 34, 0.3);
-  --portal-glow: rgba(16, 58, 122, 0.16);
+  --portal-line: rgba(13, 21, 34, 0.09);
+  --portal-line-strong: rgba(13, 21, 34, 0.14);
+  --portal-glow: rgba(16, 58, 122, 0.1);
+  --portal-muted: rgba(13, 21, 34, 0.56);
   position: relative;
   isolation: isolate;
-  background:
-    radial-gradient(900px 480px at 92% -10%, rgba(30, 86, 170, 0.13), transparent 62%),
-    radial-gradient(760px 420px at -8% 108%, rgba(56, 160, 200, 0.07), transparent 58%),
-    #edf2fa;
+  /* Un solo fondo liso: el color lo ponen los datos y las acciones, no el marco */
+  background: #f6f8fb;
   color: var(--portal-ink);
+  font-feature-settings: 'cv11', 'ss01';
 }
 .portal-ui [class*='border-white/'],
 .portal-ui [class*='border-gray-'] {
@@ -1205,20 +1205,21 @@ select {
 .portal-ui [class*='divide-gray-'] > * {
   border-color: var(--portal-line);
 }
-/* Tarjetas: papel blanco con borde fino y una sombra suave */
+/* Tarjetas: papel blanco plano con un borde fino. Sin sombras de relieve: se separan del fondo por el tono. */
 .portal-ui .card-liquid {
   background: #ffffff;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border: 1px solid var(--portal-line);
-  box-shadow: 0 1px 2px rgba(13, 21, 34, 0.05), 0 14px 34px -22px rgba(13, 21, 34, 0.25);
+  border-radius: 16px;
+  box-shadow: none;
 }
 .portal-ui .card-liquid-interactive:hover,
 .portal-ui button.card-liquid:hover,
 .portal-ui a.card-liquid:hover {
   transform: none;
   border-color: var(--portal-line-strong);
-  box-shadow: 0 1px 2px rgba(13, 21, 34, 0.06), 0 18px 38px -20px rgba(13, 21, 34, 0.3);
+  box-shadow: none;
 }
 .portal-ui input,
 .portal-ui select,
@@ -1230,16 +1231,23 @@ select {
 .portal-ui textarea:focus,
 .portal-ui select:focus {
   border-color: var(--signal);
-  box-shadow: 0 0 0 3px rgba(16, 58, 122, 0.16);
+  box-shadow: 0 0 0 3px rgba(0, 99, 230, 0.14);
 }
-/* Títulos en display; etiquetas y cifras en monoespaciada */
+/* Solo el título de cada página va en display; todo lo demás, en la tipografía de texto */
 .portal-ui h1 {
   font-family: var(--font-display);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
-.portal-ui [class*='uppercase'][class*='tracking-'],
+/* Cifras que se alinean, y etiquetas en frase normal: nada de mayúsculas espaciadas ni monoespaciada */
 .portal-ui .tabular-nums {
-  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.portal-ui [class*='uppercase'][class*='tracking-'] {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--portal-muted);
 }
 /* Fondo de las ventanas emergentes */
 .portal-ui .fixed.inset-0[class*='bg-black/'] {
@@ -1254,8 +1262,8 @@ select {
   background: var(--signal);
   color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(13, 21, 34, 0.2), 0 8px 18px -8px rgba(16, 58, 122, 0.55);
-  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  box-shadow: none;
+  transition: background 0.15s, transform 0.15s;
 }
 .portal-ui .portal-cta:hover { background: var(--signal-dim); }
 .portal-ui .portal-cta:active { transform: translateY(1px); }
@@ -1292,16 +1300,13 @@ select {
   animation: pn-shimmer 1.4s linear infinite;
 }
 .portal-ui .pn-live { animation: pn-pulse-ring 1.8s ease-out infinite; }
-/* Tarjeta destacada: blanco con un toque de verde */
+/* Tarjeta destacada: la misma superficie plana, con más aire */
 .portal-ui .pn-hero {
   position: relative;
   overflow: hidden;
-  border-radius: 24px;
-  border: 1px solid var(--portal-line-strong);
-  background:
-    radial-gradient(520px 200px at 100% 0%, rgba(30, 86, 170, 0.18), transparent 65%),
-    linear-gradient(160deg, #ffffff, #e8eef8);
-  box-shadow: 0 1px 2px rgba(13, 21, 34, 0.06), 0 26px 60px -34px rgba(16, 58, 122, 0.45);
+  border-radius: 20px;
+  border: 1px solid var(--portal-line);
+  background: #ffffff;
 }
 .portal-ui .pn-chip {
   display: inline-flex;
@@ -1311,7 +1316,7 @@ select {
   border-radius: 999px;
   border: 1px solid var(--portal-line-strong);
   background: #ffffff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: rgba(13, 21, 34, 0.72);
   white-space: nowrap;
@@ -1321,19 +1326,15 @@ select {
 .portal-ui button.pn-chip:hover { color: var(--portal-ink); border-color: var(--signal); }
 .portal-ui .pn-chip[aria-pressed='true'],
 .portal-ui .pn-chip[aria-selected='true'] {
-  background: var(--signal);
-  border-color: transparent;
-  color: #ffffff;
+  background: rgba(0, 99, 230, 0.09);
+  border-color: rgba(0, 99, 230, 0.45);
+  color: var(--signal);
   font-weight: 600;
-  box-shadow: 0 6px 14px -8px rgba(16, 58, 122, 0.6);
 }
 .portal-ui .pn-title {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(13, 21, 34, 0.52);
-  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--portal-muted);
 }
 .portal-ui .pn-row { transition: background 0.15s, border-color 0.15s; }
 .portal-ui .pn-row:hover { background: rgba(13, 21, 34, 0.035); }

@@ -1,5 +1,6 @@
 import type { Lead } from '@/app/portal/leads/context';
-import { PIPELINE, type LeadStatus } from '@/lib/admissions';
+import { PIPELINE, type Cohort, type LeadStatus } from '@/lib/admissions';
+import type { WaContext } from '@/lib/whatsapp';
 
 export type { LeadStatus };
 
@@ -87,4 +88,12 @@ export function leadNote(message: string | null | undefined): string {
     .filter((line) => !/^(Interés|Origen):/.test(line) && line.trim() !== 'Sin comentarios adicionales.')
     .join('\n')
     .trim();
+}
+
+/** Lo que el mensaje de WhatsApp necesita saber de un lead: qué le interesa, su llamada y su convocatoria. */
+export function leadWaContext(l: Pick<Lead, 'answers' | 'message' | 'kind' | 'call_at' | 'cohort_id'>, cohorts: Cohort[] = []): Omit<WaContext, 'name'> {
+  const cohort = cohorts.find((c) => c.id === l.cohort_id);
+  // «Máster BIM Full Time · landing» → «Máster BIM Full Time»: el sufijo es de dónde vino, no del programa
+  const interest = leadInterest(l)?.replace(/\s·\s(landing|admisión)$/i, '') || null;
+  return { interest, callAt: l.kind === 'call' ? l.call_at : null, cohortName: cohort?.name, startsAt: cohort?.starts_at };
 }

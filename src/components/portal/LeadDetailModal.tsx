@@ -23,7 +23,8 @@ import {
 import type { Lead } from '@/app/portal/leads/context';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
 import { formatCallDate, formatCallTime } from '@/lib/booking';
-import { contactKeys, statusMeta, statusOptions, timeAgo } from '@/components/portal/leadMeta';
+import { contactKeys, leadWaContext, statusMeta, statusOptions, timeAgo } from '@/components/portal/leadMeta';
+import WhatsAppMenu from '@/components/portal/WhatsAppMenu';
 import { formatStartDate, type Cohort } from '@/lib/admissions';
 import { cn } from '@/lib/utils';
 
@@ -159,7 +160,7 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
         {/* Cabecera de la ficha */}
         <div className="px-5 pt-5 pb-4 border-b border-white/10 shrink-0">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl shrink-0 flex items-center justify-center font-kinetic text-lg text-[var(--signal)] bg-[var(--signal)]/10 border border-[var(--portal-line-strong)] shadow-[0_0_24px_-6px_var(--portal-glow)]">
+            <div className="w-14 h-14 rounded-2xl shrink-0 flex items-center justify-center font-kinetic text-lg text-[var(--signal)] bg-[var(--signal)]/10 border border-[var(--portal-line-strong)]">
               {initials(lead.name)}
             </div>
             <div className="min-w-0 flex-1">
@@ -203,7 +204,7 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
               <a href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`} className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] hover:border-[var(--portal-line-strong)] py-2 text-xs font-medium"><Phone className="w-3.5 h-3.5" />Llamar</a>
             ) : <span className="rounded-xl border border-white/5 py-2 text-xs text-white/25 flex items-center justify-center gap-1.5"><Phone className="w-3.5 h-3.5" />Sin teléfono</span>}
             {lead.phone && phoneDigits.length >= 8 ? (
-              <a href={`https://wa.me/${phoneDigits}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] hover:border-[var(--portal-line-strong)] py-2 text-xs font-medium text-green-400"><MessageCircle className="w-3.5 h-3.5" />WhatsApp</a>
+              <WhatsAppMenu phone={lead.phone} name={lead.name} status={lead.status} context={leadWaContext(lead, cohorts)} variant="button" className="!h-auto !rounded-xl !py-2 !border-white/10 w-full" />
             ) : <span className="rounded-xl border border-white/5 py-2 text-xs text-white/25 flex items-center justify-center gap-1.5"><MessageCircle className="w-3.5 h-3.5" />WhatsApp</span>}
             {lead.email ? (
               <a href={`mailto:${lead.email}`} className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] hover:border-[var(--portal-line-strong)] py-2 text-xs font-medium"><Mail className="w-3.5 h-3.5" />Email</a>
@@ -416,7 +417,7 @@ export default function LeadDetailModal({ lead, onClose, accessToken, onChange, 
                 const current = l.id === lead.id;
                 return (
                   <li key={l.id} className="relative">
-                    <span className={cn('absolute -left-5 top-3 w-3.5 h-3.5 rounded-full border-2 bg-black', current ? 'border-[var(--signal)] shadow-[0_0_10px_var(--signal)]' : 'border-white/30')} />
+                    <span className={cn('absolute -left-5 top-3 w-3.5 h-3.5 rounded-full border-2 bg-black', current ? 'border-[var(--signal)]' : 'border-white/30')} />
                     <button
                       onClick={() => (current ? setTab('resumen') : onOpenLead?.(l.id))}
                       className="w-full text-left rounded-xl border border-white/10 bg-white/[0.03] hover:border-[var(--portal-line-strong)] px-3.5 py-3 cursor-pointer transition-colors"
