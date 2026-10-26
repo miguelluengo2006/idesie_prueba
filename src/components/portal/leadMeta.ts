@@ -12,8 +12,10 @@ interface StatusMeta {
 
 const BASE: Record<LeadStatus, Omit<StatusMeta, 'label'>> = {
   new: { badgeClass: 'bg-[var(--signal)]/15 text-[var(--signal)] border border-[var(--signal)]/30', dotColor: 'bg-[var(--signal)]' },
+  contacted: { badgeClass: 'bg-sky-500/10 text-sky-400 border border-sky-500/25', dotColor: 'bg-sky-400' },
   admission: { badgeClass: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/25', dotColor: 'bg-yellow-400' },
   call: { badgeClass: 'bg-blue-500/10 text-blue-400 border border-blue-500/20', dotColor: 'bg-blue-400' },
+  followup: { badgeClass: 'bg-orange-500/10 text-orange-400 border border-orange-500/25', dotColor: 'bg-orange-400' },
   enrolled: { badgeClass: 'bg-olive-500/10 text-olive-400 border border-olive-500/20', dotColor: 'bg-olive-400' },
   paid: { badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/25', dotColor: 'bg-green-400' },
   lost: { badgeClass: 'bg-gray-800/30 text-gray-400 border border-gray-700', dotColor: 'bg-gray-500' },

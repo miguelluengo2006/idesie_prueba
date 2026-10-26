@@ -12,9 +12,11 @@ describe('etapas del embudo', () => {
   });
 
   it('avanza de una etapa a la siguiente y se detiene en pagado', () => {
-    expect(nextStatus('new')).toBe('admission');
+    expect(nextStatus('new')).toBe('contacted');
+    expect(nextStatus('contacted')).toBe('admission');
     expect(nextStatus('admission')).toBe('call');
-    expect(nextStatus('call')).toBe('enrolled');
+    expect(nextStatus('call')).toBe('followup');
+    expect(nextStatus('followup')).toBe('enrolled');
     expect(nextStatus('enrolled')).toBe('paid');
     expect(nextStatus('paid')).toBeNull();
     expect(nextStatus('lost')).toBeNull();
@@ -78,8 +80,8 @@ describe('convocatorias', () => {
 describe('línea de tiempo del proceso', () => {
   it('cuenta cuántos han llegado a cada etapa, sin los descartados', () => {
     const leads = [{ status: 'new' }, { status: 'admission' }, { status: 'call' }, { status: 'paid' }, { status: 'paid' }, { status: 'lost' }];
-    expect(reachCounts(leads)).toEqual({ new: 5, admission: 4, call: 3, enrolled: 2, paid: 2 });
-    expect(reachCounts([])).toEqual({ new: 0, admission: 0, call: 0, enrolled: 0, paid: 0 });
+    expect(reachCounts(leads)).toEqual({ new: 5, contacted: 4, admission: 4, call: 3, followup: 2, enrolled: 2, paid: 2 });
+    expect(reachCounts([])).toEqual({ new: 0, contacted: 0, admission: 0, call: 0, followup: 0, enrolled: 0, paid: 0 });
   });
 
   it('calcula qué porcentaje pasa a la siguiente etapa', () => {

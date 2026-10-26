@@ -6,6 +6,8 @@ import {
   ArrowRight,
   BellRing,
   Building2,
+  CalendarClock,
+  MessageSquareText,
   Check,
   CreditCard,
   Download,
@@ -437,11 +439,13 @@ export default function LeadsPage() {
       />
 
       {/* Resumen por etapa: en la lista, cada tarjeta filtra */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3">
         {([
           { v: 'new', label: 'Nuevos', icon: BellRing, tone: 'text-[var(--signal)]' },
+          { v: 'contacted', label: 'Contactados', icon: MessageSquareText, tone: 'text-sky-400' },
           { v: 'admission', label: 'Admisión', icon: Inbox, tone: 'text-yellow-400' },
           { v: 'call', label: 'Llamada', icon: PhoneCall, tone: 'text-blue-400' },
+          { v: 'followup', label: 'Seguimiento', icon: CalendarClock, tone: 'text-orange-400' },
           { v: 'enrolled', label: 'Matriculados', icon: UserCheck, tone: 'text-olive-400' },
           { v: 'paid', label: 'Pagados', icon: CreditCard, tone: 'text-green-400' },
         ] as const).map((k, i) => {

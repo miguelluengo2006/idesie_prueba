@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, BellRing, ClipboardList, CreditCard, PhoneCall, Plus, UserCheck, UserX, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BellRing, CalendarClock, ClipboardList, MessageSquareText, CreditCard, PhoneCall, Plus, UserCheck, UserX, type LucideIcon } from 'lucide-react';
 import type { Lead } from '@/app/portal/leads/context';
 import { PIPELINE, passRate, reachCounts, sinceLabel, type Cohort, type LeadStatus, type Stage } from '@/lib/admissions';
 import { leadChannel, leadInterest, leadWaContext, statusMeta } from '@/components/portal/leadMeta';
@@ -12,8 +12,10 @@ import { cn } from '@/lib/utils';
 
 const STAGE_ICON: Record<Stage, LucideIcon> = {
   new: BellRing,
+  contacted: MessageSquareText,
   admission: ClipboardList,
   call: PhoneCall,
+  followup: CalendarClock,
   enrolled: UserCheck,
   paid: CreditCard,
 };
@@ -92,7 +94,7 @@ export default function ProcessTimeline({
           {PIPELINE.slice(0, -1).map((p, i) => {
             const rate = passRate(reach[p.status], reach[PIPELINE[i + 1].status]);
             return (
-              <div key={p.status} className="absolute top-0 -translate-y-1/2" style={{ left: `${(i + 0.5) * 20}%`, width: '20%' }}>
+              <div key={p.status} className="absolute top-0 -translate-y-1/2" style={{ left: `${(i + 0.5) * (100 / PIPELINE.length)}%`, width: `${100 / PIPELINE.length}%` }}>
                 <div className="h-[3px] rounded-full bg-[var(--portal-line-strong)] mx-[26px] overflow-hidden">
                   <motion.div
                     className="h-full origin-left rounded-full bg-[var(--signal)]"
@@ -111,7 +113,7 @@ export default function ProcessTimeline({
           })}
         </div>
 
-        <ol className="grid gap-x-3 gap-y-8 lg:grid-cols-5">
+        <ol className="grid gap-x-3 gap-y-8 lg:grid-cols-7">
           {PIPELINE.map((p, i) => {
             const rows = byStage.get(p.status) || [];
             const Icon = STAGE_ICON[p.status];

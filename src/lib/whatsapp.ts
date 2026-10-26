@@ -7,12 +7,13 @@ import { whatsappDigits } from '@/lib/contact';
 import { formatCallDate, formatCallTime } from '@/lib/booking';
 import { formatStartDate, type LeadStatus } from '@/lib/admissions';
 
-export type WaIntent = 'call' | 'reminder' | 'info' | 'admission' | 'enrol' | 'welcome' | 'blank';
+export type WaIntent = 'call' | 'reminder' | 'info' | 'followup' | 'admission' | 'enrol' | 'welcome' | 'blank';
 
 export const WA_INTENTS: { id: WaIntent; label: string; hint: string }[] = [
   { id: 'call', label: 'Agendar una llamada', hint: 'Le pasas tu calendario para que elija hueco' },
   { id: 'reminder', label: 'Recordar la llamada', hint: 'Avisa del día y la hora, o le deja cambiarla' },
   { id: 'info', label: 'Enviar información', hint: 'Responde a su interés y pregunta qué necesita' },
+  { id: 'followup', label: 'Hacer seguimiento', hint: 'Retoma la conversación y pregunta si sigue interesado' },
   { id: 'admission', label: 'Seguimiento de admisión', hint: 'Pregunta cómo va y si le falta algo' },
   { id: 'enrol', label: 'Confirmar matrícula', hint: 'Su plaza está reservada; falta el pago' },
   { id: 'welcome', label: 'Dar la bienvenida', hint: 'Ya ha pagado: confirma su plaza' },
@@ -23,6 +24,8 @@ export const WA_INTENTS: { id: WaIntent; label: string; hint: string }[] = [
 export function suggestedIntent(status: LeadStatus | string | null | undefined): WaIntent {
   switch (status) {
     case 'new': return 'call';
+    case 'contacted': return 'info';
+    case 'followup': return 'followup';
     case 'admission': return 'admission';
     case 'call': return 'reminder';
     case 'enrolled': return 'enrol';
@@ -72,6 +75,8 @@ export function waMessage(intent: WaIntent, ctx: WaContext = {}): string {
     }
     case 'info':
       return `${hello} Gracias por tu interés${about}. ¿Qué te gustaría saber? Te cuento el plan de estudios, las fechas y cómo funciona la admisión.`;
+    case 'followup':
+      return `${hello} Te escribo para retomar lo que hablamos${about}. ¿Sigues interesado? Si te surge cualquier duda, dímelo y lo resolvemos, o reserva una llamada aquí: ${calendar}`;
     case 'admission':
       return `${hello} ¿Cómo va todo con tu proceso de admisión${about}? Si tienes alguna duda o te falta algún documento, dímelo y lo vemos juntos.`;
     case 'enrol':

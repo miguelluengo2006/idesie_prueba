@@ -3,7 +3,7 @@
  * Lo comparten el panel y la API, así que no importa nada del navegador.
  */
 
-export const LEAD_STATUSES = ['new', 'admission', 'call', 'enrolled', 'paid', 'lost'] as const;
+export const LEAD_STATUSES = ['new', 'contacted', 'admission', 'call', 'followup', 'enrolled', 'paid', 'lost'] as const;
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
 
 export function isLeadStatus(v: unknown): v is LeadStatus {
@@ -16,8 +16,10 @@ export type Stage = Exclude<LeadStatus, 'lost'>;
 /** Etapas por orden, de la primera a la última. «Descartado» queda fuera: no es un paso del camino. */
 export const PIPELINE: { status: Stage; label: string; hint: string }[] = [
   { status: 'new', label: 'Nuevo', hint: 'Sin atender' },
+  { status: 'contacted', label: 'Contactado', hint: 'Ya hemos hablado con él' },
   { status: 'admission', label: 'Admisión', hint: 'En proceso de admisión' },
   { status: 'call', label: 'Llamada', hint: 'Llamada agendada o hecha' },
+  { status: 'followup', label: 'Seguimiento', hint: 'Pendiente de decidir' },
   { status: 'enrolled', label: 'Matriculado', hint: 'Ha dado el paso' },
   { status: 'paid', label: 'Pagado', hint: 'Ya está en clase' },
 ];
@@ -103,7 +105,7 @@ export function defaultCohort(cohorts: Cohort[], now: Date = new Date()): Cohort
 
 /** Cuántos han llegado al menos a cada etapa (un pagado cuenta en todas las anteriores). Los descartados no cuentan. */
 export function reachCounts(leads: { status: string }[]): Record<Stage, number> {
-  const out: Record<Stage, number> = { new: 0, admission: 0, call: 0, enrolled: 0, paid: 0 };
+  const out: Record<Stage, number> = { new: 0, contacted: 0, admission: 0, call: 0, followup: 0, enrolled: 0, paid: 0 };
   for (const l of leads) {
     if (!isLeadStatus(l.status) || l.status === 'lost') continue;
     for (const p of PIPELINE) if (reachedStatus(l.status, p.status)) out[p.status] += 1;

@@ -25,7 +25,7 @@ describe('lead en el panel', () => {
   });
 
   it('ofrece las etapas del embudo en orden y con el mismo nombre para solicitudes y llamadas', () => {
-    expect(statusOptions('proposal').map((o) => o.label)).toEqual(['Nuevo', 'Admisión', 'Llamada', 'Matriculado', 'Pagado', 'Descartado']);
+    expect(statusOptions('proposal').map((o) => o.label)).toEqual(['Nuevo', 'Contactado', 'Admisión', 'Llamada', 'Seguimiento', 'Matriculado', 'Pagado', 'Descartado']);
     expect(statusOptions('call')).toEqual(statusOptions('proposal'));
     expect(statusMeta('paid', 'call').label).toBe('Pagado');
   });

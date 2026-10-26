@@ -63,7 +63,7 @@ export default function ProcessPage() {
   if (loading) {
     return (
       <Page title="Proceso de admisión">
-        <div className="grid gap-3 lg:grid-cols-5">{[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-64" />)}</div>
+        <div className="grid gap-3 lg:grid-cols-7">{[0, 1, 2, 3, 4, 5, 6].map((i) => <Skeleton key={i} className="h-64" />)}</div>
       </Page>
     );
   }
