@@ -120,9 +120,9 @@ export async function POST(req: NextRequest) {
 
     let emailSent = false;
     try {
-      // Se envía con el mismo correo que los avisos (Resend o el SMTP de Ajustes), pero al invitado
+      // Se envía con el mismo Resend que los avisos, pero al invitado
       const mailer = await resolveLeadMailer(supabaseAdmin, effectiveOwnerId);
-      if (!mailer) throw new Error('No hay correo configurado (Ajustes → Email)');
+      if (!mailer) throw new Error('No hay correo configurado (RESEND_API_KEY)');
       const mail = teamInviteEmail({ ownerName, role: role || 'member', inviteUrl });
       await sendLeadMail({ ...mailer, to: normalizedEmail }, { ...mail, idempotencyKey: `team-invite-${token}` });
       emailSent = true;

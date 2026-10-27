@@ -23,8 +23,6 @@ function SettingsLayoutInner({ children }: { children: React.ReactNode }) {
     const hash = window.location.hash.replace('#', '');
     if (hash === 'branding' || hash === 'team-members') {
       if (activeTab !== 'company') router.replace('/portal/settings?tab=company#' + hash);
-    } else if (hash === 'smtp') {
-      if (activeTab !== 'connections') router.replace('/portal/settings?tab=connections#' + hash);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -55,14 +53,9 @@ function SettingsLayoutInner({ children }: { children: React.ReactNode }) {
     { id: 'branding', label: 'Nombre y logo' },
   ];
 
-  const connectionsSubItems = [
-    { id: 'smtp', label: 'Email (avisos y campañas)' },
-  ];
-
   const tabs: { id: SettingsTab; label: string; subItems: { id: string; label: string }[] }[] = [
     { id: 'account', label: 'Cuenta', subItems: accountSubItems },
     { id: 'company', label: 'Empresa', subItems: companySubItems },
-    { id: 'connections', label: 'Email', subItems: connectionsSubItems },
   ];
 
   // Only the agency sees company/connection settings; clients and registered visitors just get their own account

@@ -23,11 +23,10 @@ de tu cuenta de Resend**. Sirve para probar, no para producción.
 
 Sin `LEAD_NOTIFY_EMAIL`, el aviso va al email de la cuenta del panel (o a `ADMIN_EMAIL`).
 
-## Orden de prioridad
+## Solo Resend
 
-1. Resend (`RESEND_API_KEY`)
-2. SMTP guardado en Ajustes → Pagos y email
-3. SMTP de las variables `SMTP_*` + `ADMIN_EMAIL`
+Todos los correos (avisos, invitaciones de equipo y campañas) salen por Resend. No hay SMTP: sin `RESEND_API_KEY`
+los leads se guardan igual, pero no se envía ningún correo y las campañas no se pueden enviar.
 
 ## Qué correos se envían
 

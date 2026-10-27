@@ -30,7 +30,7 @@ function sanitizeUtm(input: any): Record<string, string> | null {
 //   kind "proposal" → free-text proposal request (default when no kind is sent)
 //   source "landing" → the ads landing form: WhatsApp + name (+ business/interest); email is optional
 //                      and ad attribution (utm_*, fbclid) is stored with the lead
-// Always persisted as a lead first, so nothing is lost even if SMTP isn't configured.
+// Always persisted as a lead first, so nothing is lost even if Resend isn't configured.
 // Email notification to the agency is best-effort on top of that.
 export async function POST(req: NextRequest) {
   try {
@@ -198,7 +198,7 @@ export async function POST(req: NextRequest) {
         console.error('Contact form: lead saved but email notification failed:', emailError);
       }
     } else {
-      console.warn('Contact form: no email configured (RESEND_API_KEY, Ajustes → Email, or SMTP_* env vars) — lead saved, no email sent.');
+      console.warn('Contact form: no email configured (RESEND_API_KEY) — lead saved, no email sent.');
     }
 
     return NextResponse.json({ success: true, id: lead?.id });

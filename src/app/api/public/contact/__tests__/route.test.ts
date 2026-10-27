@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
@@ -51,7 +51,6 @@ vi.mock('@/lib/packs', async (orig) => {
   return { ...actual, welcomeSpots: () => ({ ...actual.welcomeSpots(), soldOut: state.soldOut }) };
 });
 vi.mock('@/lib/encryption', () => ({ decrypt: (v: string) => v.replace('enc:', '') }));
-vi.mock('nodemailer', () => ({ default: { createTransport: () => ({ sendMail }) } }));
 
 import { POST } from '../route';
 
@@ -80,8 +79,19 @@ beforeEach(() => {
   upsertContacts.mockClear();
   upsertContacts.mockResolvedValue({ created: 1, updated: 0, invalid: 0 });
   delete process.env.ADMIN_EMAIL;
-  delete process.env.SMTP_USER;
-  delete process.env.SMTP_PASS;
+  delete process.env.LEAD_NOTIFY_EMAIL;
+  delete process.env.RESEND_API_KEY;
+  delete process.env.RESEND_FROM;
+  // Lo que se manda a Resend queda en `sendMail` con el mismo formato que usan las aserciones
+  vi.stubGlobal('fetch', async (_url: string, init: any) => {
+    const b = JSON.parse(init.body);
+    await sendMail({ ...b, to: b.to.join(', '), replyTo: b.reply_to });
+    return { ok: true, json: async () => ({ id: 'e1' }) };
+  });
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 // ─── Booked call ──────────────────────────────────────────────────────────────
@@ -198,10 +208,9 @@ describe('POST /api/public/contact — landing lead', () => {
     expect(res.status).toBe(400);
   });
 
-  it('emails the agency about the lead when SMTP is configured', async () => {
+  it('emails the agency about the lead when Resend is configured', async () => {
     process.env.ADMIN_EMAIL = 'agencia@example.com';
-    process.env.SMTP_USER = 'user';
-    process.env.SMTP_PASS = 'pass';
+    process.env.RESEND_API_KEY = 're_test';
     await post(lead());
     expect(sendMail).toHaveBeenCalledTimes(1);
     const mail = sendMail.mock.calls[0][0];
@@ -264,8 +273,7 @@ describe('POST /api/public/contact — Pack de Bienvenida', () => {
 
   it('includes the pack in the notification email', async () => {
     process.env.ADMIN_EMAIL = 'agencia@example.com';
-    process.env.SMTP_USER = 'user';
-    process.env.SMTP_PASS = 'pass';
+    process.env.RESEND_API_KEY = 're_test';
     await post(pack());
     expect(sendMail.mock.calls[0][0].html).toContain('Pack de Bienvenida');
     expect(sendMail.mock.calls[0][0].html).toContain('Vela de soja');
@@ -277,28 +285,21 @@ describe('POST /api/public/contact — Pack de Bienvenida', () => {
 describe('POST /api/public/contact — who gets the notification', () => {
   const lead = { source: 'landing', kind: 'proposal', name: 'Ana', phone: '+34 600 000 000' };
 
-  it('uses the SMTP saved in the panel and notifies the owner account', async () => {
-    state.ownerMail = {
-      email: 'duena@agencia.com',
-      agency_smtp_enabled: true,
-      agency_smtp_host: 'smtp.agencia.com',
-      agency_smtp_port: 465,
-      agency_smtp_user: 'envios@agencia.com',
-      agency_smtp_sender: 'Agencia <envios@agencia.com>',
-      agency_smtp_pass_encrypted: 'enc:secreto',
-    };
+  it('notifies LEAD_NOTIFY_EMAIL from RESEND_FROM when both are set', async () => {
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.RESEND_FROM = 'IDESIE <info@idesie.com>';
+    process.env.LEAD_NOTIFY_EMAIL = 'avisos@idesie.com';
+    state.ownerMail = { email: 'duena@agencia.com' };
     await post(lead);
     expect(sendMail).toHaveBeenCalledTimes(1);
-    expect(sendMail.mock.calls[0][0]).toMatchObject({ to: 'duena@agencia.com', from: 'Agencia <envios@agencia.com>' });
+    expect(sendMail.mock.calls[0][0]).toMatchObject({ to: 'avisos@idesie.com', from: 'IDESIE <info@idesie.com>' });
   });
 
-  it('falls back to the env configuration when the panel SMTP is off', async () => {
-    process.env.ADMIN_EMAIL = 'env@agencia.com';
-    process.env.SMTP_USER = 'user';
-    process.env.SMTP_PASS = 'pass';
-    state.ownerMail = { email: 'duena@agencia.com', agency_smtp_enabled: false };
+  it('falls back to the owner account email without LEAD_NOTIFY_EMAIL', async () => {
+    process.env.RESEND_API_KEY = 're_test';
+    state.ownerMail = { email: 'duena@agencia.com' };
     await post(lead);
-    expect(sendMail.mock.calls[0][0].to).toBe('env@agencia.com');
+    expect(sendMail.mock.calls[0][0].to).toBe('duena@agencia.com');
   });
 
   it('still saves the lead when no email is configured at all', async () => {
@@ -310,9 +311,8 @@ describe('POST /api/public/contact — who gets the notification', () => {
 
   it('still saves the lead when sending the email fails', async () => {
     process.env.ADMIN_EMAIL = 'env@agencia.com';
-    process.env.SMTP_USER = 'user';
-    process.env.SMTP_PASS = 'pass';
-    sendMail.mockRejectedValueOnce(new Error('SMTP down'));
+    process.env.RESEND_API_KEY = 're_test';
+    sendMail.mockRejectedValueOnce(new Error('Resend down'));
     const res = await post(lead);
     expect(res.status).toBe(200);
     expect(state.inserted).not.toBeNull();

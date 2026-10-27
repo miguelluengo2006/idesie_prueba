@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { AccountSettings } from '@/components/settings/AccountSettings';
 import { AgencyBranding } from '@/components/settings/AgencyBranding';
 import { TeamMembers } from '@/components/settings/TeamMembers';
-import { PlatformSettings } from '@/components/settings/PlatformSettings';
 import { PasskeysSettings } from '@/components/settings/PasskeysSettings';
 import { usePortalRoleContext } from '@/app/portal/context';
 import { useSettingsContext } from './context';
@@ -58,12 +57,6 @@ export default function PortalSettingsPage() {
             </div>
 
           </>
-        )}
-
-        {activeTab === 'connections' && (
-          <div className='space-y-8'>
-            <PlatformSettings />
-          </div>
         )}
 
       </div>

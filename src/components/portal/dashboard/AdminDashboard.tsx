@@ -295,10 +295,9 @@ export default function AdminDashboard() {
 
       {leads.length === 0 && (
         <Panel title="Primeros pasos">
-          <ul className="grid gap-3 md:grid-cols-3">
+          <ul className="grid gap-3 md:grid-cols-2">
             {[
               { done: false, title: 'Comparte tu web', text: 'Cada llamada agendada y cada formulario aparecerá aquí al instante como un lead.', href: '/', label: 'Abrir la web', external: true },
-              { done: false, title: 'Configura el email', text: 'Lo necesitas para recibir avisos de cada lead y para enviar campañas.', href: '/portal/settings?tab=connections', label: 'Abrir ajustes' },
               { done: (crmSummary?.total || 0) > 0, title: 'Importa tus contactos', text: 'Sube un CSV con tus alumnos y empresas para empezar a hacer campañas.', href: '/portal/contacts', label: 'Ir a contactos' },
             ].map((step) => (
               <li key={step.title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex flex-col gap-2">

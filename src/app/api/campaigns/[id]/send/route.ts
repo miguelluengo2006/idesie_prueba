@@ -35,7 +35,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const mailer = await resolveLeadMailer(supabaseAdmin, auth.ownerId).catch(() => null);
   if (!mailer) {
     return NextResponse.json(
-      { error: 'Falta configurar el email de envío. Hazlo en Ajustes → Email y vuelve a intentarlo.' },
+      { error: 'Falta configurar Resend (RESEND_API_KEY en el servidor). Mira docs/EMAIL_RESEND.md y vuelve a intentarlo.' },
       { status: 400 }
     );
   }
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const contactById = new Map((contactRows || []).map((c) => [c.id, c]));
 
     const started = Date.now();
-    const throttle = mailer.provider === 'resend' ? 550 : 0; // Resend admite ~2 envíos por segundo
+    const throttle = 550; // Resend admite ~2 envíos por segundo
     const now = () => new Date().toISOString();
 
     for (const send of claimed || []) {

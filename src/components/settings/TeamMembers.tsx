@@ -72,7 +72,7 @@ export function TeamMembers() {
       }
 
       if (data.emailSent === false) {
-        setSuccess(`Invitation created for ${email.trim()} but email delivery failed — check your SMTP settings.`);
+        setSuccess(`Invitation created for ${email.trim()} but email delivery failed — check the Resend configuration.`);
       } else {
         setSuccess(`Invitation sent to ${email.trim()}`);
       }

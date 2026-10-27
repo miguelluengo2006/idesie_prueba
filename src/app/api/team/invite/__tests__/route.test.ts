@@ -24,7 +24,7 @@ vi.mock('@/lib/teamUtils', () => ({
   canManageTeam: vi.fn().mockReturnValue(true),
 }));
 vi.mock('@/lib/leadMailer', () => ({
-  resolveLeadMailer: vi.fn().mockResolvedValue({ provider: 'resend', to: 'owner@agency.com', from: 'samgple <a@b.c>', resendApiKey: 'k', origin: 'env', transport: {} }),
+  resolveLeadMailer: vi.fn().mockResolvedValue({ to: 'owner@agency.com', from: 'samgple <a@b.c>', resendApiKey: 'k' }),
   sendLeadMail: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -207,7 +207,7 @@ describe('POST /api/team/invite – success', () => {
     });
 
     const { sendLeadMail } = await import('@/lib/leadMailer');
-    (sendLeadMail as any).mockRejectedValueOnce(new Error('SMTP failure'));
+    (sendLeadMail as any).mockRejectedValueOnce(new Error('Resend failure'));
 
     const res = await POST(makePost({ email: 'newuser@test.com', role: 'member' }) as any);
     expect(res.status).toBe(200);

@@ -12,7 +12,7 @@ import { isPasskeySession, mustUsePasskey, sessionIdFromToken } from '@/lib/pass
  * owner's accepted team members act on their behalf.
  *
  * Anyone else who registers (visitors from the public site, invited clients) must never
- * reach routes that use the agency's own keys (SMTP, Telegram…). Those routes call
+ * reach routes that use the agency's own keys (Resend, Telegram…). Those routes call
  * requireAgencyPrincipal().
  */
 
