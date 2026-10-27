@@ -8,6 +8,9 @@ import { useAuth } from '@/components/AuthContext';
 import { cn } from '@/lib/utils';
 import { EmptyState, Page, Skeleton } from '@/components/portal/ui';
 import Modal from '@/components/portal/Modal';
+import EmailBlocks from '@/components/portal/EmailBlocks';
+import TemplatePicker from '@/components/portal/TemplatePicker';
+import CampaignResults from '@/components/portal/CampaignResults';
 import { crm } from '@/components/portal/crmApi';
 import { CAMPAIGN_BADGE } from '@/components/portal/campaignMeta';
 import {
@@ -20,6 +23,7 @@ import {
   type Campaign,
 } from '@/lib/campaigns';
 import { contactStatus, inAudience, tagCounts, type Contact } from '@/lib/contacts';
+import { insertBlock } from '@/lib/campaignTemplates';
 
 const fieldClass = 'w-full px-4 py-2.5 border border-[var(--portal-line-strong)] rounded-xl text-sm outline-none placeholder:text-white/30';
 const labelClass = 'block text-xs uppercase tracking-widest text-white/40 mb-1.5';
@@ -54,6 +58,7 @@ export default function CampaignEditorPage() {
   const [testing, setTesting] = useState(false);
   const [confirmSend, setConfirmSend] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [sendError, setSendError] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
@@ -218,6 +223,19 @@ export default function CampaignEditorPage() {
     setDirty(true);
   };
 
+  // Los bloques (título, botón, imagen…) se insertan en su propio párrafo donde está el cursor
+  const insertAtCursor = (block: string) => {
+    const el = bodyRef.current;
+    const at = el ? el.selectionEnd : body.length;
+    const next = insertBlock(body, block, at);
+    setBody(next.body);
+    setDirty(true);
+    requestAnimationFrame(() => {
+      el?.focus();
+      el?.setSelectionRange(next.cursor, next.cursor);
+    });
+  };
+
   const toggleTag = (tag: string) => {
     const has = audienceTags.some((t) => t.toLowerCase() === tag.toLowerCase());
     setAudienceTags(has ? audienceTags.filter((t) => t.toLowerCase() !== tag.toLowerCase()) : [...audienceTags, tag]);
@@ -320,6 +338,8 @@ export default function CampaignEditorPage() {
         </section>
       )}
 
+      {!isDraft && !interrupted && <CampaignResults token={token} campaignId={id} sentAt={campaign.sent_at} />}
+
       <div className="grid xl:grid-cols-[1fr_1fr] gap-5 items-start">
         {/* Editor */}
         <section className="card-liquid rounded-3xl p-5 md:p-6 space-y-5">
@@ -346,6 +366,11 @@ export default function CampaignEditorPage() {
                 </div>
               )}
             </div>
+            {isDraft && (
+              <div className="mb-2">
+                <EmailBlocks onInsert={insertAtCursor} onOpenTemplates={() => setShowTemplates(true)} />
+              </div>
+            )}
             <textarea
               id="cp-body"
               ref={bodyRef}
@@ -362,7 +387,8 @@ export default function CampaignEditorPage() {
               <ul className="mt-2 space-y-1 leading-relaxed">
                 <li>Deja una línea en blanco entre párrafos. Un salto de línea simple se respeta.</li>
                 <li><code>**negrita**</code> · <code>[texto del enlace](https://…)</code> · listas con <code>- </code> al inicio de cada línea.</li>
-                <li>Botón: <code>[[Texto del botón|https://…]]</code> en un párrafo suelto.</li>
+                <li>Cada bloque va en su propio párrafo: <code># Título</code> · <code>![descripción](https://…/imagen.jpg)</code> · <code>---</code> (separador).</li>
+                <li>Botón: <code>[[Texto del botón|https://…]]</code>, o <code>[[Texto|https://…|outline]]</code> con borde. Uno por párrafo.</li>
                 <li><code>{'{{nombre}}'}</code> y <code>{'{{empresa}}'}</code> se sustituyen por los datos de cada contacto. <code>{'{{nombre|amigo}}'}</code> usa «amigo» si no hay nombre.</li>
                 <li>El pie con tus datos y el enlace para darse de baja se añade solo.</li>
               </ul>
@@ -429,6 +455,20 @@ export default function CampaignEditorPage() {
           <iframe title="Vista previa del email" srcDoc={preview.html} sandbox="" className="w-full h-[560px] rounded-2xl border border-white/10 bg-white" />
         </section>
       </div>
+
+      {showTemplates && (
+        <TemplatePicker
+          token={token}
+          current={{ subject, body }}
+          onClose={() => setShowTemplates(false)}
+          onPick={(t) => {
+            setSubject(t.subject);
+            setBody(t.body);
+            setDirty(true);
+            setShowTemplates(false);
+          }}
+        />
+      )}
 
       {confirmSend && (
         <Modal title="¿Enviar la campaña?" onClose={() => setConfirmSend(false)}>

@@ -83,11 +83,16 @@ function inline(escaped: string): string {
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 }
 
-const BUTTON_RE = /^\[\[\s*([^|\]]+?)\s*\|\s*([^\]\s]+)\s*\]\]$/;
+/** [[Texto|https://…]] o [[Texto|https://…|outline]] (botón con borde, para la acción secundaria) */
+const BUTTON_RE = /^\[\[\s*([^|\]]+?)\s*\|\s*([^|\]\s]+)\s*(?:\|\s*(outline)\s*)?\]\]$/;
+const IMAGE_RE = /^!\[([^\]]*)\]\(([^)\s]+)\)$/;
+const HEADING_RE = /^(#{1,2})\s+(.+)$/;
+const DIVIDER_RE = /^(-{3,}|\*{3,})$/;
 
 /**
  * Cuerpo del editor → HTML del email. Formato: párrafos separados por una línea en blanco, **negrita**,
- * [texto](https://…), listas con «- » y botones con [[Texto del botón|https://…]].
+ * [texto](https://…), listas con «- », títulos con «# », imágenes con ![descripción](https://…), separador con «---»
+ * y botones con [[Texto del botón|https://…]] (o …|outline para uno con borde).
  */
 export function bodyToHtml(body: string): string {
   const blocks = body.replace(/\r\n?/g, '\n').trim().split(/\n{2,}/);
@@ -96,12 +101,31 @@ export function bodyToHtml(body: string): string {
     .filter((b) => b.trim())
     .map((block) => {
       const lines = block.split('\n');
-      const button = block.trim().match(BUTTON_RE);
+      const trimmed = block.trim();
+      const button = trimmed.match(BUTTON_RE);
       if (button) {
         const href = safeUrl(button[2]);
         if (href) {
-          return `<p style="margin:8px 0 24px"><a href="${escapeHtml(href)}" style="display:inline-block;background:${BRAND.blue};color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 26px;border-radius:999px">${escapeHtml(button[1])}</a></p>`;
+          const look = button[3]
+            ? `background:#ffffff;color:${BRAND.blue};border:2px solid ${BRAND.blue};padding:12px 24px`
+            : `background:${BRAND.blue};color:#ffffff;padding:14px 26px`;
+          return `<p style="margin:8px 0 24px"><a href="${escapeHtml(href)}" style="display:inline-block;${look};text-decoration:none;font-weight:700;font-size:16px;border-radius:999px">${escapeHtml(button[1])}</a></p>`;
         }
+      }
+      if (DIVIDER_RE.test(trimmed)) {
+        return `<hr style="border:0;border-top:1px solid ${BRAND.line};margin:8px 0 24px">`;
+      }
+      const image = trimmed.match(IMAGE_RE);
+      if (image) {
+        const src = /^https:\/\//i.test(image[2]) ? image[2] : null;
+        if (src) {
+          return `<p style="margin:0 0 20px"><img src="${escapeHtml(src)}" alt="${escapeHtml(image[1])}" width="536" style="display:block;width:100%;max-width:536px;height:auto;border:0;border-radius:12px"></p>`;
+        }
+      }
+      const heading = lines.length === 1 ? trimmed.match(HEADING_RE) : null;
+      if (heading) {
+        const size = heading[1].length === 1 ? 28 : 21;
+        return `<h${heading[1].length} style="margin:0 0 14px;font-size:${size}px;line-height:1.25;letter-spacing:-0.3px;color:${BRAND.ink}">${inline(escapeHtml(heading[2]))}</h${heading[1].length}>`;
       }
       if (lines.every((l) => /^\s*[-•]\s+/.test(l))) {
         const items = lines.map((l) => `<li style="margin:0 0 6px">${inline(escapeHtml(l.replace(/^\s*[-•]\s+/, '')))}</li>`).join('');
@@ -116,9 +140,13 @@ export function bodyToHtml(body: string): string {
 export function bodyToText(body: string): string {
   return body
     .replace(/\r\n?/g, '\n')
-    .replace(/\[\[\s*([^|\]]+?)\s*\|\s*([^\]\s]+)\s*\]\]/g, '$1: $2')
+    .replace(/\[\[\s*([^|\]]+?)\s*\|\s*([^|\]\s]+)\s*(?:\|\s*outline\s*)?\]\]/g, '$1: $2')
+    .replace(/^!\[([^\]]*)\]\(([^)\s]+)\)$/gm, '')
+    .replace(/^#{1,2}\s+/gm, '')
+    .replace(/^(-{3,}|\*{3,})$/gm, '')
     .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '$1 ($2)')
     .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 

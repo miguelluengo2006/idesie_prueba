@@ -148,11 +148,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         unsubscribeUrl: link,
       });
       try {
-        await sendLeadMail(mailerFor(mailer, send.email), {
+        const resendId = await sendLeadMail(mailerFor(mailer, send.email), {
           ...mail,
           headers: { 'List-Unsubscribe': `<${link}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
         });
-        await supabaseAdmin.from('campaign_sends').update({ status: 'sent', sent_at: now(), claimed_at: null, error: null }).eq('id', send.id);
+        await supabaseAdmin.from('campaign_sends').update({ status: 'sent', sent_at: now(), claimed_at: null, error: null, resend_id: resendId }).eq('id', send.id);
       } catch (error: any) {
         console.error('Campaign send failed:', send.email, error?.message);
         await supabaseAdmin

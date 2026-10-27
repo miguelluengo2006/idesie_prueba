@@ -49,3 +49,41 @@ las respuestas del formulario y el origen del anuncio (campaña, fuente…). «R
   un `RESEND_FROM` de un dominio que no es tuyo.
 - **Llega a spam:** verifica SPF/DKIM del dominio en Resend y usa un remitente de tu propio dominio.
 - **Envío duplicado:** cada aviso lleva una `Idempotency-Key` (`lead-<id>` / `order-<sesión>`), así que Resend ignora los reintentos.
+
+# Campañas: quién ha recibido, abierto y pulsado cada email
+
+Las campañas (Panel → Campañas) salen por Resend. Para ver **por persona** si el email se entregó, se abrió, si pulsó un
+enlace o si rebotó, hay que conectar el webhook de Resend. Sin él las campañas se envían igual, pero solo sabrás «Enviado».
+
+## Activar el seguimiento (10 minutos, una sola vez)
+
+1. **Base de datos:** ejecuta `migrations/add-email-tracking.sql` en Supabase (SQL Editor). Es seguro repetirla.
+2. **Seguimiento en el dominio:** Resend → *Domains* → tu dominio → activa **Open Tracking** y **Click Tracking**.
+   (Sin esto Resend avisa de entregas y rebotes, pero no de aperturas ni clics.)
+3. **Webhook:** Resend → *Webhooks* → *Add Webhook*:
+   - Endpoint: `https://TU-DOMINIO/api/webhooks/resend`
+   - Eventos: `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`,
+     `email.opened`, `email.clicked`, `email.failed`
+4. Copia el **Signing Secret** (`whsec_…`) a la variable `RESEND_WEBHOOK_SECRET` del servidor (Vercel → Environment Variables) y redespliega.
+5. Envía una campaña de prueba a tu propio correo (botón «Enviarme una prueba» no deja rastro; para ver el seguimiento
+   hay que enviar una campaña real a un contacto tuyo).
+
+## Qué se ve
+
+En una campaña enviada aparece **Resultados**: enviados, entregados, abiertos, clics y rebotes (contando personas, no
+eventos) y una fila por destinatario con su estado, cuántas veces abrió, qué enlaces pulsó y el motivo si rebotó.
+Se refresca solo cada 30 s.
+
+- Una **queja de spam** da de baja automáticamente al contacto.
+- Un clic cuenta también como apertura (hay clientes de correo que bloquean la imagen de medida).
+- Las **aperturas no son exactas** (Apple Mail precarga las imágenes). Los clics y las entregas sí son fiables.
+- Los avisos duplicados se descartan (`svix-id` único) y los que llegan sin firma válida se rechazan con 401.
+
+## Plantillas y bloques
+
+En el editor de una campaña (borrador) hay una barra con **Plantillas · Título · Imagen · Botón · Lista · Separador**.
+Cada bloque se inserta como un párrafo propio en el texto; el formato completo está en «Cómo dar formato».
+«Plantillas» ofrece las de partida de IDESIE y las que guardes tú (*Guardar el email actual como plantilla*).
+
+> Los botones y las imágenes siempre llevan una dirección `https://` completa. Las imágenes tienen que estar ya
+> publicadas en una URL pública; los clientes de correo no admiten imágenes adjuntas dentro del HTML de forma fiable.

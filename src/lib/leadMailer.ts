@@ -114,8 +114,11 @@ export function mailerFor(mailer: LeadMailer, to: string): LeadMailer {
   return { ...mailer, to };
 }
 
-/** Sends one notification with whichever provider was resolved. Throws on failure (callers treat it as best-effort). */
-export async function sendLeadMail(mailer: LeadMailer, msg: LeadMailMessage): Promise<void> {
+/**
+ * Sends one notification with whichever provider was resolved. Throws on failure (callers treat it as best-effort).
+ * Devuelve el id del email en Resend (para seguirlo con el webhook) o null con SMTP.
+ */
+export async function sendLeadMail(mailer: LeadMailer, msg: LeadMailMessage): Promise<string | null> {
   if (mailer.provider === 'resend') {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -138,7 +141,8 @@ export async function sendLeadMail(mailer: LeadMailer, msg: LeadMailMessage): Pr
       const detail = await res.json().catch(() => ({}));
       throw new Error(`Resend ${res.status}: ${detail?.message || detail?.name || 'error desconocido'}`);
     }
-    return;
+    const sent = await res.json().catch(() => ({}));
+    return typeof sent?.id === 'string' ? sent.id : null;
   }
 
   await nodemailer.createTransport(mailer.transport).sendMail({
@@ -150,4 +154,5 @@ export async function sendLeadMail(mailer: LeadMailer, msg: LeadMailMessage): Pr
     html: msg.html,
     ...(msg.text ? { text: msg.text } : {}),
   });
+  return null;
 }
