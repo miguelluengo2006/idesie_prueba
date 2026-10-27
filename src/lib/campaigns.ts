@@ -12,6 +12,8 @@ export interface Campaign {
   subject: string;
   body: string;
   audience_tags: string[];
+  /** Campañas cuyos destinatarios no recibirán esta */
+  exclude_campaign_ids: string[];
   status: CampaignStatus;
   total: number;
   sent_count: number;
@@ -190,6 +192,36 @@ Recibes este email porque estás en nuestra lista de contactos y aceptaste recib
 /** Enlace público de baja de un contacto. */
 export function unsubscribeUrl(siteUrl: string, token: string): string {
   return `${siteUrl.replace(/\/+$/, '')}/baja?t=${encodeURIComponent(token)}`;
+}
+
+/** Una campaña que ya recibió un email: id y cuándo se envió. */
+export interface ReceivedEntry {
+  c: string;
+  at: string | null;
+}
+/** Respuesta de /api/campaigns/history */
+export interface CampaignHistory {
+  campaigns: { id: string; name: string; sent_at: string | null; sent_count: number }[];
+  received: ReceivedMap;
+}
+
+/** email → campañas que ya ha recibido */
+export type ReceivedMap = Record<string, ReceivedEntry[]>;
+
+/** Emails que ya recibieron alguna de las campañas indicadas. */
+export function receivedEmails(received: ReceivedMap, excludeIds: string[]): Set<string> {
+  const wanted = new Set(excludeIds);
+  const out = new Set<string>();
+  if (!wanted.size) return out;
+  for (const [email, entries] of Object.entries(received)) {
+    if (entries.some((e) => wanted.has(e.c))) out.add(email);
+  }
+  return out;
+}
+
+/** Quita de la lista a quien ya recibió (los emails se comparan en minúsculas, como se guardan). */
+export function withoutReceived<T extends { email: string }>(contacts: T[], received: ReadonlySet<string>): T[] {
+  return received.size ? contacts.filter((c) => !received.has(c.email.toLowerCase())) : contacts;
 }
 
 /** Problemas que impiden enviar la campaña (lista vacía = lista para enviar). */

@@ -11,6 +11,7 @@ import TagInput from '@/components/portal/TagInput';
 import { crm } from '@/components/portal/crmApi';
 import { timeAgo } from '@/components/portal/leadMeta';
 import WhatsAppMenu from '@/components/portal/WhatsAppMenu';
+import type { CampaignHistory, ReceivedEntry } from '@/lib/campaigns';
 import {
   CONTACT_SOURCES,
   STATUS_LABEL,
@@ -42,12 +43,17 @@ const labelClass = 'block text-xs uppercase tracking-widest text-white/40 mb-1.5
 function ContactModal({
   contact,
   suggestions,
+  received,
+  campaignNames,
   token,
   onClose,
   onSaved,
 }: {
   contact: Contact | null;
   suggestions: string[];
+  /** Campañas que ya ha recibido este contacto */
+  received: ReceivedEntry[];
+  campaignNames: Map<string, string>;
   token: string | undefined;
   onClose: () => void;
   onSaved: (message: string) => void;
@@ -123,6 +129,23 @@ function ContactModal({
           <span className={labelClass}>Etiquetas</span>
           <TagInput label="Añadir etiqueta" value={tags} onChange={setTags} suggestions={suggestions} placeholder="Alumno, Empresa, Máster BIM…" />
         </div>
+        {editing && (
+          <div>
+            <span className={labelClass}>Campañas recibidas</span>
+            {received.length === 0 ? (
+              <p className="text-sm text-white/45">Todavía no ha recibido ninguna campaña.</p>
+            ) : (
+              <ul className="text-sm space-y-1">
+                {[...received].sort((a, b) => (b.at || '').localeCompare(a.at || '')).map((r) => (
+                  <li key={r.c} className="flex items-baseline justify-between gap-3">
+                    <span className="truncate">{campaignNames.get(r.c) || 'Campaña eliminada'}</span>
+                    <span className="text-xs text-white/45 tabular-nums shrink-0">{r.at ? new Date(r.at).toLocaleDateString('es-ES') : ''}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
         <div>
           <label htmlFor="c-notes" className={labelClass}>Notas</label>
           <textarea id="c-notes" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} className={`${fieldClass} resize-none`} />
@@ -296,6 +319,7 @@ export default function ContactsPage() {
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [modal, setModal] = useState<'new' | 'import' | { contact: Contact } | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const [history, setHistory] = useState<CampaignHistory | null>(null);
   const [toast, setToast] = useState<{ ok: boolean; text: string } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -308,8 +332,13 @@ export default function ContactsPage() {
   const load = useCallback(async () => {
     if (!token) return;
     try {
-      const data = await crm<{ contacts: Contact[] }>(token, '/api/contacts');
+      const [data, past] = await Promise.all([
+        crm<{ contacts: Contact[] }>(token, '/api/contacts'),
+        // Extra: sin historial se ve la agenda igual, solo que sin la columna de campañas
+        crm<CampaignHistory>(token, '/api/campaigns/history').catch(() => null),
+      ]);
       setContacts(data.contacts);
+      setHistory(past);
       setLoadError(null);
     } catch (err: any) {
       setLoadError(err.message);
@@ -323,6 +352,8 @@ export default function ContactsPage() {
   }, [load]);
 
   const tags = useMemo(() => tagCounts(contacts), [contacts]);
+  const campaignNames = useMemo(() => new Map((history?.campaigns || []).map((c) => [c.id, c.name])), [history]);
+  const receivedBy = (c: Contact): ReceivedEntry[] => history?.received[c.email.toLowerCase()] || [];
   const counts = useMemo(() => {
     const c = { all: contacts.length, subscribed: 0, 'no-consent': 0, unsubscribed: 0 };
     for (const x of contacts) c[contactStatus(x)] += 1;
@@ -480,6 +511,7 @@ export default function ContactsPage() {
                       <th scope="col" className="px-3 py-3 font-medium">Empresa</th>
                       <th scope="col" className="px-3 py-3 font-medium">Etiquetas</th>
                       <th scope="col" className="px-3 py-3 font-medium">Estado</th>
+                      <th scope="col" className="px-3 py-3 font-medium">Campañas</th>
                       <th scope="col" className="px-3 py-3 font-medium">Alta</th>
                     </tr>
                   </thead>
@@ -508,6 +540,9 @@ export default function ContactsPage() {
                             </div>
                           </td>
                           <td className="px-3 py-3"><span className={cn('px-2 py-0.5 text-[11px] rounded-full whitespace-nowrap', STATUS_BADGE[st])}>{STATUS_LABEL[st]}</span></td>
+                          <td className="px-3 py-3 text-xs tabular-nums whitespace-nowrap" title={receivedBy(c).map((r) => campaignNames.get(r.c)).filter(Boolean).join(', ') || undefined}>
+                            {history ? (receivedBy(c).length ? <span className="text-white/75">{receivedBy(c).length} {receivedBy(c).length === 1 ? 'recibida' : 'recibidas'}</span> : <span className="text-white/35">Ninguna</span>) : <span className="text-white/25">—</span>}
+                          </td>
                           <td className="px-3 py-3 text-xs text-white/50 whitespace-nowrap">
                             {timeAgo(c.created_at)}
                             <span className="block text-[11px] text-white/35">{CONTACT_SOURCES[c.source] || c.source}</span>
@@ -579,9 +614,9 @@ export default function ContactsPage() {
         </>
       )}
 
-      {modal === 'new' && <ContactModal contact={null} suggestions={tags.map((t) => t.tag)} token={token} onClose={() => setModal(null)} onSaved={afterChange} />}
+      {modal === 'new' && <ContactModal contact={null} suggestions={tags.map((t) => t.tag)} received={[]} campaignNames={campaignNames} token={token} onClose={() => setModal(null)} onSaved={afterChange} />}
       {modal && typeof modal === 'object' && (
-        <ContactModal contact={modal.contact} suggestions={tags.map((t) => t.tag)} token={token} onClose={() => setModal(null)} onSaved={afterChange} />
+        <ContactModal contact={modal.contact} suggestions={tags.map((t) => t.tag)} received={receivedBy(modal.contact)} campaignNames={campaignNames} token={token} onClose={() => setModal(null)} onSaved={afterChange} />
       )}
       {modal === 'import' && <ImportModal suggestions={tags.map((t) => t.tag)} token={token} onClose={() => setModal(null)} onDone={afterChange} />}
     </Page>

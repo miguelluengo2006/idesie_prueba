@@ -5,8 +5,10 @@ import {
   bodyToText,
   campaignProblems,
   firstName,
+  receivedEmails,
   renderCampaignEmail,
   unsubscribeUrl,
+  withoutReceived,
 } from '../campaigns';
 
 describe('variables', () => {
@@ -86,5 +88,25 @@ describe('validación previa al envío', () => {
     expect(campaignProblems({ subject: '', body: '' }, 0)).toHaveLength(3);
     expect(campaignProblems({ subject: 'a', body: 'b' }, 10)).toEqual([]);
     expect(campaignProblems({ subject: 'a', body: 'b' }, 0)).toHaveLength(1);
+  });
+});
+
+describe('no repetir', () => {
+  const received = {
+    'ana@x.es': [{ c: 'camp-1', at: '2026-10-01T10:00:00Z' }],
+    'luis@x.es': [{ c: 'camp-2', at: null }],
+    'eva@x.es': [{ c: 'camp-1', at: null }, { c: 'camp-2', at: null }],
+  };
+
+  it('junta a quien recibió alguna de las campañas elegidas', () => {
+    expect([...receivedEmails(received, ['camp-1'])].sort()).toEqual(['ana@x.es', 'eva@x.es']);
+    expect([...receivedEmails(received, ['camp-1', 'camp-2'])].sort()).toEqual(['ana@x.es', 'eva@x.es', 'luis@x.es']);
+    expect(receivedEmails(received, []).size).toBe(0);
+  });
+
+  it('quita de la lista a quien ya recibió, sin distinguir mayúsculas', () => {
+    const contacts = [{ email: 'Ana@x.es' }, { email: 'pepe@x.es' }];
+    expect(withoutReceived(contacts, new Set(['ana@x.es']))).toEqual([{ email: 'pepe@x.es' }]);
+    expect(withoutReceived(contacts, new Set())).toEqual(contacts);
   });
 });

@@ -52,6 +52,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   // El texto del email no pasa por sanitizeString: se escapa al convertirlo a HTML (src/lib/campaigns.ts)
   if (body.body !== undefined) updates.body = String(body.body || '').slice(0, MAX_BODY_LENGTH);
   if (body.audience_tags !== undefined) updates.audience_tags = normalizeTags(body.audience_tags);
+  if (body.exclude_campaign_ids !== undefined) {
+    const asked = Array.isArray(body.exclude_campaign_ids) ? body.exclude_campaign_ids.filter((v: unknown): v is string => typeof v === 'string' && isValidUUID(v) && v !== id) : [];
+    // Solo campañas del propio propietario: nunca se confía en un id que venga del navegador
+    const { data: own } = asked.length
+      ? await supabaseAdmin.from('campaigns').select('id').eq('owner_id', auth.ownerId).in('id', asked.slice(0, 100))
+      : { data: [] as { id: string }[] };
+    updates.exclude_campaign_ids = (own || []).map((c) => c.id);
+  }
 
   const { data, error } = await supabaseAdmin.from('campaigns').update(updates).eq('id', id).eq('owner_id', auth.ownerId).select(CAMPAIGN_COLUMNS).single();
   if (error) {

@@ -86,3 +86,13 @@ Cada bloque se inserta como un párrafo propio en el texto; el formato completo 
 
 > Los botones y las imágenes siempre llevan una dirección `https://` completa. Las imágenes tienen que estar ya
 > publicadas en una URL pública; los clientes de correo no admiten imágenes adjuntas dentro del HTML de forma fiable.
+
+## No repetir campañas
+
+Requiere ejecutar antes `migrations/add-campaign-exclusions.sql` en Supabase.
+
+- En una campaña en borrador aparece **No repetir**: marca las campañas anteriores y no se enviará a quien ya las recibió.
+  El número de destinatarios se actualiza al momento y el envío lo vuelve a comprobar en el servidor.
+- **Duplicar** una campaña enviada excluye automáticamente a quien recibió la original.
+- En **Contactos**, la columna *Campañas* muestra cuántas ha recibido cada persona y, al abrir el contacto, cuáles y cuándo.
+- Cuenta como «recibida» una campaña que Resend aceptó enviar a ese email. Las pruebas («Enviarme una prueba») no cuentan.

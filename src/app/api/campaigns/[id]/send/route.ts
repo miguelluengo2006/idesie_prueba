@@ -4,7 +4,7 @@ import { agencyUser } from '@/lib/routeAuth';
 import { isValidUUID } from '@/lib/validation';
 import { resolveLeadMailer, sendLeadMail, mailerFor } from '@/lib/leadMailer';
 import { CAMPAIGN_COLUMNS, CONTACT_COLUMNS, fetchAllRows, siteUrlFrom } from '@/lib/crmServer';
-import { campaignProblems, renderCampaignEmail, unsubscribeUrl } from '@/lib/campaigns';
+import { campaignProblems, renderCampaignEmail, unsubscribeUrl, withoutReceived } from '@/lib/campaigns';
 import { inAudience, type Contact } from '@/lib/contacts';
 
 // Cada llamada envía un lote y devuelve el progreso; el panel la repite hasta que no quedan pendientes.
@@ -72,7 +72,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const contacts = await fetchAllRows<Contact>((from, to) =>
         supabaseAdmin.from('contacts').select(CONTACT_COLUMNS).eq('owner_id', auth.ownerId).order('id').range(from, to)
       );
-      const recipients = contacts.filter((c) => inAudience(c, campaign.audience_tags || []));
+      let recipients = contacts.filter((c) => inAudience(c, campaign.audience_tags || []));
+      // «No repetir»: fuera quien ya recibió alguna de las campañas excluidas
+      const excludeIds: string[] = campaign.exclude_campaign_ids || [];
+      if (excludeIds.length) {
+        const sent = await fetchAllRows<{ email: string }>((from, to) =>
+          supabaseAdmin.from('campaign_sends').select('email').in('campaign_id', excludeIds).eq('status', 'sent').order('id').range(from, to)
+        );
+        recipients = withoutReceived(recipients, new Set(sent.map((s) => s.email.toLowerCase())));
+      }
       const problems = campaignProblems(campaign, recipients.length);
       if (problems.length) return NextResponse.json({ error: problems.join(' ') }, { status: 400 });
 

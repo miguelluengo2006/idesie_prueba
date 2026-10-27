@@ -19,8 +19,11 @@ import {
   MAX_BODY_LENGTH,
   MAX_SUBJECT_LENGTH,
   campaignProblems,
+  receivedEmails,
   renderCampaignEmail,
+  withoutReceived,
   type Campaign,
+  type CampaignHistory,
 } from '@/lib/campaigns';
 import { contactStatus, inAudience, tagCounts, type Contact } from '@/lib/contacts';
 import { insertBlock } from '@/lib/campaignTemplates';
@@ -52,6 +55,8 @@ export default function CampaignEditorPage() {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [audienceTags, setAudienceTags] = useState<string[]>([]);
+  const [excludeIds, setExcludeIds] = useState<string[]>([]);
+  const [history, setHistory] = useState<CampaignHistory | null>(null);
   const [dirty, setDirty] = useState(false);
 
   const [saving, setSaving] = useState(false);
@@ -71,16 +76,20 @@ export default function CampaignEditorPage() {
     setSubject(c.subject);
     setBody(c.body);
     setAudienceTags(c.audience_tags);
+    setExcludeIds(c.exclude_campaign_ids || []);
     setDirty(false);
   }, []);
 
   const load = useCallback(async () => {
     if (!token) return;
     try {
-      const [c, list] = await Promise.all([
+      const [c, list, past] = await Promise.all([
         crm<{ campaign: Campaign; failures: { email: string; error: string | null }[] }>(token, `/api/campaigns/${id}`),
         crm<{ contacts: Contact[] }>(token, '/api/contacts'),
+        // El historial es un extra: si falla, el editor sigue funcionando sin «No repetir»
+        crm<CampaignHistory>(token, '/api/campaigns/history').catch(() => null),
       ]);
+      setHistory(past);
       apply(c.campaign);
       setFailures(c.failures);
       setContacts(list.contacts);
@@ -97,7 +106,11 @@ export default function CampaignEditorPage() {
   }, [load]);
 
   const tags = useMemo(() => tagCounts(contacts), [contacts]);
-  const recipients = useMemo(() => contacts.filter((c) => inAudience(c, audienceTags)), [contacts, audienceTags]);
+  const alreadyReceived = useMemo(() => (history ? receivedEmails(history.received, excludeIds) : new Set<string>()), [history, excludeIds]);
+  const inAudienceNow = useMemo(() => contacts.filter((c) => inAudience(c, audienceTags)), [contacts, audienceTags]);
+  const recipients = useMemo(() => withoutReceived(inAudienceNow, alreadyReceived), [inAudienceNow, alreadyReceived]);
+  const repeatsAvoided = inAudienceNow.length - recipients.length;
+  const pastCampaigns = useMemo(() => (history?.campaigns || []).filter((c) => c.id !== id), [history, id]);
   const excluded = useMemo(() => {
     const inTag = (c: Contact) => !audienceTags.length || c.tags.some((t) => audienceTags.some((a) => a.toLowerCase() === t.toLowerCase()));
     const pool = contacts.filter(inTag);
@@ -129,7 +142,7 @@ export default function CampaignEditorPage() {
     try {
       const { campaign: c } = await crm<{ campaign: Campaign }>(token, `/api/campaigns/${id}`, {
         method: 'PATCH',
-        body: { name, subject, body, audience_tags: audienceTags },
+        body: { name, subject, body, audience_tags: audienceTags, exclude_campaign_ids: excludeIds },
       });
       setCampaign(c);
       setDirty(false);
@@ -140,7 +153,7 @@ export default function CampaignEditorPage() {
     } finally {
       setSaving(false);
     }
-  }, [isDraft, token, id, name, subject, body, audienceTags]);
+  }, [isDraft, token, id, name, subject, body, audienceTags, excludeIds]);
 
   const sendTest = async () => {
     setTesting(true);
@@ -190,7 +203,7 @@ export default function CampaignEditorPage() {
     if (!campaign) return;
     try {
       const { campaign: copy } = await crm<{ campaign: Campaign }>(token, '/api/campaigns', { method: 'POST', body: { name: `${campaign.name} (copia)` } });
-      await crm(token, `/api/campaigns/${copy.id}`, { method: 'PATCH', body: { subject: campaign.subject, body: campaign.body, audience_tags: campaign.audience_tags } });
+      await crm(token, `/api/campaigns/${copy.id}`, { method: 'PATCH', body: { subject: campaign.subject, body: campaign.body, audience_tags: campaign.audience_tags, exclude_campaign_ids: [...new Set([...(campaign.exclude_campaign_ids || []), campaign.id])] } });
       router.push(`/portal/campaigns/${copy.id}`);
     } catch (err: any) {
       say(err.message, false);
@@ -234,6 +247,11 @@ export default function CampaignEditorPage() {
       el?.focus();
       el?.setSelectionRange(next.cursor, next.cursor);
     });
+  };
+
+  const toggleExclude = (cid: string) => {
+    setExcludeIds(excludeIds.includes(cid) ? excludeIds.filter((x) => x !== cid) : [...excludeIds, cid]);
+    setDirty(true);
   };
 
   const toggleTag = (tag: string) => {
@@ -409,6 +427,9 @@ export default function CampaignEditorPage() {
               <Users className="w-4 h-4 text-[var(--signal)]" />
               <b className="tabular-nums">{isDraft ? recipients.length : campaign.total}</b> {(isDraft ? recipients.length : campaign.total) === 1 ? 'destinatario' : 'destinatarios'}
             </p>
+            {isDraft && repeatsAvoided > 0 && (
+              <p className="text-xs text-white/45 mt-1.5">{repeatsAvoided} {repeatsAvoided === 1 ? 'contacto no lo recibirá' : 'contactos no lo recibirán'} porque ya recibieron una campaña anterior.</p>
+            )}
             {isDraft && (excluded.noConsent > 0 || excluded.unsubscribed > 0) && (
               <p className="text-xs text-white/45 mt-1.5">
                 No reciben este email: {excluded.noConsent > 0 && `${excluded.noConsent} sin consentimiento`}
@@ -417,6 +438,29 @@ export default function CampaignEditorPage() {
               </p>
             )}
           </div>
+
+          {(isDraft ? pastCampaigns.length > 0 : excludeIds.length > 0) && (
+            <div>
+              <span className={labelClass}>No repetir</span>
+              <p className="text-xs text-white/45 mb-2">
+                {isDraft ? 'No se enviará a quien ya haya recibido las campañas que marques.' : 'No se envió a quien ya había recibido estas campañas.'}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {pastCampaigns
+                  .filter((c) => isDraft || excludeIds.includes(c.id))
+                  .map((c) => (
+                    <button key={c.id} type="button" disabled={!isDraft} onClick={() => toggleExclude(c.id)} aria-pressed={excludeIds.includes(c.id)} className="pn-chip max-w-full" title={c.sent_at ? `Enviada el ${new Date(c.sent_at).toLocaleDateString('es-ES')}` : undefined}>
+                      <span className="truncate">{c.name}</span> <span className="tabular-nums text-white/35">{c.sent_count}</span>
+                    </button>
+                  ))}
+              </div>
+              {isDraft && pastCampaigns.length > 1 && (
+                <button type="button" onClick={() => { setExcludeIds(excludeIds.length === pastCampaigns.length ? [] : pastCampaigns.map((c) => c.id)); setDirty(true); }} className="mt-2 text-xs text-[var(--signal)] hover:underline cursor-pointer">
+                  {excludeIds.length === pastCampaigns.length ? 'Quitar todas' : 'Marcar todas'}
+                </button>
+              )}
+            </div>
+          )}
 
           {isDraft && (
             <div className="space-y-3 pt-1">
@@ -474,7 +518,7 @@ export default function CampaignEditorPage() {
         <Modal title="¿Enviar la campaña?" onClose={() => setConfirmSend(false)}>
           <p className="text-sm text-white/70 leading-relaxed">
             Se enviará <b>«{subject}»</b> a <b>{recipients.length}</b> {recipients.length === 1 ? 'contacto' : 'contactos'}
-            {audienceTags.length > 0 ? ` con las etiquetas ${audienceTags.join(', ')}` : ''}. No se puede deshacer.
+            {audienceTags.length > 0 ? ` con las etiquetas ${audienceTags.join(', ')}` : ''}{repeatsAvoided > 0 ? `, sin los ${repeatsAvoided} que ya recibieron una campaña anterior` : ''}. No se puede deshacer.
           </p>
           <p className="text-xs text-white/45 mt-3">Consejo: envíate antes una prueba para revisar cómo se ve. Los proveedores de correo limitan los envíos diarios (p. ej. unos 500 al día con Gmail).</p>
           <div className="flex justify-end gap-2 mt-6">

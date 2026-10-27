@@ -12,7 +12,7 @@ export const CONTACT_COLUMNS =
 
 /** Columnas de una campaña que se envían al panel. */
 export const CAMPAIGN_COLUMNS =
-  'id, name, subject, body, audience_tags, status, total, sent_count, failed_count, sent_at, created_at, updated_at';
+  'id, name, subject, body, audience_tags, exclude_campaign_ids, status, total, sent_count, failed_count, sent_at, created_at, updated_at';
 
 const PAGE = 1000;
 /** Tope de seguridad por consulta (PostgREST devuelve como mucho 1000 filas por petición). */
