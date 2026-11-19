@@ -35,7 +35,12 @@ export default function MasterHero({ master }: { master: Master }) {
 
       <div className="relative max-w-6xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-14 lg:gap-16 items-center">
         <div>
-          <motion.h1 {...rise(0.05)} className="font-kinetic font-bold text-[clamp(2rem,4vw,3.5rem)] leading-[1.12]">
+          <motion.h1
+            {...rise(0.05)}
+            className={`font-kinetic font-bold leading-[1.15] ${
+              master.headline.pre.length > 60 ? 'text-[clamp(1.75rem,2.9vw,2.6rem)]' : 'text-[clamp(2rem,4vw,3.5rem)] leading-[1.12]'
+            }`}
+          >
             {master.headline.pre} <span className="ui-hl">{master.headline.mark}</span>
             {master.headline.post}
           </motion.h1>
@@ -44,13 +49,13 @@ export default function MasterHero({ master }: { master: Master }) {
           </motion.p>
           <motion.div {...rise(0.35)} className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-4">
             <BookCallButton pack={master.name} className="btn btn-blue">
-              Solicitar información
+              {master.extras?.hero?.cta ?? 'Solicitar información'}
               <span className="btn-dot bg-[#fff]/20">
                 <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
               </span>
             </BookCallButton>
-            <Link href="#recorrido" className="font-semibold underline underline-offset-[6px] decoration-2 decoration-[#7db4ff] hover:decoration-[#fff] transition-colors">
-              Ver el recorrido
+            <Link href={master.extras?.hero?.secondary.href ?? '#recorrido'} className="font-semibold underline underline-offset-[6px] decoration-2 decoration-[#7db4ff] hover:decoration-[#fff] transition-colors">
+              {master.extras?.hero?.secondary.label ?? 'Ver el recorrido'}
             </Link>
           </motion.div>
         </div>

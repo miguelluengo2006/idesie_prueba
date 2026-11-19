@@ -10,6 +10,7 @@ const TONES = [
   { floor: 'bg-[#0063e6] text-[#fff]', chip: 'bg-[#0063e6] text-[#fff]' },
   { floor: 'bg-[#0a1f44] text-[#fff]', chip: 'bg-[#0a1f44] text-[#fff]' },
   { floor: 'bg-[#7db4ff] text-[#0a1f44]', chip: 'bg-[#7db4ff] text-[#0a1f44]' },
+  { floor: 'bg-[#fff] text-[#0a1f44] ring-1 ring-[#0a1f44]/15', chip: 'bg-[#e9f0fc] text-[#0a1f44]' },
 ];
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -79,6 +80,14 @@ export default function ModuleExplorer({ master }: { master: Master }) {
             </motion.span>
           </div>
         </div>
+        {master.modules.every((mod) => mod.ai) && (
+          <p className="mt-5 flex gap-3 text-sm leading-snug text-[#0a1f44]">
+            <span className="w-1.5 self-stretch rounded-full bg-[#0063e6] shrink-0" aria-hidden="true" />
+            <span>
+              <span className="font-semibold">IA en todos los módulos.</span> En cada planta del edificio se trabaja con IA.
+            </span>
+          </p>
+        )}
       </div>
 
       <div className="rounded-3xl bg-[#fff] p-6 md:p-10 min-h-[26rem] flex flex-col">
@@ -109,7 +118,7 @@ export default function ModuleExplorer({ master }: { master: Master }) {
             className="mt-8"
             aria-live="polite"
           >
-            <span className={`inline-block rounded-full px-3 py-1 text-sm font-semibold ${tone.chip}`}>{m.phase}</span>
+            <span className={`inline-block rounded-full px-3 py-1 text-sm font-semibold ${tone.chip}`}>{m.phase === 'IA' ? 'Módulo específico de IA' : m.phase}</span>
             <h3 className="font-kinetic font-bold text-2xl md:text-4xl leading-tight mt-4 text-[#0a1f44]">{m.title}</h3>
             <p className="text-lg font-semibold text-[#0063e6] leading-snug mt-3">{m.tagline}</p>
             <ul className="mt-6 space-y-3">
@@ -126,6 +135,12 @@ export default function ModuleExplorer({ master }: { master: Master }) {
                 </motion.li>
               ))}
             </ul>
+            {m.ai && (
+              <div className="mt-7 rounded-2xl bg-[#0a1f44] text-[#fff] p-5">
+                <p className="text-sm font-semibold text-[#7db4ff]">Con IA</p>
+                <p className="mt-1.5 leading-relaxed">{m.ai}</p>
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

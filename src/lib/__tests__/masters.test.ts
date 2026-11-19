@@ -15,8 +15,10 @@ describe('másteres', () => {
     expect(getMaster('no-existe')).toBeUndefined();
   });
 
-  it('el número de módulos es el de idesie.com', () => {
-    expect(MASTERS.mbim.modules).toHaveLength(9);
+  it('el número de módulos es el de idesie.com (el MBIM suma el módulo de IA)', () => {
+    expect(MASTERS.mbim.modules).toHaveLength(10);
+    expect(MASTERS.mbim.modules[0].phase).toBe('IA');
+    expect(MASTERS.mbim.modules.every((m) => m.ai)).toBe(true);
     expect(MASTERS.mbbe.modules).toHaveLength(5);
     expect(MASTERS['mbim-online'].modules).toHaveLength(9);
   });

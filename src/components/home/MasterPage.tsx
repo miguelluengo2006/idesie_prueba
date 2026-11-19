@@ -10,6 +10,7 @@ import ModuleExplorer from './ModuleExplorer';
 import RhythmToggle from './RhythmToggle';
 import MasterHero from './MasterHero';
 import AiLab from './AiLab';
+import { AiProof, Endorsements, Faculty, Legacy, Profile, RealProject } from './MasterSections';
 import { PHOTOS } from '@/lib/content';
 import { MASTERS, MASTER_SLUGS, type Master } from '@/lib/masters';
 
@@ -17,13 +18,45 @@ import { MASTERS, MASTER_SLUGS, type Master } from '@/lib/masters';
 export default function MasterPage({ master }: { master: Master }) {
   const others = MASTER_SLUGS.filter((s) => s !== master.slug).map((s) => MASTERS[s]);
   const online = master.mode === 'Online';
+  const x = master.extras ?? {};
+
+  const ai = x.aiProof ? (
+    <AiProof data={x.aiProof} />
+  ) : (
+    <AiLab masterName={master.name} kind={master.ai.kind} where={master.ai.where} />
+  );
+  const certification = x.endorsements ? (
+    <Endorsements data={x.endorsements} />
+  ) : (
+    <section id="certificacion" aria-labelledby="cert-title" className="field-tint px-4 md:px-6 py-20 md:py-28 scroll-mt-24">
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
+        <Reveal>
+          <h2 id="cert-title" className="font-kinetic font-bold text-3xl md:text-4xl leading-[1.15]">
+            {master.certification.title}
+          </h2>
+          <p className="text-lg text-white/60 leading-relaxed mt-6 max-w-2xl">{master.certification.text}</p>
+          <ul className="mt-10 grid sm:grid-cols-3 gap-3">
+            {master.certification.items.map((it, i) => (
+              <Tile as="li" key={it.title} delay={i * 0.1} className={`p-5 ${['bg-[#0063e6] text-[#fff]', 'bg-[#fff] text-[#0a1f44]', 'bg-[#0a1f44] text-[#fff]'][i % 3]}`}>
+                <h3 className="font-kinetic font-bold text-lg leading-snug">{it.title}</h3>
+                <p className="leading-snug mt-2 text-[15px] opacity-85">{it.text}</p>
+              </Tile>
+            ))}
+          </ul>
+        </Reveal>
+        <div className="relative aspect-[3/2] lg:aspect-[4/3] rounded-2xl overflow-hidden">
+          <Image src={PHOTOS.auditorio.src} alt={PHOTOS.auditorio.alt} fill sizes="(min-width: 1024px) 40vw, 92vw" className="object-cover" />
+        </div>
+      </div>
+    </section>
+  );
 
   return (
     <SubPageShell>
       <MasterHero master={master} />
 
       <section aria-label="El máster en cifras" className="field-blue px-4 md:px-6 py-14 md:py-20">
-        <dl className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <dl className={`max-w-6xl mx-auto grid grid-cols-2 gap-3 md:gap-4 ${master.facts.length % 3 === 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
           {master.facts.map((f, i) => (
             <Tile key={f.label} delay={i * 0.09} className={`p-6 md:p-7 ${i % 2 ? 'bg-[#fff] text-[#0a1f44]' : 'bg-[#0a1f44] text-[#fff]'}`}>
               <dd className="font-kinetic font-bold text-[clamp(1.6rem,2.8vw,2.4rem)] leading-none whitespace-nowrap">{f.value}</dd>
@@ -33,38 +66,96 @@ export default function MasterPage({ master }: { master: Master }) {
         </dl>
       </section>
 
-      <RhythmToggle title={master.method.title} lead={master.method.lead} columns={master.method.columns} online={online} />
-
-      <Section field="white" id="como" labelledBy="como-title" className="!py-16 md:!py-24">
-        <h2 id="como-title" className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.12] max-w-3xl">
-          {online ? 'Lo que llevas incluido' : 'Cómo avanzas, paso a paso'}
-        </h2>
-        <ol className="mt-12 grid md:grid-cols-3 gap-4">
-          {master.method.steps.map((st, i) => (
-            <Tile as="li" key={st.title} delay={i * 0.12} className="bg-[var(--card)] p-7 md:p-8">
-              <h3 className="font-kinetic font-bold text-xl md:text-2xl leading-snug">{st.title}</h3>
-              <p className="text-white/60 leading-relaxed mt-3">{st.text}</p>
-              <span className="absolute left-0 bottom-0 h-1.5 bg-[#0063e6] w-1/3 transition-all duration-500 group-hover:w-full" aria-hidden="true" />
-            </Tile>
-          ))}
-        </ol>
-      </Section>
-
-      <Section field="tint" id="recorrido" labelledBy="recorrido-title">
-        <Reveal className="max-w-4xl">
-          <h2 id="recorrido-title" className="font-kinetic font-bold text-3xl md:text-6xl leading-[1.1]">
-            {master.modules.length} módulos, <span className="ui-hl">una sola obra</span>
-          </h2>
-          <p className="text-lg md:text-xl text-white/60 mt-6 max-w-2xl leading-relaxed">
-            Cada módulo es una planta más del mismo edificio, de los cimientos al proyecto que defiendes. Pulsa una planta para ver qué haces en ella.
-          </p>
-        </Reveal>
-        <div className="mt-12">
-          <ModuleExplorer master={master} />
-        </div>
-      </Section>
-
-      <AiLab masterName={master.name} kind={master.ai.kind} where={master.ai.where} />
+      {x.aiProof ? (
+        <>
+          {ai}
+          {x.realProject && <RealProject data={x.realProject} />}
+          {x.legacy && <Legacy data={x.legacy} />}
+          {certification}
+          {x.faculty && <Faculty data={x.faculty} />}
+          {x.profile && <Profile data={x.profile} />}
+          <Section field="tint" id="recorrido" labelledBy="recorrido-title">
+            <Reveal className="max-w-4xl">
+              <h2 id="recorrido-title" className="font-kinetic font-bold text-3xl md:text-6xl leading-[1.1]">
+                {x.modulesIntro ? (
+                  <>
+                    {x.modulesIntro.title.pre} <span className="ui-hl">{x.modulesIntro.title.mark}</span>
+                    {x.modulesIntro.title.post}
+                  </>
+                ) : (
+                  <>
+                    {master.modules.length} módulos, <span className="ui-hl">una sola obra</span>
+                  </>
+                )}
+              </h2>
+              <p className="text-lg md:text-xl text-white/60 mt-6 max-w-2xl leading-relaxed">
+                {x.modulesIntro?.lead ??
+                  'Cada módulo es una planta más del mismo edificio, de los cimientos al proyecto que defiendes. Pulsa una planta para ver qué haces en ella.'}
+              </p>
+            </Reveal>
+            <div className="mt-12">
+              <ModuleExplorer master={master} />
+            </div>
+          </Section>
+          <RhythmToggle title={master.method.title} lead={master.method.lead} columns={master.method.columns} online={online} />
+          <Section field="white" id="como" labelledBy="como-title" className="!py-16 md:!py-24">
+            <h2 id="como-title" className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.12] max-w-3xl">
+              {online ? 'Lo que llevas incluido' : x.cta ? 'Las cifras del recorrido' : 'Cómo avanzas, paso a paso'}
+            </h2>
+            <ol className="mt-12 grid md:grid-cols-3 gap-4">
+              {master.method.steps.map((st, i) => (
+                <Tile as="li" key={st.title} delay={i * 0.12} className="bg-[var(--card)] p-7 md:p-8">
+                  <h3 className="font-kinetic font-bold text-xl md:text-2xl leading-snug">{st.title}</h3>
+                  <p className="text-white/60 leading-relaxed mt-3">{st.text}</p>
+                  <span className="absolute left-0 bottom-0 h-1.5 bg-[#0063e6] w-1/3 transition-all duration-500 group-hover:w-full" aria-hidden="true" />
+                </Tile>
+              ))}
+            </ol>
+          </Section>
+        </>
+      ) : (
+        <>
+          <RhythmToggle title={master.method.title} lead={master.method.lead} columns={master.method.columns} online={online} />
+          <Section field="white" id="como" labelledBy="como-title" className="!py-16 md:!py-24">
+            <h2 id="como-title" className="font-kinetic font-bold text-3xl md:text-5xl leading-[1.12] max-w-3xl">
+              {online ? 'Lo que llevas incluido' : x.cta ? 'Las cifras del recorrido' : 'Cómo avanzas, paso a paso'}
+            </h2>
+            <ol className="mt-12 grid md:grid-cols-3 gap-4">
+              {master.method.steps.map((st, i) => (
+                <Tile as="li" key={st.title} delay={i * 0.12} className="bg-[var(--card)] p-7 md:p-8">
+                  <h3 className="font-kinetic font-bold text-xl md:text-2xl leading-snug">{st.title}</h3>
+                  <p className="text-white/60 leading-relaxed mt-3">{st.text}</p>
+                  <span className="absolute left-0 bottom-0 h-1.5 bg-[#0063e6] w-1/3 transition-all duration-500 group-hover:w-full" aria-hidden="true" />
+                </Tile>
+              ))}
+            </ol>
+          </Section>
+          <Section field="tint" id="recorrido" labelledBy="recorrido-title">
+            <Reveal className="max-w-4xl">
+              <h2 id="recorrido-title" className="font-kinetic font-bold text-3xl md:text-6xl leading-[1.1]">
+                {x.modulesIntro ? (
+                  <>
+                    {x.modulesIntro.title.pre} <span className="ui-hl">{x.modulesIntro.title.mark}</span>
+                    {x.modulesIntro.title.post}
+                  </>
+                ) : (
+                  <>
+                    {master.modules.length} módulos, <span className="ui-hl">una sola obra</span>
+                  </>
+                )}
+              </h2>
+              <p className="text-lg md:text-xl text-white/60 mt-6 max-w-2xl leading-relaxed">
+                {x.modulesIntro?.lead ??
+                  'Cada módulo es una planta más del mismo edificio, de los cimientos al proyecto que defiendes. Pulsa una planta para ver qué haces en ella.'}
+              </p>
+            </Reveal>
+            <div className="mt-12">
+              <ModuleExplorer master={master} />
+            </div>
+          </Section>
+          {ai}
+        </>
+      )}
 
       <Section field="white" id="salida" labelledBy="salida-title">
         <div className="grid lg:grid-cols-[1fr_1.1fr] gap-12 lg:gap-16 items-start">
@@ -101,27 +192,7 @@ export default function MasterPage({ master }: { master: Master }) {
         </div>
       </Section>
 
-      <section id="certificacion" aria-labelledby="cert-title" className="field-tint px-4 md:px-6 py-20 md:py-28 scroll-mt-24">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
-          <Reveal>
-            <h2 id="cert-title" className="font-kinetic font-bold text-3xl md:text-4xl leading-[1.15]">
-              {master.certification.title}
-            </h2>
-            <p className="text-lg text-white/60 leading-relaxed mt-6 max-w-2xl">{master.certification.text}</p>
-            <ul className="mt-10 grid sm:grid-cols-3 gap-3">
-              {master.certification.items.map((it, i) => (
-                <Tile as="li" key={it.title} delay={i * 0.1} className={`p-5 ${['bg-[#0063e6] text-[#fff]', 'bg-[#fff] text-[#0a1f44]', 'bg-[#0a1f44] text-[#fff]'][i % 3]}`}>
-                  <h3 className="font-kinetic font-bold text-lg leading-snug">{it.title}</h3>
-                  <p className="leading-snug mt-2 text-[15px] opacity-85">{it.text}</p>
-                </Tile>
-              ))}
-            </ul>
-          </Reveal>
-          <div className="relative aspect-[3/2] lg:aspect-[4/3] rounded-2xl overflow-hidden">
-            <Image src={PHOTOS.auditorio.src} alt={PHOTOS.auditorio.alt} fill sizes="(min-width: 1024px) 40vw, 92vw" className="object-cover" />
-          </div>
-        </div>
-      </section>
+      {!x.aiProof && certification}
 
       <Section field="white" id="admision" labelledBy="admision-title">
         <div className="grid lg:grid-cols-[0.9fr_1.2fr] gap-12 lg:gap-16 items-start">
@@ -165,8 +236,16 @@ export default function MasterPage({ master }: { master: Master }) {
       <section className="field-navy px-4 md:px-6 py-20 md:py-28" aria-labelledby="cta-title">
         <div className="max-w-6xl mx-auto">
           <h2 id="cta-title" className="font-kinetic font-bold text-2xl md:text-4xl leading-[1.15] max-w-3xl">
-            ¿Listo para el {master.code}? Te decimos con franqueza si encaja contigo.
+            {x.cta ? (
+              <>
+                {x.cta.title} <span className="ui-hl">{x.cta.mark}</span>
+                {x.cta.post}
+              </>
+            ) : (
+              <>¿Listo para el {master.code}? Te decimos con franqueza si encaja contigo.</>
+            )}
           </h2>
+          {x.cta && <p className="text-lg text-[#c9d9f0] leading-relaxed mt-5 max-w-2xl">{x.cta.text}</p>}
           <BookCallButton
             pack={master.name}
             className="group mt-8 inline-flex items-center gap-4 md:gap-6 font-kinetic font-bold text-[clamp(3.25rem,13vw,10rem)] leading-none text-[#fff] hover:text-[#7db4ff] transition-colors cursor-pointer text-left"

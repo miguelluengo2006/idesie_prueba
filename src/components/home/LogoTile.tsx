@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { COMPANY_LOGOS } from '@/lib/content';
 
-export type CompanyLogo = (typeof COMPANY_LOGOS)[number];
+export type CompanyLogo = Pick<(typeof COMPANY_LOGOS)[number], 'name' | 'src' | 'width' | 'height'>;
 
 /** Logo de una empresa sobre una ficha blanca de tamaño fijo, para que todos pesen parecido aunque su proporción sea distinta. */
 export default function LogoTile({ logo, className = '' }: { logo: CompanyLogo; className?: string }) {

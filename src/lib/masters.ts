@@ -13,6 +13,75 @@ export interface MasterModule {
   /** Fase del recorrido a la que pertenece (agrupa los módulos en la interfaz). */
   phase: string;
   points: string[];
+  /** Cómo se usa la IA en este módulo (solo en los másteres que la integran en todas las plantas). */
+  ai?: string;
+}
+
+export interface MasterLogo {
+  name: string;
+  src: string;
+  width: number;
+  height: number;
+}
+
+/** Secciones propias del MBIM. Todas opcionales: el resto de másteres no las pintan. */
+export interface MasterExtras {
+  hero?: { cta: string; secondary: { label: string; href: string } };
+  modulesIntro?: {
+    title: { pre: string; mark: string; post?: string };
+    lead: string;
+  };
+  aiProof?: {
+    eyebrow: string;
+    title: { pre: string; mark: string };
+    lead: string;
+    pillars: { kicker: string; title: string; text: string }[];
+    quote: string;
+  };
+  realProject?: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    name: string;
+    specs: { label: string; value: string }[];
+    steps: { title: string; text: string }[];
+    note: string;
+  };
+  legacy?: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    logos: MasterLogo[];
+    logosCaption: string;
+    milestones: { year: string; text: string }[];
+  };
+  endorsements?: {
+    title: string;
+    lead: string;
+    items: { name: string; text: string; url: string; logo: MasterLogo }[];
+    certificate: { src: string; caption: string; verifyUrl: string };
+  };
+  faculty?: {
+    eyebrow: string;
+    title: { pre: string; mark: string };
+    lead: string;
+    people: {
+      name: string;
+      role: string;
+      company: string;
+      teaches: string;
+      photo?: string;
+      linkedin?: string;
+    }[];
+  };
+  profile?: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    skills: { title: string; text: string }[];
+    closing: { title: string; text: string; punch: string };
+  };
+  cta?: { title: string; mark: string; post: string; text: string };
 }
 
 export interface Master {
@@ -32,7 +101,11 @@ export interface Master {
     columns: { when: string; title: string; text: string }[];
     steps: { title: string; text: string }[];
   };
-  certification: { title: string; text: string; items: { title: string; text: string }[] };
+  certification: {
+    title: string;
+    text: string;
+    items: { title: string; text: string }[];
+  };
   outcomes: {
     title: string;
     stats: { value: string; text: string }[];
@@ -43,6 +116,7 @@ export interface Master {
   faqs: { q: string; a: string }[];
   /** La IA dentro de este máster. */
   ai: { kind: 'subject' | 'module'; where: string };
+  extras?: MasterExtras;
 }
 
 const BIM_ROLES = [
@@ -124,6 +198,86 @@ const BIM_MODULES: MasterModule[] = [
   },
 ];
 
+/** El MBIM: diez plantas, la primera dedicada a la IA, y la IA en todas las demás sobre el proyecto real del curso. */
+const MBIM_MODULES: MasterModule[] = [
+  {
+    title: 'IA para arquitectos e ingenieros',
+    tagline: 'Entender la IA para elegirla bien y construir tus propias herramientas.',
+    phase: 'IA',
+    points: [
+      'Fundamentos de la IA generativa y los modelos de lenguaje, explicados para perfiles AEC',
+      'Mapa de soluciones del mercado y criterios para elegir la mejor en cada caso',
+      'Prompting, asistentes y flujos de trabajo con IA aplicados a proyectos',
+      'Cómo montar tus propios agentes y automatizaciones (Revit + MCP, Claude, ChatGPT, Gemini)',
+      'Datos, seguridad y límites: qué delegar en la IA y qué no',
+    ],
+    ai: 'Entiendes cómo funcionan los modelos de lenguaje y los agentes, comparas las soluciones del mercado con criterio técnico y construyes tus propios flujos (Revit + MCP, automatizaciones). Es la base que aplicas en el resto de módulos.',
+  },
+  {
+    ...BIM_MODULES[0],
+    points: [BIM_MODULES[0].points[0], BIM_MODULES[0].points[2], BIM_MODULES[0].points[1]],
+    ai: 'Asistentes de IA para redactar y revisar protocolos y requisitos de información (EIR, BEP).',
+  },
+  {
+    ...BIM_MODULES[1],
+    ai: 'Modelado en Revit con IA (Revit + MCP) desde cero o a partir de la documentación del Hospital La Laguna.',
+  },
+  {
+    ...BIM_MODULES[2],
+    ai: 'IA para generar escenarios de planificación y detectar desviaciones durante la obra, que arranca en octubre de 2026.',
+  },
+  {
+    ...BIM_MODULES[3],
+    ai: 'Automatización de trazados y extracción de datos del entorno urbano del proyecto.',
+  },
+  {
+    ...BIM_MODULES[4],
+    ai: 'Modelos predictivos de mantenimiento a partir del gemelo digital del hospital.',
+  },
+  {
+    ...BIM_MODULES[5],
+    ai: 'IA como apoyo al control de costes, contratos e informes de seguimiento del proyecto real.',
+  },
+  {
+    ...BIM_MODULES[6],
+    ai: 'Cómo dirigir equipos que trabajan con IA: qué delegar en la máquina y qué decidir tú.',
+  },
+  {
+    ...BIM_MODULES[7],
+    ai: 'Revit + MCP, Claude, ChatGPT, Gemini, generación de imagen y vídeo aplicados al proyecto.',
+  },
+  {
+    ...BIM_MODULES[8],
+    ai: 'Tu portfolio: el Hospital La Laguna, modelado, coordinado y planificado con IA, defendido ante profesionales del sector.',
+  },
+];
+
+const logo = (name: string, file: string, width: number, height: number): MasterLogo => ({ name, src: `/img/mbim/logos/${file}`, width, height });
+
+const MBIM_COMPANY_LOGOS: MasterLogo[] = [
+  logo('Ferrovial', 'ferrovial.png', 900, 196),
+  logo('Estudio Lamela', 'lamela.png', 400, 48),
+  logo('L35 Arquitectos', 'l35.png', 100, 100),
+  logo('IDOM', 'idom.png', 600, 215),
+  logo('Accenture', 'accenture.png', 600, 167),
+  logo('Savills', 'savills.png', 300, 300),
+  logo('Tétris', 'tetris.png', 417, 237),
+  logo('Lantania', 'lantania.png', 987, 236),
+  logo('Hill International', 'hill.png', 900, 599),
+  logo('Fenwick Iribarren', 'fenwick.png', 300, 300),
+  logo('Valladares Ingeniería', 'valladares.png', 970, 190),
+  logo('Daikin', 'daikin.png', 696, 145),
+  logo('TROX', 'trox.png', 352, 93),
+  logo('Uponor', 'uponor.png', 540, 133),
+  logo('Grundfos', 'grundfos.png', 895, 329),
+  logo('Philips', 'philips.png', 900, 164),
+  logo('Isover', 'isover.png', 900, 275),
+  logo('Prysmian', 'prysmian.png', 500, 117),
+  logo('Wolf', 'wolf.png', 800, 242),
+  logo('Ortiz León Arquitectos', 'ortizleon.png', 276, 63),
+  logo('JG Ingenieros', 'jg.png', 324, 95),
+];
+
 const VISA_FAQ = {
   q: '¿Necesito visado para estudiar en IDESIE?',
   a: 'Si eres ciudadano no europeo, necesitarás visado de estudiante. Nuestro equipo de admisiones te ayuda con toda la documentación necesaria.',
@@ -136,51 +290,82 @@ export const MASTERS: Record<MasterSlug, Master> = {
     name: 'Máster BIM',
     mode: 'Presencial',
     eyebrow: 'Máster BIM · Presencial en Madrid · 16 meses',
-    headline: { pre: 'El sector ya construye en digital.', mark: 'Aprende a dirigirlo' },
-    lead: 'Trabajas por la mañana, te formas por la tarde y sales siendo BIM Manager. Con prácticas remuneradas garantizadas desde el primer mes.',
+    headline: {
+      pre: 'En 2011 creamos el Máster BIM. 15 años después, formamos el perfil que las empresas necesitan:',
+      mark: 'el que modela y dirige con IA',
+      post: '.',
+    },
+    lead: 'El Máster BIM más recomendado por las empresas del sector y el primero en España donde la IA no solo revisa: modela en Revit desde cero o a partir de documentación. Trabajas por la mañana, te formas por la tarde y sales preparado para dirigir procesos BIM con IA.',
     facts: [
       { value: '16', label: 'meses de recorrido' },
-      { value: '10 + 6', label: 'Diez meses de formación con prácticas a media jornada, más seis de prácticas a jornada completa.' },
-      { value: '11.000 €', label: 'Ingresos aproximados mientras estudias, abonados mensualmente mediante nómina.' },
-      { value: '2', label: 'Certificaciones al terminar: título propio IDESIE y certificación Cualificam.' },
+      { value: '2011', label: 'Año en que creamos el Máster BIM.' },
+      {
+        value: '15 años',
+        label: 'Formando a los profesionales BIM que el sector contrata.',
+      },
+      { value: '+95 %', label: 'Con empleo a los 6 meses de terminar.' },
+      { value: '100 %', label: 'Prácticas remuneradas garantizadas.' },
+      {
+        value: '1.º',
+        label: 'Máster BIM en España donde la IA ya modela en Revit.',
+      },
     ],
-    phases: ['Fundamentos', 'Ejecución', 'Liderazgo'],
-    modules: BIM_MODULES,
+    phases: ['IA', 'Fundamentos', 'Ejecución', 'Liderazgo'],
+    modules: MBIM_MODULES,
     method: {
-      title: 'Un día partido en dos. Esa es toda la metodología.',
-      lead: 'No es un máster con prácticas al final. Es un trabajo y una formación que empiezan el mismo día.',
+      title: 'Por la mañana en la empresa. Por la tarde en IDESIE. Desde el primer mes.',
+      lead: 'No esperas a acabar para empezar a trabajar. Desde el primer mes haces prácticas remuneradas a media jornada en una empresa del sector y por la tarde te formas con nosotros. Lo que aprendes por la tarde lo aplicas a la mañana siguiente, y la IA está en ambos lados.',
       columns: [
-        { when: 'Por la mañana', title: 'Trabajas', text: 'Prácticas remuneradas en empresas del sector con las que IDESIE tiene acuerdo. Desde el primer mes, no al final del programa.' },
-        { when: 'Por la tarde', title: 'Estudias', text: 'Clases presenciales en Madrid, de lunes a viernes, con profesionales en activo del sector AEC. Lo que ves por la tarde lo aplicas a la mañana siguiente.' },
+        {
+          when: 'Por la mañana',
+          title: 'Trabajas',
+          text: 'Prácticas remuneradas en un estudio, ingeniería o constructora. Nómina desde el primer mes.',
+        },
+        {
+          when: 'Por la tarde',
+          title: 'Te formas',
+          text: 'Presencial en Madrid. Proyectos reales, IA en cada proceso, competencias que demuestras.',
+        },
       ],
       steps: [
-        { title: 'Media jornada', text: 'Desde el inicio y durante 10 meses, prácticas matutinas remuneradas para aplicar lo aprendido esa misma tarde.' },
-        { title: 'Prácticas a jornada completa', text: 'Al terminar la formación, 6 meses adicionales de prácticas remuneradas a jornada completa.' },
-        { title: 'Inserción laboral', text: 'Incorporación definitiva en empresas colaboradoras del sector AEC, muchas veces en la misma donde hiciste prácticas.' },
+        {
+          title: '16 meses',
+          text: 'Diez meses de formación con prácticas a media jornada, más seis de prácticas a jornada completa.',
+        },
+        {
+          title: '≈ 11.000 € brutos',
+          text: 'Ingresos aproximados durante el máster, abonados cada mes mediante nómina.',
+        },
+        {
+          title: '100 % garantizadas',
+          text: 'Prácticas remuneradas en empresas del sector. Certificaciones: Cualificam · AEEN · UDIT · AECOMI.',
+        },
       ],
     },
     certification: {
-      title: 'Certificado por Cualificam y alineado con ISO 19650.',
-      text: 'El MBIM cuenta con la certificación Cualificam de la Fundación para el Conocimiento Madri+d, que evalúa y certifica programas de Máster Profesional bajo estándares del Espacio Europeo de Educación Superior. Es la única de los másteres de IDESIE que la posee.',
-      items: [
-        { title: 'Diploma normalizado', text: 'Certificado con trazabilidad digital, incluido en el Registro de Programas Certificados Cualificam.' },
-        { title: 'Estándar internacional', text: 'Programa alineado con ISO 19650, la norma que rige la gestión de la información en proyectos BIM.' },
-        { title: 'Red de empresas', text: 'Estudios de arquitectura, ingenierías, constructoras y empresas de facility management, españolas e internacionales.' },
-      ],
+      title: 'Certificaciones y avales',
+      text: 'Máster profesional certificado por Cualificam (Fundación para el Conocimiento madri+d), alineado con ISO 19650 y respaldado por AEEN, UDIT y AECOMI.',
+      items: [],
     },
     outcomes: {
       title: 'A dónde llegas cuando terminas.',
       stats: [
-        { value: '95%', text: 'de los alumnos consigue empleo en los seis meses posteriores, muchos en la empresa donde hicieron prácticas.' },
-        { value: '100%', text: 'de las prácticas están garantizadas: IDESIE asigna la empresa según tu perfil y tu rendimiento.' },
+        {
+          value: '95%',
+          text: 'de los alumnos consigue empleo en los seis meses posteriores, muchos en la empresa donde hicieron prácticas.',
+        },
+        {
+          value: '100%',
+          text: 'de las prácticas están garantizadas y remuneradas: IDESIE asigna la empresa desde el primer mes.',
+        },
       ],
-      roles: BIM_ROLES,
+      roles: [{ ...BIM_ROLES[0], focus: 'Modelado y producción, ya con IA' }, ...BIM_ROLES.slice(1)],
       note: 'Horquillas de salario bruto anual correspondientes a los perfiles profesionales a los que da acceso el programa.',
     },
     requirements: [
       'Título universitario oficial de Ingeniero, Arquitecto o equivalente',
-      'Pasión por la transformación digital del sector AEC mediante BIM',
-      'Compromiso con la metodología Learning by Working (mañanas trabajando, tardes estudiando)',
+      'Pasión por la transformación digital del sector AEC mediante BIM e IA',
+      'Compromiso con la metodología Learning by Working: mañanas trabajando, tardes estudiando',
       'Nivel de inglés técnico suficiente para documentación BIM internacional',
       'Disponibilidad para asistir presencialmente en Madrid durante 16 meses',
       'Motivación para liderar equipos multidisciplinares en proyectos BIM',
@@ -198,11 +383,247 @@ export const MASTERS: Record<MasterSlug, Master> = {
         q: '¿Qué salidas profesionales tiene este máster?',
         a: 'Podrás trabajar como BIM Modeler, BIM Coordinator, Especialista MEP o Project Manager Junior. Más del 95 % de los alumnos consigue empleo en los 6 meses posteriores, muchos directamente en la empresa donde realizaron prácticas.',
       },
-      { q: '¿Dónde está IDESIE?', a: 'Nuestro campus está en Madrid, en Plaza de Castilla, una zona bien comunicada con transporte público.' },
-      { q: '¿Puedo visitar la escuela?', a: 'Sí, puedes agendar una visita a nuestras instalaciones. Contáctanos para coordinar una fecha que se ajuste a tu disponibilidad.' },
+      {
+        q: '¿Necesito saber de IA para entrar?',
+        a: 'No. El máster incluye un módulo específico de fundamentos de IA para arquitectos e ingenieros, y a partir de ahí la aplicas en todos los demás módulos sobre el proyecto real.',
+      },
+      {
+        q: '¿Dónde está IDESIE?',
+        a: 'Nuestro campus está en Madrid, en Plaza de Castilla, una zona bien comunicada con transporte público.',
+      },
+      {
+        q: '¿Puedo visitar la escuela?',
+        a: 'Sí, puedes agendar una visita a nuestras instalaciones. Contáctanos para coordinar una fecha que se ajuste a tu disponibilidad.',
+      },
       VISA_FAQ,
     ],
-    ai: { kind: 'subject', where: 'Módulo Innovation y asignatura «IA aplicada a la Arquitectura»' },
+    ai: {
+      kind: 'subject',
+      where: 'Módulo «IA para arquitectos e ingenieros» y la IA en todos los demás módulos',
+    },
+    extras: {
+      hero: {
+        cta: 'Quiero ser ese perfil',
+        secondary: {
+          label: 'Ver el proyecto de este curso',
+          href: '#proyecto',
+        },
+      },
+      modulesIntro: {
+        title: {
+          pre: '10 módulos, una sola obra. Y la IA en',
+          mark: 'todas las plantas',
+          post: '.',
+        },
+        lead: 'Cada módulo es una planta más del mismo edificio, de los cimientos al proyecto que defiendes. Este curso, ese edificio es el Hospital La Laguna. La IA no es una asignatura aparte: recorre todas las plantas como la estructura del edificio. Y para que sepas usarla con criterio, el edificio arranca con una planta dedicada a sus fundamentos, antes de empezar con el BIM. Pulsa una planta para ver qué haces en ella.',
+      },
+      aiProof: {
+        eyebrow: 'Prueba, no promesa',
+        title: {
+          pre: 'El sector usa la IA para revisar. Nosotros la usamos para',
+          mark: 'modelar',
+        },
+        lead: 'En la mayoría de estudios y constructoras la IA sirve para revisar modelos, extraer información o redactar informes. En IDESIE hemos ido un paso más allá: modelamos edificios en Revit con IA, desde cero o a partir de la documentación del proyecto. Y no es una demostración: forma parte de cómo trabajamos cada proceso y protocolo BIM del máster.',
+        pillars: [
+          {
+            kicker: '01 · Modelar',
+            title: 'De planos a modelo Revit',
+            text: 'Documentación de entrada, modelo Revit de salida. Con IA, a través de Revit + MCP, y con criterio sobre qué se automatiza y qué no.',
+          },
+          {
+            kicker: '02 · Gestionar',
+            title: 'Procesos y protocolos con IA',
+            text: 'Flujos, protocolos y entregables BIM diseñados y revisados con IA, bajo ISO 19650, de principio a fin.',
+          },
+          {
+            kicker: '03 · Dirigir',
+            title: 'Equipos que ya trabajan así',
+            text: 'Aprendes a liderar equipos que modelan y validan con IA, decidiendo qué hace la máquina y qué hace la persona.',
+          },
+        ],
+        quote: 'No se puede dirigir lo que no se entiende. Por eso aquí primero lo haces y luego lo gestionas.',
+      },
+      realProject: {
+        eyebrow: 'Proyecto real · Curso 2026-27',
+        title: 'No simulas un proyecto. Formas parte de uno.',
+        lead: 'Cada promoción se integra en el equipo de diseño y construcción de un proyecto real y participa en todos los procesos BIM, del primer modelo a la entrega de obra. Este curso, el proyecto es el Hospital La Laguna: diseño y construcción, con inicio de obras en octubre de 2026. Lo que modelas, coordinas y planificas con IA en clase es lo que se construye.',
+        name: 'Hospital La Laguna',
+        specs: [
+          { label: 'Alcance', value: 'Diseño y construcción' },
+          { label: 'Inicio de obras', value: 'Octubre 2026' },
+          {
+            label: 'Tu papel',
+            value: 'Integrado en el equipo de diseño y construcción',
+          },
+          { label: 'Procesos', value: 'Todos los procesos BIM, con IA' },
+        ],
+        steps: [
+          {
+            title: 'Diseño y modelado',
+            text: 'Modelo federado del hospital en Revit, con IA desde la documentación de proyecto.',
+          },
+          {
+            title: 'Coordinación',
+            text: 'Disciplinas, interferencias y decisiones con el equipo real de proyecto.',
+          },
+          {
+            title: 'Planificación y obra',
+            text: 'Fases, mediciones y seguimiento de ejecución a partir de octubre de 2026.',
+          },
+          {
+            title: 'Entrega',
+            text: 'Entregables, protocolos y requisitos de información bajo ISO 19650.',
+          },
+        ],
+        note: 'Es el único máster BIM que desarrolla toda la formación sobre un proyecto real, participando en todos sus procesos.',
+      },
+      legacy: {
+        eyebrow: 'Desde 2011',
+        title: 'El Máster BIM nació aquí. Y el sector lo sabe.',
+        lead: 'En 2011 creamos el primer Máster BIM de España, cuando casi nadie en el sector hablaba de BIM. Quince años después, nuestros alumnos dirigen departamentos BIM en los estudios, ingenierías y constructoras de referencia, y esas mismas empresas son las que recomiendan el máster a quienes quieren entrar.',
+        logos: MBIM_COMPANY_LOGOS,
+        logosCaption: 'Empresas que contratan y recomiendan a alumnos de IDESIE.',
+        milestones: [
+          {
+            year: '2011',
+            text: 'Creamos el Máster BIM, el primero en España.',
+          },
+          {
+            year: '2023',
+            text: 'Certificación Cualificam alineada con ISO 19650, otorgada por la Fundación para el Conocimiento madri+d.',
+          },
+          {
+            year: '2026',
+            text: 'Primer máster BIM donde la IA modela en Revit desde cero o a partir de documentación.',
+          },
+        ],
+      },
+      endorsements: {
+        title: 'Certificaciones y avales',
+        lead: 'Un máster propio con reconocimiento externo: certificado como máster profesional y respaldado por las entidades de referencia en escuelas de negocio, universidad y sector.',
+        items: [
+          {
+            name: 'Cualificam',
+            text: 'Certificación de Máster Profesional de la Fundación para el Conocimiento madri+d. Alineado con ISO 19650.',
+            url: 'https://cualificam.com',
+            logo: logo('Cualificam', 'cualificam.png', 800, 183),
+          },
+          {
+            name: 'AEEN',
+            text: 'Asociación Española de Escuelas de Negocios.',
+            url: 'https://aeen.org',
+            logo: logo('AEEN', 'aeen.png', 307, 76),
+          },
+          {
+            name: 'UDIT',
+            text: 'Universidad de Diseño, Innovación y Tecnología.',
+            url: 'https://udit.es',
+            logo: logo('UDIT', 'udit.png', 700, 347),
+          },
+          {
+            name: 'AECOMI',
+            text: 'Certificación BIM de AECOMI.',
+            url: 'https://aecomi.org',
+            logo: logo('AECOMI', 'aecomi.png', 606, 117),
+          },
+        ],
+        certificate: {
+          src: '/img/mbim/certificado-cualificam.jpg',
+          caption: 'Certificado n.º FMID-CMP23-00020 · Madrid, 1 de marzo de 2024 · Renovación: 01/03/2030',
+          verifyUrl: 'https://www.madrimasd.org/universidades/cualificam/cve/3ab6e510-3e5b-454a-bcd2-7ab086aa8a38',
+        },
+      },
+      faculty: {
+        eyebrow: 'Quién te forma',
+        title: {
+          pre: 'Profesionales que dirigen el BIM en el sector.',
+          mark: 'No académicos',
+        },
+        lead: 'Cada profesor trabaja hoy en una empresa de referencia y enseña lo que hace cada día. Lo que ves en clase por la tarde es lo que ellos han aplicado esa misma mañana.',
+        people: [
+          {
+            name: 'José Carlos Martín Mateos',
+            role: 'Arquitecto y matemático · Responsable de IA y BIM',
+            company: 'L35 Architects',
+            teaches: 'Dirección de la IA aplicada: modelado en Revit con IA y protocolos.',
+          },
+          {
+            name: 'Martin Murphy',
+            role: 'Director División Calidad y Sistemas',
+            company: 'Hill International',
+            teaches: 'Gestión BIM y coordinación sobre el proyecto real.',
+            photo: '/img/mbim/martin-murphy.jpg',
+            linkedin: 'https://www.linkedin.com/in/martin-murphy-2a453129/',
+          },
+          {
+            name: 'Javier López',
+            role: 'National Digital Development Lead',
+            company: 'SES Engineering Services · Londres',
+            teaches: 'Transformación digital y BIM en empresas de ingeniería y construcción.',
+            photo: '/img/mbim/javier-lopez.jpg',
+            linkedin: 'https://www.linkedin.com/in/javierlopezuk/',
+          },
+          {
+            name: 'Concepción Jerez',
+            role: 'Director of Cost Management',
+            company: 'Hill International',
+            teaches: 'Control de costes y contratación en entorno BIM (5D).',
+            photo: '/img/mbim/concepcion-jerez.jpg',
+            linkedin: 'https://www.linkedin.com/in/concepci%C3%B3n-jerez-linde-63a30492/',
+          },
+          {
+            name: 'Javier Valladares',
+            role: 'Director',
+            company: 'Valladares Ingeniería SL',
+            teaches: 'Ingeniería de instalaciones (MEP) y coordinación en BIM.',
+            photo: '/img/mbim/javier-valladares.jpg',
+            linkedin: 'https://www.linkedin.com/in/javier-valladares-81324a11/',
+          },
+          {
+            name: 'Miguel Villamor',
+            role: 'General Manager',
+            company: 'AEC-ON',
+            teaches: 'Tecnología y software BIM: ecosistema de herramientas e interoperabilidad.',
+            photo: '/img/mbim/miguel-villamor.jpg',
+            linkedin: 'https://www.linkedin.com/in/miguelvillamor/',
+          },
+        ],
+      },
+      profile: {
+        eyebrow: 'El perfil que las empresas necesitan',
+        title: 'Las empresas no buscan modeladores. Buscan a quien sepa dirigir el BIM con IA.',
+        lead: 'La IA ya produce modelos, informes y comprobaciones. Lo que escasea es quien sepa diseñar el proceso, fijar el protocolo, validar el resultado y liderar al equipo. Ese es el perfil que formamos: profesionales BIM que entienden la IA porque la han usado para modelar, y que por eso saben dirigirla.',
+        skills: [
+          {
+            title: 'Dirigir',
+            text: 'Liderar proyectos y equipos BIM bajo ISO 19650, con la IA integrada en cada fase.',
+          },
+          {
+            title: 'Diseñar procesos',
+            text: 'Definir protocolos, flujos y entregables BIM que incorporan IA de principio a fin.',
+          },
+          {
+            title: 'Modelar con IA',
+            text: 'Generar modelos Revit desde cero o desde documentación, y saber cuándo conviene hacerlo.',
+          },
+          {
+            title: 'Validar',
+            text: 'Revisar, auditar y extraer información de modelos con IA con criterio profesional.',
+          },
+        ],
+        closing: {
+          title: 'No te formamos por asignaturas. Te formamos en competencias.',
+          text: 'Cada módulo termina cuando sabes hacer algo que antes no sabías y puedes demostrarlo en un proyecto real.',
+          punch: 'Por eso no sales con un expediente: sales con un portfolio.',
+        },
+      },
+      cta: {
+        title: 'Llevamos 15 años formando a quienes dirigen el BIM.',
+        mark: 'Ahora, con IA',
+        post: '. El siguiente puedes ser tú.',
+        text: 'Plazas limitadas por el número de prácticas remuneradas disponibles. Cuéntanos tu perfil y te decimos con franqueza, en 48 h, si encajas.',
+      },
+    },
   },
 
   mbbe: {
