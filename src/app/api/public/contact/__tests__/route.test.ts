@@ -203,6 +203,23 @@ describe('POST /api/public/contact — landing lead', () => {
     expect(state.inserted).toBeNull();
   });
 
+  it('guarda la modalidad elegida en la landing del máster como "needs", junto a la atribución', async () => {
+    const res = await post({ ...lead(), email: 'ana@tienda.es', interest: 'Máster BIM Online', page: '/landing', message: 'Inscripción desde la landing: Máster BIM Online.' });
+    expect(res.status).toBe(200);
+    expect(state.inserted.answers).toEqual({
+      needs: ['Máster BIM Online'],
+      budget: '',
+      timeline: '',
+      utm: { utm_source: 'facebook', utm_campaign: 'otoño', fbclid: 'abc123' },
+    });
+    expect(state.inserted.message).toBe('Inscripción desde la landing: Máster BIM Online.\n\nOrigen: /landing');
+  });
+
+  it('guarda la modalidad aunque la visita no venga de un anuncio', async () => {
+    await post({ ...lead(), utm: undefined, interest: 'Máster BIM Presencial (Madrid)' });
+    expect(state.inserted.answers).toEqual({ needs: ['Máster BIM Presencial (Madrid)'], budget: '', timeline: '' });
+  });
+
   it('does not let the website form skip the email by claiming source=landing on a call', async () => {
     const res = await post({ ...lead(), kind: 'call', email: '' });
     expect(res.status).toBe(400);

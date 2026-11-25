@@ -1,0 +1,296 @@
+/*
+ * Landing del Máster BIM (presencial + online).
+ * Un solo motivo: la losa de un forjado vista en axonométrica, la vista 3D por defecto de un modelo BIM.
+ * Su canto achaflanado recorta las fotos y los botones; la losa entera, apilada, es el edificio del hero.
+ * Todo va dentro de .lx para no tocar el resto de la web.
+ */
+
+.lx {
+  --ground: #050d1d;
+  --ground-2: #0b1a33;
+  --ground-3: #10244a;
+  --ink: #f3f7ff;
+  --muted: #c3d2ea;
+  --blue: #0063e6;
+  --blue-hi: #3d8bff;
+  --blue-mid: #0058d6;
+  --blue-lo: #0042a3;
+  --blue-deep: #002e75;
+  --paper: #dbe8ff;
+  --paper-ink: #0a1f44;
+  --paper-muted: #2a4270;
+  --sky: #8fc0ff;
+  --field: #0050c8;
+  --field-hover: #0a58d2;
+  --field-focus: #0042a3;
+  --on-blue-soft: #e9f2ff;
+  --warn: #ffe08a;
+
+  --chamfer: 14px;
+  --chamfer-lg: 44px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  background: var(--ground);
+  color: var(--ink);
+  color-scheme: dark;
+  font-family: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  overflow-x: clip;
+}
+
+.lx ::selection {
+  background: var(--blue);
+  color: #fff;
+}
+html:has(.lx) {
+  scrollbar-color: var(--blue-lo) #050d1d;
+  background: #050d1d;
+}
+.lx input {
+  caret-color: #fff;
+}
+
+.lx .display {
+  font-family: 'Unbounded Variable', 'Unbounded', 'Inter Variable', sans-serif;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+/* El chaflán de la losa: el único recorte de la página */
+.lx .cut {
+  clip-path: polygon(var(--chamfer) 0, 100% 0, 100% calc(100% - var(--chamfer)), calc(100% - var(--chamfer)) 100%, 0 100%, 0 var(--chamfer));
+}
+.lx .cut-lg {
+  clip-path: polygon(var(--chamfer-lg) 0, 100% 0, 100% calc(100% - var(--chamfer-lg)), calc(100% - var(--chamfer-lg)) 100%, 0 100%, 0 var(--chamfer-lg));
+}
+
+/* Botón: relleno plano con el chaflán. Una sola forma en toda la página. */
+.lx .btn-slab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.5rem;
+  padding: 0 1.75rem;
+  font-weight: 700;
+  font-size: 1rem;
+  background: var(--blue);
+  color: #fff;
+  clip-path: polygon(var(--chamfer) 0, 100% 0, 100% calc(100% - var(--chamfer)), calc(100% - var(--chamfer)) 100%, 0 100%, 0 var(--chamfer));
+  transition: background-color 200ms var(--ease), transform 200ms var(--ease);
+  cursor: pointer;
+}
+.lx .btn-slab:hover {
+  background: var(--blue-hi);
+}
+.lx .btn-slab:active {
+  transform: translateY(1px) scale(0.985);
+}
+.lx .btn-slab.on-blue {
+  background: var(--ground);
+}
+.lx .btn-slab.on-blue:hover {
+  background: var(--ground-3);
+}
+.lx .btn-slab.on-paper {
+  background: var(--paper-ink);
+}
+.lx .btn-slab.on-paper:hover {
+  background: var(--blue-lo);
+}
+.lx .btn-slab svg {
+  transition: transform 200ms var(--ease);
+}
+.lx .btn-slab:hover svg {
+  transform: translateX(3px);
+}
+
+.lx a:focus-visible,
+.lx button:focus-visible,
+.lx input:focus-visible,
+.lx select:focus-visible,
+.lx [tabindex]:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 3px;
+}
+
+.lx .link {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  transition: text-decoration-color 200ms var(--ease);
+}
+.lx .link:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ===== Edificio de losas ===== */
+.lx .tower-floor {
+  transition: transform 520ms var(--ease);
+}
+.lx .tower-floor .slab-top {
+  transition: fill 320ms var(--ease);
+}
+.lx .tower.assemble .tower-floor {
+  animation: lx-drop 820ms var(--ease) both;
+  animation-delay: calc(var(--i) * 95ms + 120ms);
+}
+@keyframes lx-drop {
+  from {
+    opacity: 0;
+    translate: 0 -90px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* ===== Fotos: deriva lenta y fundido mañana/tarde ===== */
+.lx .drift {
+  animation: lx-drift 22s ease-in-out infinite alternate;
+  transform-origin: 60% 40%;
+}
+@keyframes lx-drift {
+  from {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.1) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+/* ===== Entradas al hacer scroll (sin JS el contenido se ve igual) ===== */
+.lx .rise {
+  opacity: 1;
+}
+.lx.js .rise:not(.in) {
+  opacity: 0;
+  transform: translateY(26px);
+}
+.lx.js .rise {
+  transition: opacity 700ms var(--ease), transform 700ms var(--ease);
+  transition-delay: var(--d, 0ms);
+}
+
+/* ===== Cupón de inscripción ===== */
+.lx .coupon {
+  --notch: 15px;
+  position: relative;
+  background: var(--blue);
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at 46% 0, #0000 98%, #000) top / 100% 51% no-repeat, /* taste-skill-ignore */
+    radial-gradient(circle var(--notch) at 46% 100%, #0000 98%, #000) bottom / 100% 51% no-repeat; /* taste-skill-ignore */
+  mask:
+    radial-gradient(circle var(--notch) at 46% 0, #0000 98%, #000) top / 100% 51% no-repeat, /* taste-skill-ignore */
+    radial-gradient(circle var(--notch) at 46% 100%, #0000 98%, #000) bottom / 100% 51% no-repeat; /* taste-skill-ignore */
+}
+.lx .perforation {
+  position: absolute;
+  top: calc(var(--notch) + 10px);
+  bottom: calc(var(--notch) + 10px);
+  left: 46%;
+  width: 6px;
+  margin-left: -3px;
+  background: radial-gradient(circle, var(--ground) 2.6px, transparent 3px) 0 0 / 6px 16px repeat-y; /* taste-skill-ignore */
+}
+@media (max-width: 1023px) {
+  /* En móvil el cupón se corta en horizontal: la perforación va en el flujo, entre los datos y el formulario */
+  .lx .coupon {
+    -webkit-mask: none;
+    mask: none;
+  }
+  .lx .perforation-row {
+    display: block;
+    height: 6px;
+    margin: 0 1.75rem;
+    background: radial-gradient(circle, var(--ground) 2.6px, transparent 3px) 0 0 / 16px 6px repeat-x; /* taste-skill-ignore */
+  }
+}
+
+.lx .field {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0 1rem;
+  font-size: 1rem;
+  color: #fff;
+  background: var(--field);
+  border: 2px solid transparent;
+  transition: border-color 160ms var(--ease), background-color 160ms var(--ease);
+}
+.lx .field::placeholder {
+  color: #dceaff;
+  opacity: 1;
+}
+.lx .field:hover {
+  background: var(--field-hover);
+}
+.lx .field:focus {
+  outline: none;
+  border-color: #fff;
+  background: var(--field-focus);
+}
+.lx .field[aria-invalid='true'] {
+  border-color: var(--warn);
+}
+
+.lx .seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.lx .seg label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  font-weight: 700;
+  background: var(--field);
+  color: var(--on-blue-soft);
+  cursor: pointer;
+  transition: background-color 180ms var(--ease), color 180ms var(--ease);
+}
+.lx .seg label:hover {
+  background: var(--field-hover);
+}
+.lx .seg input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.lx .seg label:has(input:checked) {
+  background: var(--ground);
+  color: #fff;
+}
+.lx .seg label:has(input:focus-visible) {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ===== Fichero de preguntas ===== */
+.lx .faq-card {
+  clip-path: polygon(0 40px, var(--tab-x) 40px, calc(var(--tab-x) + 14px) 0, calc(var(--tab-x) + var(--tab-w) - 14px) 0, calc(var(--tab-x) + var(--tab-w)) 40px, 100% 40px, 100% 100%, 0 100%);
+}
+
+/* ===== Marca del pie, hecha de bloques ===== */
+.lx .mark-block {
+  transition: height 600ms var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lx .tower.assemble .tower-floor,
+  .lx .drift {
+    animation: none;
+  }
+  .lx .tower-floor,
+  .lx .mark-block,
+  .lx.js .rise {
+    transition: none;
+  }
+  .lx.js .rise:not(.in) {
+    opacity: 1;
+    transform: none;
+  }
+}

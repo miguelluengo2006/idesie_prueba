@@ -8,7 +8,7 @@ import { FULL_TIME_SLUG } from '@/lib/shop';
  * Eventos de Meta de la landing, sin tocar el contenido:
  *  · ViewContent al cargar (qué programa se mira), para el público «vio el máster».
  *  · ScrollDepth al 50 % y al 90 %, para medir cuánta gente lee de verdad.
- *  · OfferView cuando la oferta entra en pantalla, para retargeting de quien llegó hasta el precio.
+ *  · OfferView cuando el formulario de inscripción entra en pantalla, para retargeting de quien llegó hasta él.
  * Todos esperan al consentimiento de publicidad y se envían una sola vez.
  */
 export default function LandingTracker({ name }: { name: string }) {
@@ -31,7 +31,7 @@ export default function LandingTracker({ name }: { name: string }) {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    const offer = document.getElementById('reserva');
+    const offer = document.getElementById('inscripcion');
     let io: IntersectionObserver | undefined;
     if (offer && 'IntersectionObserver' in window) {
       io = new IntersectionObserver((entries) => {

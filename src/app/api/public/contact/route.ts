@@ -113,11 +113,18 @@ export async function POST(req: NextRequest) {
 
     // Formularios de las páginas de programas: qué programa interesa y desde qué página llega el lead.
     // El programa va como `needs` (el panel y el email ya lo muestran como «Necesita») y el origen, en el mensaje.
-    if (kind === 'proposal' && source === 'website') {
+    // La landing de anuncios también lo manda (Máster BIM presencial u online), junto a la atribución del anuncio.
+    let landingNeeds: string[] | null = null;
+    if (kind === 'proposal') {
       const interest = sanitizeString(body.interest || '', 120);
       const page = typeof body.page === 'string' && /^\/[\w\-/]{0,119}$/.test(body.page) ? body.page : '';
-      if (interest) answers = { needs: [interest], budget: '', timeline: '' };
-      if (page) message = `${message}\n\nOrigen: ${page}`;
+      if (source === 'website') {
+        if (interest) answers = { needs: [interest], budget: '', timeline: '' };
+        if (page) message = `${message}\n\nOrigen: ${page}`;
+      } else if (interest && !body.pack) {
+        landingNeeds = [interest];
+        if (page) message = `${message}\n\nOrigen: ${page}`;
+      }
     }
 
     // Self-hosted deployments serve a single agency — the earliest-created
@@ -149,7 +156,13 @@ export async function POST(req: NextRequest) {
         kind,
         answers:
           answers ??
-          (source === 'landing' && (utm || pack) ? { ...(pack ? { pack } : {}), ...(utm ? { utm } : {}) } : null),
+          (source === 'landing' && (utm || pack || landingNeeds)
+            ? {
+                ...(landingNeeds ? { needs: landingNeeds, budget: '', timeline: '' } : {}),
+                ...(pack ? { pack } : {}),
+                ...(utm ? { utm } : {}),
+              }
+            : null),
       })
       .select('id')
       .single();
