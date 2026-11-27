@@ -4,6 +4,7 @@ import { AuthProvider } from '@/components/AuthContext';
 import { Suspense } from 'react';
 import CookieConsent from '@/components/CookieConsent';
 import MetaPixel from '@/components/MetaPixel';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 import WebAnalytics from '@/components/WebAnalytics';
 import JsonLd from '@/components/JsonLd';
 import { OG_IMAGES, SITE_URL, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
@@ -65,6 +66,7 @@ export default function RootLayout({
         </AuthProvider>
         <CookieConsent />
         <MetaPixel />
+        <GoogleAnalytics />
         <WebAnalytics />
       </body>
     </html>

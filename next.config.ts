@@ -60,12 +60,13 @@ const nextConfig: NextConfig = {
         value: [
           "default-src 'self'",
           // 'unsafe-eval' solo en desarrollo: React Refresh lo necesita y sin él la web no hidrata (se queda en blanco)
-          `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'"} https://connect.facebook.net`,
+          `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'"} https://connect.facebook.net https://www.googletagmanager.com`,
           "style-src 'self' 'unsafe-inline'",
           "img-src 'self' data: blob: https:",
           "font-src 'self' data:",
           "media-src 'self' https://pub-e87160a916994231bb484c99e8e7ef01.r2.dev",
-          "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.facebook.com https://connect.facebook.net",
+          // Google Analytics 4: el script sale de googletagmanager y las mediciones van a *.google-analytics.com
+          "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.facebook.com https://connect.facebook.net https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com",
           // Calendly: el calendario de las llamadas se muestra incrustado en el formulario
           "frame-src 'self' https://calendly.com",
           "object-src 'none'",

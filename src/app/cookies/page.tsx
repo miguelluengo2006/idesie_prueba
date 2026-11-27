@@ -50,6 +50,12 @@ export default function CookiesPage() {
             <td>No guarda cookies</td>
           </tr>
           <tr>
+            <td>Google Analytics (<code>_ga</code>, <code>_ga_…</code>)</td>
+            <td>Análisis (terceros)</td>
+            <td>Saber cuántas personas visitan la web, qué páginas ven y cuántas se inscriben, para mejorarla. La IP se anonimiza y no se usa para publicidad. <strong>Solo se cargan si aceptas las cookies de análisis.</strong></td>
+            <td>Hasta 2 años</td>
+          </tr>
+          <tr>
             <td>Meta Pixel (<code>_fbp</code>, <code>fr</code>)</td>
             <td>Publicidad (terceros)</td>
             <td>Medir conversiones y mejorar nuestros anuncios en Meta. <strong>Solo se cargan si aceptas las cookies de publicidad.</strong></td>

@@ -2,6 +2,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import { metaTrackCustom } from '@/lib/metaPixel';
+import { gaEvent } from '@/lib/googleAnalytics';
 import { PROGRAM_EVENT, type ProgramKey } from './EnrollForm';
 
 /** Lleva al formulario de inscripción con la modalidad ya elegida. Sin JavaScript, es un enlace normal al formulario. */
@@ -14,6 +15,7 @@ export default function ProgramButton({ program, place, className = '', children
         e.preventDefault();
         if (program) window.dispatchEvent(new CustomEvent(PROGRAM_EVENT, { detail: program }));
         metaTrackCustom('EnrollOpen', { place, program: program || 'sin elegir' });
+        gaEvent('enroll_open', { place, program: program || 'sin elegir' });
         const target = document.getElementById('inscripcion');
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         target?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });

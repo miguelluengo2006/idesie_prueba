@@ -68,6 +68,7 @@ export default function PrivacidadPage() {
         <li><strong>Flywire</strong> — pasarela de pago de matrículas y reservas.</li>
         <li><strong>AECOMI</strong> — entidad certificadora, solo si solicitas la certificación de un perfil profesional.</li>
         <li><strong>Supabase</strong> y el proveedor de alojamiento de la Web (p. ej. Vercel) — almacenamiento de datos, hospedaje y estadísticas anónimas de visitas.</li>
+        <li><strong>Google (Google Analytics)</strong> — estadísticas de uso de la Web, solo si aceptas las cookies de análisis.</li>
         <li>Proveedor de correo electrónico transaccional — envío de confirmaciones, avisos y comunicaciones.</li>
         <li>Herramientas de comunicación que utilices para hablar con nosotros (WhatsApp, videollamadas), bajo sus propias políticas.</li>
         <li>Asesoría fiscal y contable, y las Administraciones públicas cuando la ley lo exija.</li>

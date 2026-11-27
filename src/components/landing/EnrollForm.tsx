@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, Check, Loader2, MessageCircle } from 'lucide-react';
 import { CONTACT } from '@/lib/bim';
 import { metaTrack } from '@/lib/metaPixel';
+import { gaEvent } from '@/lib/googleAnalytics';
 
 export const PROGRAMS = {
   presencial: { label: 'Presencial', interest: 'Máster BIM Presencial (Madrid)', short: 'Máster BIM Presencial' },
@@ -114,6 +115,7 @@ export default function EnrollForm() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'No se pudo enviar. Inténtalo de nuevo.');
       metaTrack('Lead', { content_name: p.short }, data.id ? `lead-${data.id}` : undefined);
+      gaEvent('generate_lead', { form: 'landing_inscripcion', program: p.short });
       setStatus('sent');
     } catch (err: any) {
       setServerError(err.message || 'No se pudo enviar. Inténtalo de nuevo.');
@@ -142,7 +144,10 @@ export default function EnrollForm() {
           href={waHref}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => metaTrack('Contact', { content_name: `WhatsApp · ${p.short}` })}
+          onClick={() => {
+            metaTrack('Contact', { content_name: `WhatsApp · ${p.short}` });
+            gaEvent('whatsapp_click', { place: 'tras_inscripcion', program: p.short });
+          }}
           className="btn-slab on-blue mt-8 w-full sm:w-auto self-start text-lg min-h-16 px-8"
         >
           <MessageCircle className="w-6 h-6" aria-hidden="true" />
